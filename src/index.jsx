@@ -1,7 +1,11 @@
+import { DatabaseEvent } from "nano-sql";
+import * as React from "react";
 import { nSQL } from 'nano-sql'
+import { bindNSQL } from 'nano-sql-react'
+
+import AccountStatus from './components/AccountStatus/AccountStatus'
 
 // let currentUser = 'anton'
-
 // inserting test data for now
 let balanceTable = nSQL('balance').model([
   {key: 'id', type: 'int', props: ['pk', 'ai']},
@@ -15,4 +19,5 @@ balanceTable.connect().then((res) => {
   }).exec()
 })
 
-export {default as AccountStatus} from './components/AccountStatus/AccountStatus'
+const asnsql = bindNSQL(AccountStatus)
+export {asnsql as AccountStatus}

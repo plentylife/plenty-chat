@@ -4,19 +4,19 @@ var path = require('path')
 const common = {
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.jsx?$/,
-        include: [
-          path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'test')
-        ],
-        exclude: /(node_modules|build-module|build-test)/,
-        loader: 'eslint-loader',
-        options: {
-          // eslint options (if necessary)
-        }
-      },
+      // {
+      //   enforce: 'pre',
+      //   test: /\.jsx?$/,
+      //   include: [
+      //     path.resolve(__dirname, 'src'),
+      //     path.resolve(__dirname, 'test')
+      //   ],
+      //   exclude: /(node_modules|build-module|build-test)/,
+      //   loader: 'eslint-loader',
+      //   options: {
+      //     // eslint options (if necessary)
+      //   }
+      // },
       {
         test: /\.jsx?$/,
         include: [
@@ -29,12 +29,15 @@ const common = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    alias: {
+      React: 'react'
+    }
   }
 }
 
 const library = Object.assign({}, common, {
-  entry: './src/index.js',
+  entry: './src/index.jsx',
   output: {
     path: path.resolve(__dirname, 'build-module'),
     filename: 'index.js',
