@@ -10,7 +10,10 @@ class AccountStatus extends PureComponent {
   static onChange (event, complete) {
     console.log('account status changed event', event)
 
-    complete(new Date().getTime())
+    // if (event.affectedRows && event.affectedRows.length > 0) {
+    if (!event.notes.includes('mount')) {
+      complete(event.affectedRows[0].balance)
+    }
   }
 
   render () {
