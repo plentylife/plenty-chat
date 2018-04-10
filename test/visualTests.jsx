@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {AccountStatus} from '../src'
 
 ReactDOM.render(
-  <h1>Hello, world!</h1>,
+  <AccountStatus />,
   document.getElementById('root')
 )

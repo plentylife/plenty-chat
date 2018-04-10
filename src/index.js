@@ -1,6 +1,6 @@
 import { nSQL } from 'nano-sql'
 
-let currentUser = 'anton'
+// let currentUser = 'anton'
 
 // inserting test data for now
 let balanceTable = nSQL('balance').model([

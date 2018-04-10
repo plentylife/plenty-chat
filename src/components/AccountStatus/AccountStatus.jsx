@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {nSQL} from 'nano-sql'
+// import {nSQL} from 'nano-sql'
 
 class AccountStatus extends PureComponent {
   static tables () {

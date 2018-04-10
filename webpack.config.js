@@ -2,21 +2,16 @@ const webpack = require('webpack') // to access built-in plugins
 var path = require('path')
 
 const common = {
-  // entry: {
-  //   components: './src/index.js',
-  //   visualTests: './test/visualTests.jsx'
-  // },
-  // output: {
-  //   path: path.resolve(__dirname, 'build-module'),
-  //   filename: '[name].js',
-  //   libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
-  // },
   module: {
     rules: [
       {
         enforce: 'pre',
-        test: /\.js$/,
-        exclude: /node_modules/,
+        test: /\.jsx?$/,
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'test')
+        ],
+        exclude: /(node_modules|build-module|build-test)/,
         loader: 'eslint-loader',
         options: {
           // eslint options (if necessary)
@@ -32,6 +27,9 @@ const common = {
         loader: 'babel-loader'
       }
     ]
+  },
+  resolve: {
+    extensions: ['.js', '.jsx']
   }
 }
 
@@ -60,7 +58,8 @@ const visualTests = Object.assign({}, common, {
         NODE_ENV: JSON.stringify('development')
       }
     })
-  ]
+  ],
+  devtool: 'inline-source-map'
 })
 
 module.exports = [
