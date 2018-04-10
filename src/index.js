@@ -1,8 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import { nSQL } from "nano-sql";
 
-ReactDOM.render(<App />, document.getElementById('root'));
-registerServiceWorker();
+
+let currentUser = "anton"
+
+// inserting test data for now
+let balanceTable = nSQL("balances").model([
+    {key:'id',type:'int',props:['pk','ai']},
+    {key:'userId', type: 'string'},
+    {key:'balance', type: 'int'}
+]).config({mode: "TEMP"})
+
+balanceTable.connect().then((res) => {
+    return nSQL().query('upsert',{
+        userId:"anton", balance: 20
+    }).exec();
+})
+
+export {default as AccountStatus} from './components/AccountStatus/AccountStatus'
