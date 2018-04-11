@@ -1,7 +1,27 @@
 import React, {PureComponent} from 'react'
-import {getRating, RATING_TABLE} from '../../db/RatingTable';
+import {getRating, RATING_TABLE} from '../../db/RatingTable'
+import Star from './Star'
+import './rating.css'
 
 class Rating extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.state = {
+      starsSelected: this.starsSelected()
+    }
+    this.starsSelected = ::this.starsSelected
+    this.onStarsPreSelect = ::this.onStarsPreSelect
+    this.unselectStars = ::this.unselectStars
+  }
+
+  starsSelected () {
+    return this.props.nSQLdata ? Rating.calcSelectedStars(this.props.nSQLdata, this.props.numStars) : 0
+  }
+
+  static calcSelectedStars (rating, numStars) {
+    return Math.ceil(rating * numStars)
+  }
+
   static tables () {
     return [RATING_TABLE] // listen for changes on this table
   }
@@ -18,9 +38,33 @@ class Rating extends PureComponent {
     })
   }
 
-  render () {
-    return <div>
+  static onStarClick (index) {
+    return () => {
+      this.props.onRating(index)
+    }
+  }
 
+  onStarsPreSelect (index) {
+    this.setState({
+      starsSelected: index + 1
+    })
+  }
+
+  unselectStars () {
+    this.setState({
+      starsSelected: this.starsSelected()
+    })
+  }
+
+  render () {
+    return <div className={'rating-container'}>
+      {Array.from(Array(this.props.numStars).keys()).map(index => {
+        let isFilled = this.state.starsSelected >= index + 1
+        console.log('creating star with index', index)
+        return <Star key={index} isFilled={isFilled} onClick={Rating.onStarClick(index)}
+          onSelect={this.onStarsPreSelect} onUnselect={this.unselectStars} index={index}
+        />
+      })}
     </div>
   }
 }

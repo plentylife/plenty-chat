@@ -1,9 +1,10 @@
 module.exports = {
-    "extends": [
-      "standard",
-      "plugin:react/recommended",
-      "plugin:css-modules/recommended"
-    ],
+  "parser": "babel-eslint",
+  "extends": [
+    "standard",
+    "plugin:react/recommended",
+    "plugin:css-modules/recommended"
+  ],
   "plugins": [
     "css-modules"
   ],

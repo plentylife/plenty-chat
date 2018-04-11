@@ -11,12 +11,16 @@ BalanceTable.onConnected((res) => {
   }).exec()
 })
 
+function onRating (index) {
+  console.log('Selected rating index', index)
+}
+
 function ComponentDisplay () {
   return <div className={'tests-container'}>
     <div><AccountStatus /></div>
     <div>
       Rating
-      <Rating/>
+      <Rating numStars={3} onRating={onRating}/>
     </div>
   </div>
 }
