@@ -12,6 +12,7 @@ class Rating extends PureComponent {
     this.starsSelected = ::this.starsSelected
     this.onStarsPreSelect = ::this.onStarsPreSelect
     this.unselectStars = ::this.unselectStars
+    this.onStarClick = ::this.onStarClick
   }
 
   starsSelected () {
@@ -38,7 +39,7 @@ class Rating extends PureComponent {
     })
   }
 
-  static onStarClick (index) {
+  onStarClick (index) {
     return () => {
       this.props.onRating(index)
     }
@@ -61,7 +62,7 @@ class Rating extends PureComponent {
       {Array.from(Array(this.props.numStars).keys()).map(index => {
         let isFilled = this.state.starsSelected >= index + 1
         console.log('creating star with index', index)
-        return <Star key={index} isFilled={isFilled} onClick={Rating.onStarClick(index)}
+        return <Star key={index} isFilled={isFilled} onClick={this.onStarClick(index)}
           onSelect={this.onStarsPreSelect} onUnselect={this.unselectStars} index={index}
         />
       })}
