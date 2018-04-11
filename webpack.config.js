@@ -59,7 +59,8 @@ const visualTests = Object.assign({}, common, {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('development')
-      }
+      },
+      'DB_MODE': JSON.stringify('TEMP')
     })
   ],
   devtool: 'inline-source-map'
