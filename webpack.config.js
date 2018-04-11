@@ -18,6 +18,10 @@ const common = {
       //   }
       // },
       {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
+      },
+      {
         test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, 'src'),

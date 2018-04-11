@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import {AccountStatus, Rating} from '../src/index'
 import {nSQL} from 'nano-sql'
 import BalanceTable from '../src/db/UserTable'
+import './visualTests.css'
 
 BalanceTable.onConnected((res) => {
   return nSQL().query('upsert', {
@@ -11,9 +12,12 @@ BalanceTable.onConnected((res) => {
 })
 
 function ComponentDisplay () {
-  return <div>
+  return <div className={'tests-container'}>
     <div><AccountStatus /></div>
-    <div><Rating/></div>
+    <div>
+      Rating
+      <Rating/>
+    </div>
   </div>
 }
 

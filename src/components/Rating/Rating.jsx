@@ -20,7 +20,7 @@ class Rating extends PureComponent {
 
   render () {
     return <div>
-      Rating {this.props.nSQLdata}
+
     </div>
   }
 }
