@@ -9,7 +9,7 @@
 # production
 /build
 /build-module
-/build-tests
+build-tests
 
 # misc
 .DS_Store

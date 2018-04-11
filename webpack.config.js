@@ -4,19 +4,19 @@ var path = require('path')
 const common = {
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.jsx?$/,
-        include: [
-          path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'test')
-        ],
-        exclude: /(node_modules|build-module|build-test)/,
-        loader: 'eslint-loader',
-        options: {
-          // eslint options (if necessary)
-        }
-      },
+      // {
+      //   enforce: 'pre',
+      //   test: /\.jsx?$/,
+      //   include: [
+      //     path.resolve(__dirname, 'src'),
+      //     path.resolve(__dirname, 'test')
+      //   ],
+      //   exclude: /(node_modules|build-module|build-test)/,
+      //   loader: 'eslint-loader',
+      //   options: {
+      //     // eslint options (if necessary)
+      //   }
+      // },
       {
         test: /\.jsx?$/,
         include: [
@@ -32,7 +32,13 @@ const common = {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {
       React: 'react'
-    }
+    },
+    modules: [
+      path.resolve('./src/components'),
+      path.resolve('./src/db'),
+      path.resolve('./src/state'),
+      path.resolve('./node_modules')
+    ]
   }
 }
 
