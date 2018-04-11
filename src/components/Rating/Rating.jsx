@@ -61,7 +61,6 @@ class Rating extends PureComponent {
     return <div className={'rating-container'}>
       {Array.from(Array(this.props.numStars).keys()).map(index => {
         let isFilled = this.state.starsSelected >= index + 1
-        console.log('creating star with index', index)
         return <Star key={index} isFilled={isFilled} onClick={this.onStarClick(index)}
           onSelect={this.onStarsPreSelect} onUnselect={this.unselectStars} index={index}
         />

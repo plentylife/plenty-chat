@@ -4,8 +4,6 @@ import './star.css'
 
 export default class Star extends React.PureComponent {
   render () {
-    console.log('star state', this.props.isFilled)
-
     return <div onClick={this.props.onClick} className={'star-container'} onMouseOver={() => {
       this.props.onSelect(this.props.index)
     }} onMouseOut={this.props.onUnselect}>
