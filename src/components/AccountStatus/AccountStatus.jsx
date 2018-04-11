@@ -10,9 +10,9 @@ class AccountStatus extends PureComponent {
     console.log('account status changed event', event)
 
     let q = getBalanceById(this.props.userId)
-    console.log('account status query result', q)
 
     q.then((rows) => {
+      console.log('account status query result', rows, 'for', this.props.userId)
       complete(rows.length > 0 ? rows[0].balance : null)
     })
 
@@ -28,7 +28,7 @@ class AccountStatus extends PureComponent {
   }
 
   render () {
-    console.log("render", this.props.nSQLdata, AccountStatus.Unavailable)
+    console.log("render", this.props.nSQLdata)
     return <div>
             Account balance {
         this.props.nSQLdata ? this.props.nSQLdata : <AccountStatus.Unavailable/>

@@ -8,8 +8,6 @@ const userTable = nSQL(USER_TABLE).model([
   {key: 'balance', type: 'int'}
 ]).config({mode: DB_MODE ? DB_MODE : 'PERM'}) // eslint-disable-line
 
-userTable.connect()
-
 export function getBalanceById (userId) {
   return userTable.query('select', ['balance']).where(['userId', '=', userId]).exec()
 }
