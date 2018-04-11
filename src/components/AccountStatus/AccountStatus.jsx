@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {getBalanceById} from '../../db/UserTable'
 
 // import {nSQL} from 'nano-sql'
 
@@ -10,9 +11,10 @@ class AccountStatus extends PureComponent {
   static onChange (event, complete) {
     console.log('account status changed event', event)
 
-    // if (event.affectedRows && event.affectedRows.length > 0) {
     if (!event.notes.includes('mount')) {
       complete(event.affectedRows[0].balance)
+    } else {
+      getBalanceById(this.props.userId)
     }
   }
 

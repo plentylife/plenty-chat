@@ -4,19 +4,19 @@ var path = require('path')
 const common = {
   module: {
     rules: [
-      // {
-      //   enforce: 'pre',
-      //   test: /\.jsx?$/,
-      //   include: [
-      //     path.resolve(__dirname, 'src'),
-      //     path.resolve(__dirname, 'test')
-      //   ],
-      //   exclude: /(node_modules|build-module|build-test)/,
-      //   loader: 'eslint-loader',
-      //   options: {
-      //     // eslint options (if necessary)
-      //   }
-      // },
+      {
+        enforce: 'pre',
+        test: /\.jsx?$/,
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'test')
+        ],
+        exclude: /(node_modules|build-module|build-test)/,
+        loader: 'eslint-loader',
+        options: {
+          // eslint options (if necessary)
+        }
+      },
       {
         test: /\.jsx?$/,
         include: [

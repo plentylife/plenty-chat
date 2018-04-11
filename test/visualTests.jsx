@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {AccountStatus} from '../src/index'
 import {nSQL} from 'nano-sql'
-import BalanceTable from '../src/db/balanceTable'
+import BalanceTable from '../src/db/UserTable'
 
 BalanceTable.onConnected((res) => {
   return nSQL().query('upsert', {

@@ -1,9 +1,10 @@
-import { nSQL } from 'nano-sql'
 import { bindNSQL } from 'nano-sql-react'
-
+import React from 'react'
+import {currentUser} from './state/GlobalState'
 import AccountStatus from './components/AccountStatus/AccountStatus'
 
-// let currentUser = 'anton'
-
-const asnsql = bindNSQL(AccountStatus)
-export {asnsql as AccountStatus}
+const ASnsql = bindNSQL(AccountStatus)
+function ASFilled () {
+  return <ASnsql userId={currentUser}/>
+}
+export {ASFilled as AccountStatus}
