@@ -5,7 +5,13 @@ export const MESSAGE_TABLE = 'Message'
 
 const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
-  {key: 'community', type: COMMUNITY_TABLE}
+  {key: 'communityId', type: COMMUNITY_TABLE}
 ]).config({mode: DB_MODE ? DB_MODE : 'PERM'}) // eslint-disable-line
+
+export function createMessage (id, communityId) {
+  nSQL(MESSAGE_TABLE).query('upsert', {
+    id: id, communityId: communityId
+  }).exec()
+}
 
 export default messageTable
