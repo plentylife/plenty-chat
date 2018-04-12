@@ -9,7 +9,7 @@ const messageTable = nSQL(MESSAGE_TABLE).model([
 ]).config({mode: DB_MODE ? DB_MODE : 'PERM'}) // eslint-disable-line
 
 export function createMessage (id, communityId) {
-  nSQL(MESSAGE_TABLE).query('upsert', {
+  return nSQL(MESSAGE_TABLE).query('upsert', {
     id: id, communityId: communityId
   }).exec()
 }
