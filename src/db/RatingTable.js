@@ -12,7 +12,9 @@ const ratingTable = nSQL(RATING_TABLE).model([
 
 export function getRating (userId, messageId) {
   return ratingTable.query('select', ['rating'])
-    .where([['userId', '=', userId], 'AND', ['messageId', '=', messageId]]).exec()
+    .where([['userId', '=', userId], 'AND', ['messageId', '=', messageId]]).exec().then(row => {
+      return row.length > 0 ? row[0].rating : null
+    })
 }
 
 export default ratingTable

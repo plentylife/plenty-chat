@@ -1,5 +1,4 @@
-import { bindNSQL } from 'nano-sql-react'
-// import React from 'react'
+import {bindNSQL} from 'nano-sql-react'
 import AccountStatus from './components/AccountStatus/AccountStatus'
 import Rating from './components/Rating/Rating'
 
