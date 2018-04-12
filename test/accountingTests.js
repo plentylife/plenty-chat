@@ -1,0 +1,39 @@
+// @flow
+
+import test from 'ava'
+import {getBalance, setBalance} from '../src/db/UserWalletTable'
+import {hasEnoughFunds} from '../src/accounting/Accounting'
+import {nSQL} from 'nano-sql'
+import {defaultCreditLimit} from '../src/accounting/AccountingGlobals'
+
+const USER_ID = 'uid'
+const COMMUNITY_ID = 'cid'
+
+nSQL().connect().then(() => {
+  test.serial('has enough funds', async t => {
+    await setBalance(USER_ID, COMMUNITY_ID, 0)
+    const c = await hasEnoughFunds(USER_ID, COMMUNITY_ID, 1)
+    t.true(c)
+  })
+
+  test.serial('does not have enough funds', async t => {
+    await setBalance(USER_ID, COMMUNITY_ID, -1 * defaultCreditLimit)
+    const c = await hasEnoughFunds(USER_ID, COMMUNITY_ID, 1)
+    t.false(c)
+  })
+
+  test.serial('setBalance does not affect existing credit limit', async t => {
+    await setBalance(USER_ID, COMMUNITY_ID, 0)
+    const b = await getBalance(USER_ID, COMMUNITY_ID)
+
+    t.is(b.creditLimit, defaultCreditLimit)
+  })
+
+  test('improper fund check', t => {
+    t.throws(() => {
+      hasEnoughFunds(USER_ID, COMMUNITY_ID)
+    })
+  })
+
+  test.todo('balance cannot be set below credit limit')
+})
