@@ -1,9 +1,11 @@
 // @flow
 
 import test from 'ava'
-import {createMessage, getMessage} from '../src/db/MessageTable'
+import {pushMessage, getMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
 import {sendMessage} from '../src/actions/MessageActions'
+import {setBalance} from '../src/db/UserWalletTable'
+import {defaultCreditLimit} from '../src/accounting/AccountingGlobals'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
 
@@ -15,20 +17,27 @@ nSQL().connect().then(() => {
     const MSG_ID = 'tmid_simple'
     t.plan(2)
 
-    await createMessage(MSG_ID, 'tcid')
+    await pushMessage(MSG_ID, 'tcid')
     const qGet = await getMessage(MSG_ID)
 
-    // $FlowFixMe
     t.truthy(qGet)
     t.is(qGet.communityId, 'tcid')
   })
 
-  test.serial('sending message without enough funds', async t => {
-    const MSG_ID = 'tmid_fail'
+  test.serial('sending message without existing wallet', async t => {
+    const MSG_ID = 'tmid_fail_nw'
 
-    t.throws(async () => {
-      await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID)
-    })
+    t.false(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
+    const msg = await getMessage(MSG_ID)
+
+    t.is(msg, null)
+  })
+
+  test.serial('sending message without enough funds', async t => {
+    const MSG_ID = 'tmid_fail_ne'
+
+    await setBalance(USER_ID, COMMUNITY_ID, -1 * defaultCreditLimit)
+    t.false(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
 
     t.is(msg, null)
@@ -37,7 +46,8 @@ nSQL().connect().then(() => {
   test.serial('sending message', async t => {
     const MSG_ID = 'tmid_sending'
 
-    sendMessage(USER_ID, COMMUNITY_ID, MSG_ID)
+    await setBalance(USER_ID, COMMUNITY_ID, 0)
+    await t.true(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
 
     t.is(msg.id, MSG_ID)

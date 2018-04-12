@@ -1,5 +1,5 @@
 import test from 'ava'
-import {createMessage} from '../src/db/MessageTable'
+import {pushMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
 import {rateMessage} from '../src/actions/RatingActions'
 import {getRating} from '../src/db/RatingTable'
@@ -21,7 +21,7 @@ async function addMessage (t, rating, expected) {
 addMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input} = ${expected}`.trim()
 
 nSQL().connect().then(async () => {
-  await createMessage(MSG_ID, 'tcid')
+  await pushMessage(MSG_ID, 'tcid')
 
   test.serial('adding message rating', addMessage, 1, 0.33)
   test.serial('adding message rating', addMessage, 2, 0.66)
