@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AccountStatus, Rating} from '../src/index'
+import {AccountStatus, Rating} from '../../src/index'
 import {nSQL} from 'nano-sql'
-import userTable, {USER_TABLE} from '../src/db/UserTable'
+import userTable, {USER_TABLE} from '../../src/db/UserTable'
 import './visualTests.css'
-import {currentUser} from '../src/state/GlobalState'
+import {currentUser} from '../../src/state/GlobalState'
 
 userTable.onConnected(() => {
   console.log('connected to userTable')

@@ -59,7 +59,7 @@ const library = Object.assign({}, common, {
 })
 
 const visualTests = Object.assign({}, common, {
-  entry: './test/visualTests.jsx',
+  entry: './test/visual/visualTests.jsx',
   output: {
     path: path.resolve(__dirname, 'build-tests'),
     filename: 'visualTests.js'
