@@ -15,8 +15,15 @@ export function createMessage (id, communityId) {
   }).exec()
 }
 
+/**
+ *
+ * @param id
+ * @return {(null | Object)}
+ */
 export function getMessage (id) {
-  return nSQL(MESSAGE_TABLE).query('select').where(['id', '=', id]).exec()
+  return nSQL(MESSAGE_TABLE).query('select').where(['id', '=', id]).exec().then(r => {
+    return r.length > 0 ? r[0] : null
+  })
 }
 
 export default messageTable
