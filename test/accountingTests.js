@@ -5,6 +5,7 @@ import {getBalance, setBalance} from '../src/db/UserWalletTable'
 import {hasEnoughFunds} from '../src/accounting/Accounting'
 import {nSQL} from 'nano-sql'
 import {defaultCreditLimit} from '../src/accounting/AccountingGlobals'
+import type {Balance} from '../src/db/UserWalletTable'
 
 const USER_ID = 'uid'
 const COMMUNITY_ID = 'cid'
@@ -26,13 +27,14 @@ nSQL().connect().then(() => {
     await setBalance(USER_ID, COMMUNITY_ID, 0)
     const b = await getBalance(USER_ID, COMMUNITY_ID)
 
-    t.is(b.creditLimit, defaultCreditLimit)
+    if (b === null) throw new Error('Failed to get balance')
+    t.is((b: Balance).creditLimit, defaultCreditLimit)
   })
 
   test('improper fund check', t => {
-    t.throws(() => {
-      hasEnoughFunds(USER_ID, COMMUNITY_ID)
-    })
+    t.throws((() => {
+      return hasEnoughFunds(USER_ID, COMMUNITY_ID)
+    } : () => Promise<boolean>))
   })
 
   test.todo('balance cannot be set below credit limit')

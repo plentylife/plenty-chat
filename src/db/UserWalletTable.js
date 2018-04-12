@@ -15,14 +15,14 @@ const userWalletTable = nSQL(USER_WALLET_TABLE).model([
   {key: 'creditLimit', type: 'int'}
 ]).config({mode: DB_MODE || 'PERM'})
 
-function getRecord (userId: string, communityId: string): Promise {
+function getRecord (userId: string, communityId: string): Promise<Array<any>> {
   return nSQL(USER_WALLET_TABLE).query('select')
     .where([['userId', '=', userId], 'AND', ['communityId', '=', communityId]]).exec()
 }
 
 export type Balance = {balance: number, creditLimit: number}
 
-export function getBalance (userId: string, communityId: string): Promise<Balance | null> {
+export function getBalance (userId: string, communityId: string): Promise<(Balance | null)> {
   return getRecord(userId, communityId).then(r => {
     if (r.length > 0) {
       let b: Balance = {balance: r[0].balance, creditLimit: r[0].creditLimit}
@@ -32,7 +32,7 @@ export function getBalance (userId: string, communityId: string): Promise<Balanc
   })
 }
 
-export function setBalance (userId: string, communityId: string, balance: number): Promise {
+export function setBalance (userId: string, communityId: string, balance: number): Promise<any> {
   // fixme check that balance is not below credit limit
   if (!Number.isInteger(balance)) throw new Error('Balance has to be an integer')
   let payload = {
@@ -40,8 +40,10 @@ export function setBalance (userId: string, communityId: string, balance: number
   }
   return getRecord(userId, communityId).then(r => {
     if (r.length > 0) {
+      // $FlowFixMe
       payload.id = r[0].id
     } else {
+      // $FlowFixMe
       payload.creditLimit = defaultCreditLimit
     }
     return nSQL(USER_WALLET_TABLE).query('upsert', payload).exec()

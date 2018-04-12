@@ -14,7 +14,7 @@ const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE}
 ]).config({mode: DB_MODE || 'PERM'})
 
-export function pushMessage (id: string, senderId: string, communityId: string): Promise {
+export function pushMessage (id: string, senderId: string, communityId: string): Promise<void> {
   // console.log('pushing message with id', id)
   if (!id) throw new Error('Message must have id')
   if (!senderId) throw new Error('Message must have sender')

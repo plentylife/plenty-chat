@@ -1,13 +1,12 @@
 // @flow
 
-import {Event} from './index'
 import {hasEnoughFunds} from '../accounting/Accounting'
 import {pushMessage} from '../db/MessageTable'
-import type {MessageEventPayload} from './index'
+import type {MessageEventPayload, Event} from './index'
 
-export const MESSAGE_EVENT_TYPE = 'message'
+export const MESSAGE_EVENT_TYPE: 'message' = 'message'
 
-export async function handleMessageEvent (event: Event): boolean {
+export async function handleMessageEvent (event: Event): Promise<boolean> {
   const userId = event.senderId
   const communityId = event.communityId
   validatePayload(event.payload)
