@@ -1,0 +1,15 @@
+[ignore]
+#.*/node_modules/.*
+.*/node_modules/findup/.*
+
+[include]
+.*/src/.*
+.*/test/.*
+
+[libs]
+
+[lints]
+
+[options]
+
+[strict]
