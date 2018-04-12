@@ -4,7 +4,7 @@ import {AccountStatus, Rating} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import userTable, {USER_TABLE} from '../../src/db/UserTable'
 import './visualTests.css'
-import {currentUser} from '../../src/state/GlobalState'
+import {currentUserId} from '../../src/state/GlobalState'
 
 userTable.onConnected(() => {
   console.log('connected to userTable')
@@ -22,7 +22,7 @@ function onRating (index) {
 function ComponentDisplay () {
   console.log('Test Component Display rendering')
   return <div className={'tests-container'}>
-    <div><AccountStatus userId={currentUser}/></div>
+    <div><AccountStatus userId={currentUserId}/></div>
     <div>
       Rating
       <Rating numStars={3} onRating={onRating}/>

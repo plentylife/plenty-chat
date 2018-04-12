@@ -17,7 +17,7 @@ nSQL().connect().then(() => {
     const MSG_ID = 'tmid_simple'
     t.plan(2)
 
-    await pushMessage(MSG_ID, 'tcid')
+    await pushMessage(MSG_ID, USER_ID, 'tcid')
     const qGet = await getMessage(MSG_ID)
 
     t.truthy(qGet)
