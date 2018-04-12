@@ -1,4 +1,5 @@
 import {nSQL} from 'nano-sql/lib/index'
+import {DB_MODE} from '../state/GlobalState'
 
 export const RATING_TABLE = 'Rating'
 
@@ -7,7 +8,7 @@ const ratingTable = nSQL(RATING_TABLE).model([
   {key: 'userId', type: 'string', props: ['idx']},
   {key: 'messageId', type: 'string', props: ['idx']},
   {key: 'rating', type: 'float'}
-]).config({mode: DB_MODE ? DB_MODE : 'PERM'}) // eslint-disable-line
+]).config({mode: DB_MODE || 'PERM'})
 
 export function getRating (userId, messageId) {
   return ratingTable.query('select', ['rating'])
