@@ -3,7 +3,7 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
-import {defaultCreditLimit} from '../accounting/AccountingGlobals'
+import {DEFAULT_CREDIT_LIMIT} from '../accounting/AccountingGlobals'
 
 export const USER_WALLET_TABLE = 'UserWallet'
 
@@ -44,7 +44,7 @@ export function setBalance (userId: string, communityId: string, balance: number
       payload.id = r[0].id
     } else {
       // $FlowFixMe
-      payload.creditLimit = defaultCreditLimit
+      payload.creditLimit = DEFAULT_CREDIT_LIMIT
     }
     return nSQL(USER_WALLET_TABLE).query('upsert', payload).exec()
   })

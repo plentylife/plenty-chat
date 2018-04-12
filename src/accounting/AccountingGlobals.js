@@ -1,3 +1,3 @@
-export const costOfSendingMessage = 1
+export const COST_OF_SENDING_MESSAGE = 1
 
-export const defaultCreditLimit = 20
+export const DEFAULT_CREDIT_LIMIT = 20

@@ -1,8 +1,9 @@
 // @flow
 
-import {hasEnoughFunds} from '../accounting/Accounting'
+import {hasEnoughFunds, spend} from '../accounting/Accounting'
 import {pushMessage} from '../db/MessageTable'
 import type {MessageEventPayload, Event} from './index'
+import {COST_OF_SENDING_MESSAGE} from '../accounting/AccountingGlobals'
 
 export const MESSAGE_EVENT_TYPE: 'message' = 'message'
 
@@ -12,10 +13,10 @@ export async function handleMessageEvent (event: Event): Promise<boolean> {
   validatePayload(event.payload)
 
   const p = event.payload
-  const fc = await hasEnoughFunds(userId, communityId, 1)
+  const fc = await hasEnoughFunds(userId, communityId, COST_OF_SENDING_MESSAGE)
   if (fc) {
     pushMessage(p.messageId, userId, communityId)
-    return true
+    return spend(userId, communityId, COST_OF_SENDING_MESSAGE).then(() => true)
   }
   return false
 }

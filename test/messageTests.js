@@ -4,8 +4,8 @@ import test from 'ava'
 import {pushMessage, getMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
 import {sendMessage} from '../src/actions/MessageActions'
-import {setBalance} from '../src/db/UserWalletTable'
-import {defaultCreditLimit} from '../src/accounting/AccountingGlobals'
+import {getBalance, setBalance} from '../src/db/UserWalletTable'
+import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
 
@@ -29,17 +29,22 @@ nSQL().connect().then(() => {
 
     t.false(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
+    const balance = await getBalance(USER_ID, COMMUNITY_ID)
 
+    t.is(balance, null)
     t.is(msg, null)
   })
 
   test.serial('sending message without enough funds', async t => {
     const MSG_ID = 'tmid_fail_ne'
 
-    await setBalance(USER_ID, COMMUNITY_ID, -1 * defaultCreditLimit)
+    const initBalance = -1 * DEFAULT_CREDIT_LIMIT
+    await setBalance(USER_ID, COMMUNITY_ID, initBalance)
     t.false(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
+    const balance = await getBalance(USER_ID, COMMUNITY_ID)
 
+    t.is(balance.balance, initBalance)
     t.is(msg, null)
   })
 
@@ -49,7 +54,9 @@ nSQL().connect().then(() => {
     await setBalance(USER_ID, COMMUNITY_ID, 0)
     await t.true(await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
+    const balance = await getBalance(USER_ID, COMMUNITY_ID)
 
+    t.is(balance.balance, -1)
     t.is(msg.id, MSG_ID)
   })
 })
