@@ -1,3 +1,5 @@
+// @flow
+
 import test from 'ava'
 import {createMessage, getMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
@@ -16,11 +18,23 @@ nSQL().connect().then(() => {
     await createMessage(MSG_ID, 'tcid')
     const qGet = await getMessage(MSG_ID)
 
-    t.truthly(qGet)
+    // $FlowFixMe
+    t.truthy(qGet)
     t.is(qGet.communityId, 'tcid')
   })
 
-  test('sending message', async t => {
+  test.serial('sending message without enough funds', async t => {
+    const MSG_ID = 'tmid_fail'
+
+    t.throws(async () => {
+      await sendMessage(USER_ID, COMMUNITY_ID, MSG_ID)
+    })
+    const msg = await getMessage(MSG_ID)
+
+    t.is(msg, null)
+  })
+
+  test.serial('sending message', async t => {
     const MSG_ID = 'tmid_sending'
 
     sendMessage(USER_ID, COMMUNITY_ID, MSG_ID)
