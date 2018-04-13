@@ -6,11 +6,11 @@ import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 
 export function initializeAccount (agentId: string, communityId: string): Promise<void> {
-  setBalance(agentId, communityId, 0)
+  return setBalance(agentId, communityId, 0)
 }
 
 export function intializeCommunity (communityId: string): Promise<void> {
-  setCommunityBalance(communityId, 0)
+  return setCommunityBalance(communityId, 0)
 }
 
 /**
