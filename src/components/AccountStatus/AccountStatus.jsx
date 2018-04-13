@@ -19,6 +19,8 @@ class AccountStatus extends PureComponent<Props> {
     let q = getBalance(this.props.agentId, this.props.communityId)
 
     q.then((wallet) => {
+      console.log('AccountStatus component. Agent, community, wallet, event',
+        this.props.agentId, this.props.communityId, wallet, event)
       complete(wallet)
     })
 

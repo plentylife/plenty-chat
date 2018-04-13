@@ -2,7 +2,7 @@
   "name": "plenty-chat",
   "version": "0.1.0",
   "private": true,
-  "main": "build-module/components.js",
+  "main": "build-module/index.js",
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "nano-sql": "^1.4.3",

@@ -4,12 +4,13 @@ import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {DEFAULT_CREDIT_LIMIT} from '../accounting/AccountingGlobals'
+import {AGENT_TABLE} from './AgentTable'
 
 export const AGENT_WALLET_TABLE = 'AgentWallet'
 
 const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'id', type: 'uuid', props: ['pk', 'ai']},
-  {key: 'agentId', type: 'string', props: ['idx']},
+  {key: 'agentId', type: AGENT_TABLE, props: ['idx']},
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'balance', type: 'int'},
   {key: 'creditLimit', type: 'int'}
@@ -46,6 +47,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
       // $FlowFixMe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT
     }
+    console.log('Setting new balance for [agent] in [community] to [amount]', agentId, communityId, balance)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
   })
 }

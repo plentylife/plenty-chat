@@ -56,7 +56,16 @@ const library = Object.assign({}, common, {
   externals: {
     'react': 'commonjs react' // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
   },
-  mode: 'production'
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
+      }
+    })
+  ],
+  target: 'web',
+  devtool: process.env.NODE_ENV === 'development' ? 'source-map' : '',
+  mode: process.env.NODE_ENV || 'production'
 })
 
 const visualTests = Object.assign({}, common, {
@@ -71,12 +80,10 @@ const visualTests = Object.assign({}, common, {
       'process.env': {
         NODE_ENV: JSON.stringify('development')
       }
-      // ,
-      // 'DB_MODE': JSON.stringify('TEMP')
     })
   ],
   mode: 'development',
-  devtool: 'inline-source-map'
+  devtool: 'cheap-module-eval-source-map'
 })
 
 module.exports = [
