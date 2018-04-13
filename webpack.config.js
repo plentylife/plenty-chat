@@ -55,7 +55,8 @@ const library = Object.assign({}, common, {
   },
   externals: {
     'react': 'commonjs react' // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
-  }
+  },
+  mode: 'production'
 })
 
 const visualTests = Object.assign({}, common, {
@@ -74,6 +75,7 @@ const visualTests = Object.assign({}, common, {
       // 'DB_MODE': JSON.stringify('TEMP')
     })
   ],
+  mode: 'development',
   devtool: 'inline-source-map'
 })
 

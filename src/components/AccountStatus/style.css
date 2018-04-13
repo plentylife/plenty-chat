@@ -1,0 +1,13 @@
+.agent-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.agent-balance > span {
+    display: flex;
+}
+
+.agent-balance label {
+    margin-right: 1em;
+}

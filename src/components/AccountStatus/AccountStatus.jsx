@@ -1,37 +1,53 @@
 import React, {PureComponent} from 'react'
-import {getBalanceById, AGENT_TABLE} from '../../db/AgentTable'
+import {AGENT_WALLET_TABLE, getBalance} from '../../db/AgentWalletTable'
+import type {Wallet} from '../../db/AgentWalletTable'
+import './style.css'
+import {TENGE} from '../utils'
 
-class AccountStatus extends PureComponent {
+type Props = {
+  agentId: string,
+  communityId: string,
+  nSQLdata: Wallet
+}
+
+class AccountStatus extends PureComponent<Props> {
   static tables () {
-    return [AGENT_TABLE] // listen for changes on this table
+    return [AGENT_WALLET_TABLE] // listen for changes on this table
   }
 
-  static onChange (event, complete) {
-    console.log('account status changed event', event)
+  static onChange (event: any, complete: any => void) {
+    let q = getBalance(this.props.agentId, this.props.communityId)
 
-    let q = getBalanceById(this.props.agentId)
-
-    q.then((rows) => {
-      console.log('account status query result', rows, 'for', this.props.agentId)
-      complete(rows.length > 0 ? rows[0].balance : null)
+    q.then((wallet) => {
+      complete(wallet)
     })
 
-    // fixme optimize at some point
-    // if (!event.notes.includes('mount')) {
-    //   complete(event.affectedRows[0].balance)
-    // } else {
-    // }
+    // fixme optimize at some point to react only to the appropriate change
   }
 
   static Unavailable () {
-    return <div className="unavailable">Unavailable</div>
+    return <div className="unavailable">Wallet info unavailable</div>
   }
 
   render () {
-    console.log("render", this.props.nSQLdata)
-    return <div>
-            Account balance {
-        this.props.nSQLdata ? this.props.nSQLdata : <AccountStatus.Unavailable/>
+    const data = this.props.nSQLdata
+    // $FlowFixMe
+    const disp = () => {
+      if (!data) {
+        // eslint-disable-next-line no-unused-expressions
+        return <AccountStatus.Unavailable/>
+      } else {
+        // eslint-disable-next-line no-unused-expressions
+        return <span className={'agent-balance'}>
+          <span><label>Balance</label><span>{data.balance}{TENGE}</span></span>
+          <span><label>Credit Limit</label><span>{data.creditLimit}{TENGE}</span></span>
+        </span>
+      }
+    }
+
+    return <div className={'wallet-container'}>
+      {
+        disp()
       }
     </div>
   }
