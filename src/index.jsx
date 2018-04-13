@@ -9,6 +9,8 @@ import {setBalance, walletExists} from './db/AgentWalletTable'
 import {sendMessage} from './actions/MessageActions'
 import {hasEnoughFundsToSendMessage, initializeAccount, intializeCommunity} from './accounting/Accounting'
 import {communityExists} from './db/CommunityTable'
+import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
+import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
 
 const AccountStatusSql = bindNSQL(AccountStatus)
 const RatingSql = bindNSQL(Rating)
@@ -36,8 +38,16 @@ export function onChannelView (agentId: string, communityId: string) {
     walletExists(agentId, communityId).then(e => {
       if (!e) initializeAccount(agentId, communityId)
     })
+
+    /* TESTING MM INTEGRATION; REMOVE */
+    setTimeout(() => {
+      console.log('setting balance to', -1 * DEFAULT_CREDIT_LIMIT)
+      setBalance(agentId, communityId, -1 * DEFAULT_CREDIT_LIMIT)
+    }, 1000)
+    /* END: TESTING MM INTEGRATION; REMOVE */
   })
 }
 
-export {AccountStatusSql as AccountStatus, RatingSql as Rating, plentyInit, currentAgentId, currentCommunityId,
+export {AccountStatusSql as AccountStatus, RatingSql as Rating, NotEnoughFundsForMessageModal,
+  plentyInit, currentAgentId, currentCommunityId,
   sendMessage, hasEnoughFundsToSendMessage}

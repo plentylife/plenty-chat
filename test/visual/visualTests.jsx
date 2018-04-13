@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AccountStatus, Rating} from '../../src/index'
+import {AccountStatus, Rating, NotEnoughFundsForMessageModal} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {currentAgentId, currentCommunityId} from '../../src/state/GlobalState'
@@ -23,6 +23,9 @@ function ComponentDisplay () {
     <div>
       Rating
       <Rating numStars={3} onRating={onRating}/>
+    </div>
+    <div>
+      <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
     </div>
   </div>
 }
