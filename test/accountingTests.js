@@ -1,5 +1,3 @@
-// @flow
-
 import test from 'ava'
 import {getBalance, setBalance} from '../src/db/UserWalletTable'
 import {hasEnoughFunds} from '../src/accounting/Accounting'

@@ -11,7 +11,7 @@ import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
  * @param communityId
  * @param {int} amount has to be an integer
  */
-export function hasEnoughFunds (userId, communityId, amount): Promise<boolean> {
+export function hasEnoughFunds (userId: string, communityId: string, amount: number): Promise<boolean> {
   if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
 
   return getBalance(userId, communityId).then(b => {
@@ -35,6 +35,7 @@ export async function spend (userId: string, communityId: string, byAmount: numb
   assertPositive(byAmount)
 
   await getBalance(userId, communityId).then(b => {
+    if (b === null) throw new Error('No record of balance for user ' + userId)
     const nb = b.balance - byAmount
     return setBalance(userId, communityId, nb)
   })

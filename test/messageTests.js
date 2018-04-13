@@ -1,5 +1,3 @@
-// @flow
-
 import test from 'ava'
 import {pushMessage, getMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
