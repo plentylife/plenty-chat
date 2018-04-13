@@ -1,20 +1,20 @@
 // @flow
 
-import {getBalance, setBalance} from '../db/UserWalletTable'
+import {getBalance, setBalance} from '../db/AgentWalletTable'
 import {assertPositive, assertInt} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 
 /**
- * Checks if the user has enough funds according to the point of view of this agent
+ * Checks if the agent has enough funds according to the point of view of this agent
  *
- * @param userId
+ * @param agentId
  * @param communityId
  * @param {int} amount has to be an integer
  */
-export function hasEnoughFunds (userId: string, communityId: string, amount: number): Promise<boolean> {
+export function hasEnoughFunds (agentId: string, communityId: string, amount: number): Promise<boolean> {
   if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
 
-  return getBalance(userId, communityId).then(b => {
+  return getBalance(agentId, communityId).then(b => {
     if (b !== null) {
       const check = b.balance + b.creditLimit >= amount
       return check
@@ -26,18 +26,18 @@ export function hasEnoughFunds (userId: string, communityId: string, amount: num
 /**
  * UNSAFE!
  * Does not check if there are enough funds
- * Sends money into the community pot from the user
- * @param userId
+ * Sends money into the community pot from the agent
+ * @param agentId
  * @param byAmount should be positive
  */
-export async function spend (userId: string, communityId: string, byAmount: number): Promise<any> {
+export async function spend (agentId: string, communityId: string, byAmount: number): Promise<any> {
   assertInt(byAmount)
   assertPositive(byAmount)
 
-  await getBalance(userId, communityId).then(b => {
-    if (b === null) throw new Error('No record of balance for user ' + userId)
+  await getBalance(agentId, communityId).then(b => {
+    if (b === null) throw new Error('No record of balance for agent ' + agentId)
     const nb = b.balance - byAmount
-    return setBalance(userId, communityId, nb)
+    return setBalance(agentId, communityId, nb)
   })
 
   const cb = await getCommunityBalance(communityId)

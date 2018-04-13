@@ -6,11 +6,11 @@ import {MESSAGE_EVENT_TYPE} from '../events/MessageEvents'
 /**
  * Sends message with all appropriate checks
  *
- * @param userId
+ * @param agentId
  * @param communityId
  * @param messageId
  * @return false if cannot send, or true if successful
  */
-export function sendMessage (userId: string, communityId: string, messageId: string): Promise<boolean> {
-  return sendEvent(MESSAGE_EVENT_TYPE, userId, communityId, {messageId})
+export function sendMessage (agentId: string, communityId: string, messageId: string): Promise<boolean> {
+  return sendEvent(MESSAGE_EVENT_TYPE, agentId, communityId, {messageId})
 }

@@ -1,7 +1,7 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
-import {USER_TABLE} from './UserTable'
+import {AGENT_TABLE} from './AgentTable'
 
 export const EVENT_TABLE = 'Event'
 
@@ -13,9 +13,9 @@ const baseEventModel = [
 ]
 
 const eventModel = baseEventModel.concat([
-  // this even id is created by the user who sent the event
+  // this even id is created by the agent who sent the event
   {key: 'eventId', type: 'int'},
-  {key: 'senderId', type: USER_TABLE},
+  {key: 'senderId', type: AGENT_TABLE},
   {key: 'handledSuccessfully', type: 'bool'}
 ])
 const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM'})

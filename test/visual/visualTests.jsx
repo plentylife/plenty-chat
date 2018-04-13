@@ -2,14 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {AccountStatus, Rating} from '../../src/index'
 import {nSQL} from 'nano-sql'
-import userTable, {USER_TABLE} from '../../src/db/UserTable'
+import agentTable, {AGENT_TABLE} from '../../src/db/AgentTable'
 import './visualTests.css'
-import {currentUserId} from '../../src/state/GlobalState'
+import {currentAgentId} from '../../src/state/GlobalState'
 
-userTable.onConnected(() => {
-  console.log('connected to userTable')
-  return nSQL(USER_TABLE).query('upsert', {
-    userId: 'anton', balance: 20
+agentTable.onConnected(() => {
+  console.log('connected to agentTable')
+  return nSQL(AGENT_TABLE).query('upsert', {
+    agentId: 'anton', balance: 20
   }).exec()
 })
 
@@ -22,7 +22,7 @@ function onRating (index) {
 function ComponentDisplay () {
   console.log('Test Component Display rendering')
   return <div className={'tests-container'}>
-    <div><AccountStatus userId={currentUserId}/></div>
+    <div><AccountStatus agentId={currentAgentId}/></div>
     <div>
       Rating
       <Rating numStars={3} onRating={onRating}/>

@@ -3,11 +3,11 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 
-export const USER_TABLE = 'User'
+export const AGENT_TABLE = 'Agent'
 
-const userTable = nSQL(USER_TABLE).model([
+const agentTable = nSQL(AGENT_TABLE).model([
   // {key: 'id', type: 'int', props: ['pk', 'ai']},
-  {key: 'userId', type: 'string', props: ['pk']}
+  {key: 'agentId', type: 'string', props: ['pk']}
 ]).config({mode: DB_MODE || 'PERM'})
 
-export default userTable
+export default agentTable

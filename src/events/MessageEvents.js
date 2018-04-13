@@ -8,15 +8,15 @@ import {COST_OF_SENDING_MESSAGE} from '../accounting/AccountingGlobals'
 export const MESSAGE_EVENT_TYPE: 'message' = 'message'
 
 export async function handleMessageEvent (event: Event): Promise<boolean> {
-  const userId = event.senderId
+  const agentId = event.senderId
   const communityId = event.communityId
   validatePayload(event.payload)
 
   const p = event.payload
-  const fc = await hasEnoughFunds(userId, communityId, COST_OF_SENDING_MESSAGE)
+  const fc = await hasEnoughFunds(agentId, communityId, COST_OF_SENDING_MESSAGE)
   if (fc) {
-    pushMessage(p.messageId, userId, communityId)
-    return spend(userId, communityId, COST_OF_SENDING_MESSAGE).then(r => true)
+    pushMessage(p.messageId, agentId, communityId)
+    return spend(agentId, communityId, COST_OF_SENDING_MESSAGE).then(r => true)
   }
   return false
 }

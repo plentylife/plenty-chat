@@ -1,18 +1,18 @@
 import React, {PureComponent} from 'react'
-import {getBalanceById, USER_TABLE} from '../../db/UserTable'
+import {getBalanceById, AGENT_TABLE} from '../../db/AgentTable'
 
 class AccountStatus extends PureComponent {
   static tables () {
-    return [USER_TABLE] // listen for changes on this table
+    return [AGENT_TABLE] // listen for changes on this table
   }
 
   static onChange (event, complete) {
     console.log('account status changed event', event)
 
-    let q = getBalanceById(this.props.userId)
+    let q = getBalanceById(this.props.agentId)
 
     q.then((rows) => {
-      console.log('account status query result', rows, 'for', this.props.userId)
+      console.log('account status query result', rows, 'for', this.props.agentId)
       complete(rows.length > 0 ? rows[0].balance : null)
     })
 
