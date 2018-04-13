@@ -2,7 +2,7 @@
 
 import {bindNSQL} from 'nano-sql-react'
 import AccountStatus from './components/AccountStatus/AccountStatus'
-import Rating from './components/Rating/Rating'
+import MessageRating from './components/Rating/MessageRating'
 import {nSQL} from 'nano-sql'
 import {currentAgentId, currentCommunityId, DB_MODE} from './state/GlobalState'
 import {walletExists} from './db/AgentWalletTable'
@@ -14,7 +14,6 @@ import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughF
 import {setCommunityOfChannel} from './db/ChannelTable'
 
 const AccountStatusSql = bindNSQL(AccountStatus)
-const RatingSql = bindNSQL(Rating)
 
 function plentyInit () {
   console.log('Initializing Plenty')
@@ -47,6 +46,6 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
   })
 }
 
-export {AccountStatusSql as AccountStatus, RatingSql as Rating, NotEnoughFundsForMessageModal,
+export {AccountStatusSql as AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
   plentyInit, currentAgentId, currentCommunityId,
   sendMessage, hasEnoughFundsToSendMessage}

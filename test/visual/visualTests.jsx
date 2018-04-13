@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AccountStatus, Rating, NotEnoughFundsForMessageModal} from '../../src/index'
+import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {currentAgentId, currentCommunityId} from '../../src/state/GlobalState'
@@ -12,9 +12,9 @@ nSQL().onConnected(() => {
 
 nSQL().connect()
 
-function onRating (index) {
-  console.log('Selected rating index', index)
-}
+// function onRating (index) {
+//   console.log('Selected rating index', index)
+// }
 
 function ComponentDisplay () {
   console.log('Test Component Display rendering')
@@ -22,7 +22,7 @@ function ComponentDisplay () {
     <div><AccountStatus agentId={currentAgentId} communityId={currentCommunityId}/></div>
     <div>
       Rating
-      <Rating numStars={3} onRating={onRating}/>
+      <MessageRating/>
     </div>
     <div>
       <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
