@@ -3,6 +3,7 @@
 import {getBalance, setBalance} from '../db/AgentWalletTable'
 import {assertPositive, assertInt} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
+import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 
 /**
  * Checks if the agent has enough funds according to the point of view of this agent
@@ -21,6 +22,10 @@ export function hasEnoughFunds (agentId: string, communityId: string, amount: nu
     }
     return false
   })
+}
+
+export function hasEnoughFundsToSendMessage (agentId: string, communityId: string): Promise<boolean> {
+  return hasEnoughFunds(agentId, communityId, COST_OF_SENDING_MESSAGE)
 }
 
 /**

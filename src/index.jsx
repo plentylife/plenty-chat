@@ -4,6 +4,8 @@ import Rating from './components/Rating/Rating'
 import {nSQL} from 'nano-sql'
 import {currentAgentId, currentCommunityId, DB_MODE} from './state/GlobalState'
 import {setBalance} from './db/AgentWalletTable'
+import {sendMessage} from './actions/MessageActions'
+import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 
 const AccountStatusSql = bindNSQL(AccountStatus)
 const RatingSql = bindNSQL(Rating)
@@ -23,4 +25,5 @@ function plentyInit () {
   /* END: TESTING MM INTEGRATION; REMOVE */
 }
 
-export {AccountStatusSql as AccountStatus, RatingSql as Rating, plentyInit, currentAgentId, currentCommunityId}
+export {AccountStatusSql as AccountStatus, RatingSql as Rating, plentyInit, currentAgentId, currentCommunityId,
+  sendMessage, hasEnoughFundsToSendMessage}
