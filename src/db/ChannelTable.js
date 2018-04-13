@@ -17,7 +17,7 @@ export function getCommunity (channelId: string): Promise<string> {
   })
 }
 
-export function setCommunity (channelId: string, communityId: string): Promise<void> {
+export function setCommunityOfChannel (channelId: string, communityId: string): Promise<void> {
   return nSQL(CHANNEL_TABLE).query('upsert', {
     channelId, communityId
   }).exec()
