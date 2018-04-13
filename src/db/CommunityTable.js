@@ -3,12 +3,14 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 import {assertPositive, assertInt} from '../accounting/utils'
+// import {CHANNEL_TABLE} from './ChannelTable'
 
 export const COMMUNITY_TABLE = 'Community'
 
 const communityTable = nSQL(COMMUNITY_TABLE).model([
   {key: 'communityId', type: 'uuid', props: ['pk']},
   {key: 'balance', type: 'int'}
+  // {key: 'channels', type: CHANNEL_TABLE + '[]', props: ['ref=>communityId']}
 ]).config({mode: DB_MODE || 'PERM'})
 
 /**

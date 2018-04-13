@@ -3,10 +3,7 @@
 import {handleMessageEvent, MESSAGE_EVENT_TYPE} from './MessageEvents'
 import {pushEvent, pushSelfEvent} from '../db/EventTable'
 import {RATING_EVENT_TYPE} from './RatingEvents'
-
-export type MessageEventPayload = {
-  messageId: string
-}
+import type {MessageEventPayload} from './MessageEvents'
 
 export type EventPayload = MessageEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)

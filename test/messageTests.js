@@ -5,28 +5,37 @@ import {sendMessage} from '../src/actions/MessageActions'
 import {getBalance, setBalance} from '../src/db/AgentWalletTable'
 import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {getCommunityBalance} from '../src/db/CommunityTable'
+import {getCommunity, setCommunity} from '../src/db/ChannelTable'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
 
 const AGENT_ID = 'uid'
-const COMMUNITY_ID = 'cid'
+const COMMUNITY_ID = 'comid'
+const CHANNEL_ID = 'chid'
 
-nSQL().connect().then(() => {
+nSQL().connect().then(async () => {
+  test.before('setting up channel to community mapping', async t => {
+    await setCommunity(CHANNEL_ID, COMMUNITY_ID)
+    const c = await getCommunity(CHANNEL_ID)
+
+    t.is(c, COMMUNITY_ID)
+  })
+
   test('adding message to db', async t => {
     const MSG_ID = 'tmid_simple'
     t.plan(2)
 
-    await pushMessage(MSG_ID, AGENT_ID, 'tcid')
+    await pushMessage(MSG_ID, AGENT_ID, CHANNEL_ID)
     const qGet = await getMessage(MSG_ID)
 
     t.truthy(qGet)
-    t.is(qGet.communityId, 'tcid')
+    t.is(qGet.channelId, CHANNEL_ID)
   })
 
   test.serial('sending message without existing wallet', async t => {
     const MSG_ID = 'tmid_fail_nw'
 
-    t.false(await sendMessage(AGENT_ID, COMMUNITY_ID, MSG_ID))
+    t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
     const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
@@ -41,7 +50,7 @@ nSQL().connect().then(() => {
 
     const initBalance = -1 * DEFAULT_CREDIT_LIMIT
     await setBalance(AGENT_ID, COMMUNITY_ID, initBalance)
-    t.false(await sendMessage(AGENT_ID, COMMUNITY_ID, MSG_ID))
+    t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
     const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
@@ -55,7 +64,7 @@ nSQL().connect().then(() => {
     const MSG_ID = 'tmid_sending'
 
     await setBalance(AGENT_ID, COMMUNITY_ID, 0)
-    await t.true(await sendMessage(AGENT_ID, COMMUNITY_ID, MSG_ID))
+    await t.true(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
     const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
