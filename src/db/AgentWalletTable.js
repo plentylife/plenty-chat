@@ -52,4 +52,10 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
   })
 }
 
+export function walletExists (communityId: string): Promise<boolean> {
+  return nSQL(AGENT_WALLET_TABLE).query('select', ['id']).exec().then(r => {
+    return r.lenght > 0
+  })
+}
+
 export default agentWalletTable

@@ -30,4 +30,10 @@ export function setCommunityBalance (communityId: string, balance: number): Prom
   }).exec()
 }
 
+export function communityExists (communityId: string): Promise<boolean> {
+  return nSQL(COMMUNITY_TABLE).query('select', ['communityId']).exec().then(r => {
+    return r.lenght > 0
+  })
+}
+
 export default communityTable

@@ -5,6 +5,14 @@ import {assertPositive, assertInt} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 
+export function initializeAccount (agentId: string, communityId: string): Promise<void> {
+  setBalance(agentId, communityId, 0)
+}
+
+export function intializeCommunity (communityId: string): Promise<void> {
+  setCommunityBalance(communityId, 0)
+}
+
 /**
  * Checks if the agent has enough funds according to the point of view of this agent
  *
