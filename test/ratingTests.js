@@ -20,25 +20,27 @@ async function addMessage (t, rating, expected) {
 }
 addMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input} = ${expected}`.trim()
 
-nSQL().connect().then(async () => {
-  await pushMessage(MSG_ID, 'tcid')
-
-  test.serial('adding message rating', addMessage, 1, 0.33)
-  test.serial('adding message rating', addMessage, 2, 0.66)
-  test.serial('adding message rating', addMessage, 3, 1)
-
-  test.serial('adding inappropriate message rating', t => {
-    t.throws(() => {
-      rateMessage(AGENT_ID, MSG_ID, 0, NUM_STARS)
-    })
+test.before(async t => {
+  await nSQL().connect().then(() => {
+    return pushMessage(MSG_ID, AGENT_ID, 'tcid')
   })
+})
 
-  test.serial('wrong star setup', t => {
-    t.throws(() => {
-      rateMessage(AGENT_ID, MSG_ID, 1, 0)
-    })
-    t.throws(() => {
-      rateMessage(AGENT_ID, MSG_ID, 2, 1)
-    })
+test.serial('adding message rating', addMessage, 1, 0.33)
+test.serial('adding message rating', addMessage, 2, 0.66)
+test.serial('adding message rating', addMessage, 3, 1)
+
+test.serial('adding inappropriate message rating', t => {
+  t.throws(() => {
+    rateMessage(AGENT_ID, MSG_ID, 0, NUM_STARS)
+  })
+})
+
+test.serial('wrong star setup', t => {
+  t.throws(() => {
+    rateMessage(AGENT_ID, MSG_ID, 1, 0)
+  })
+  t.throws(() => {
+    rateMessage(AGENT_ID, MSG_ID, 2, 1)
   })
 })
