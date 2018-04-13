@@ -16,7 +16,7 @@ export async function handleMessageEvent (event: Event): Promise<boolean> {
   const fc = await hasEnoughFunds(userId, communityId, COST_OF_SENDING_MESSAGE)
   if (fc) {
     pushMessage(p.messageId, userId, communityId)
-    return spend(userId, communityId, COST_OF_SENDING_MESSAGE).then(() => true)
+    return spend(userId, communityId, COST_OF_SENDING_MESSAGE).then(r => true)
   }
   return false
 }

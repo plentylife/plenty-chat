@@ -1,7 +1,8 @@
 // @flow
 
 import {getBalance, setBalance} from '../db/UserWalletTable'
-import {assertAboveZero, assertInt} from './utils'
+import {assertPositive, assertInt} from './utils'
+import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 
 /**
  * Checks if the user has enough funds according to the point of view of this agent
@@ -25,15 +26,19 @@ export function hasEnoughFunds (userId, communityId, amount): Promise<boolean> {
 /**
  * UNSAFE!
  * Does not check if there are enough funds
- * Sends money into the community pot
+ * Sends money into the community pot from the user
  * @param userId
  * @param byAmount should be positive
  */
-export function spend (userId: string, communityId: string, byAmount: number): Promise<any> {
+export async function spend (userId: string, communityId: string, byAmount: number): Promise<any> {
   assertInt(byAmount)
-  assertAboveZero(byAmount)
-  return getBalance(userId, communityId).then(b => {
+  assertPositive(byAmount)
+
+  await getBalance(userId, communityId).then(b => {
     const nb = b.balance - byAmount
     return setBalance(userId, communityId, nb)
   })
+
+  const cb = await getCommunityBalance(communityId)
+  return setCommunityBalance(communityId, cb + byAmount)
 }
