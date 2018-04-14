@@ -1,7 +1,8 @@
 // @flow
 import type {Event} from './index'
-import {MissingPayload, MissingProperty} from '../utils/Error'
+import {InappropriateAction, MissingPayload, MissingProperty} from '../utils/Error'
 import {setRating} from '../db/RatingTable'
+import {getMessage} from '../db/MessageTable'
 
 export const RATING_EVENT_TYPE: 'rating' = 'rating'
 
@@ -10,8 +11,12 @@ export type RatingEventPayload = {
   rating: number
 }
 
-export function handleRatingEvent (event: Event): Promise<boolean> {
+export async function handleRatingEvent (event: Event): Promise<boolean> {
   const payload = validatePayload(event.payload)
+
+  const msg = await getMessage(payload.messageId)
+  if (msg.senderId === event.senderId) throw new CannotRateOwnMessage()
+
   return setRating(payload.messageId, event.senderId, payload.rating)
 }
 
@@ -25,3 +30,5 @@ function validatePayload (payload: Object): RatingEventPayload {
 }
 
 export class InvalidRating extends Error {}
+
+export class CannotRateOwnMessage extends InappropriateAction {}

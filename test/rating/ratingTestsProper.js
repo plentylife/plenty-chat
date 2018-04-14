@@ -10,6 +10,7 @@ console.log('NODE_ENV is ', process.env.NODE_ENV)
 
 const MSG_ID = 'tmid'
 const AGENT_ID = 'uid'
+const AGENT_SENDER_ID = 'sender'
 const CHANNEL_ID = 'chid'
 const COMMUNITY_ID = 'comid'
 const NUM_STARS = 3
@@ -26,7 +27,7 @@ addMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input
 test.before(async t => {
   await nSQL().connect().then(async () => {
     await setCommunityOfChannel(CHANNEL_ID, COMMUNITY_ID)
-    await pushMessage(MSG_ID, AGENT_ID, CHANNEL_ID)
+    await pushMessage(MSG_ID, AGENT_SENDER_ID, CHANNEL_ID)
   })
 })
 

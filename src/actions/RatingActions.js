@@ -17,12 +17,12 @@ import {CommunityIdNotInferrable} from '../utils/Error'
 export async function rateMessage (msgId: string, agentId: string, rating: number, ratingMax: number) {
   if (rating <= 0) throw new Error('rating has to be positive and above zero')
   if (rating > ratingMax) throw new Error('rating cannot be higher than maximum')
-  if (ratingMax <= 0) throw new Error('Maximum rating has to be positive and above zero')
+  if (ratingMax <= 1) throw new Error('Maximum rating has to be positive and above one')
 
   const communityId = await getCommunityOfMsg(msgId)
   if (!communityId) throw new CommunityIdNotInferrable()
 
-  const r = (rating - 1) / (ratingMax - 1)
+  const r = (rating - 1) / (ratingMax - 1) // ratingMax has to be more than one
   const p: RatingEventPayload = {
     messageId: msgId,
     rating: r

@@ -13,3 +13,5 @@ export class MissingProperty extends Error {
     super('Missing property ' + propertyName)
   }
 }
+
+export class InappropriateAction extends Error {}
