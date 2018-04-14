@@ -1,6 +1,8 @@
-import {nSQL} from 'nano-sql/lib/index'
-import test from 'ava/index'
-import {getCommunityOfMsg} from '../../src/db/index'
+import {nSQL} from 'nano-sql'
+import test from 'ava'
+
+import '../../src/db/MessageTable'
+
 import {EVENT_TABLE} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
 
