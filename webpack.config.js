@@ -29,6 +29,10 @@ const common = {
         ],
         exclude: /(node_modules|bower_components|build)/,
         loader: 'babel-loader'
+      },
+      {
+        test: /\.node$/,
+        use: 'node-loader'
       }
     ]
   },
@@ -111,7 +115,36 @@ const dbTests = Object.assign({}, common, {
   // devtool: 'source-map'
 })
 
+const server = Object.assign({}, common, {
+  entry: './src/sync/SyncServer.js',
+  output: {
+    path: path.resolve(__dirname, 'server'),
+    filename: 'server-lib.js',
+    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
+  },
+  target: 'node',
+  // mode: process.env.NODE_ENV || 'development',
+  devtool: 'source-map'
+})
+
+const serverTest = Object.assign({}, server, {
+  output: {
+    path: path.resolve(__dirname, 'server'),
+    filename: 'server-test-lib.js',
+    libraryTarget: 'umd'
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('testperm')
+      }
+    })
+  ]
+})
+
 module.exports = [
+  serverTest
+  // server
   // library,
-  visualTests, dbTests
+  // visualTests, dbTests
 ]
