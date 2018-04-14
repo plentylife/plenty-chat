@@ -1,4 +1,5 @@
 .rating-container {
-    display: flex;
+    display: inline-flex !important;
     flex-direction: row;
+    align-items: center;
 }

@@ -8,8 +8,8 @@ type Props = {
   messageId: string
 }
 
-function onRating (index) {
-  console.log('Selected rating index', index)
+function onRating (index, agentId, messageId) {
+  console.log('Selected rating index', index, agentId, messageId)
 }
 
 const RatingSql = bindNSQL(Rating)

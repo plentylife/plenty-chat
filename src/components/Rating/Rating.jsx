@@ -41,7 +41,7 @@ class Rating extends PureComponent {
 
   onStarClick (index) {
     return () => {
-      this.props.onRating(index)
+      this.props.onRating(index, this.props.agentId, this.props.messageId)
     }
   }
 
