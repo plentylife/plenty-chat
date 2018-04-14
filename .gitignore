@@ -24,5 +24,6 @@ yarn-error.log*
 yarn.lock
 package-lock.json
 
+*.sqlite3
 .idea
 .directory

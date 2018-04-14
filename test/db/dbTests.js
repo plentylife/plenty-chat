@@ -1,16 +1,20 @@
 import {nSQL} from 'nano-sql/lib/index'
-import {getCommunity, setCommunityOfChannel} from '../src/db/ChannelTable'
+import {getCommunity, setCommunityOfChannel} from '../../src/db/ChannelTable'
 import test from 'ava/index'
-import {pushMessage} from '../src/db/MessageTable'
-import {getCommunityOfMsg} from '../src/db'
-import {pushEvent, selectAfterTimestamp} from '../src/db/EventTable'
+import {pushMessage} from '../../src/db/MessageTable'
+import {getCommunityOfMsg} from '../../src/db/index'
+import {pushEvent, selectAfterTimestamp} from '../../src/db/EventTable'
+import {DB_MODE} from '../../src/state/GlobalState'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
 const CHANNEL_ID = 'chid'
 const MSG_ID = 'msid'
 
-nSQL().connect().then(async () => {
+console.log('DB Mode is', DB_MODE)
+
+nSQL().connect().then(async (r) => {
+  console.log('Connected to DB', r)
   const INITIAL_TIME = new Date().getTime()
 
   test.before('setting up channel to community mapping', async t => {

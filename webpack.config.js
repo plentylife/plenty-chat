@@ -43,6 +43,11 @@ const common = {
       path.resolve('./src/state'),
       path.resolve('./node_modules')
     ]
+  },
+  externals: {
+    'nano-sqlite': 'commonjs nano-sqlite',
+    'sqlite3': 'commonjs sqlite3',
+    'leveldown': 'commonjs leveldown'
   }
 }
 
@@ -65,7 +70,7 @@ const library = Object.assign({}, common, {
     })
   ],
   target: 'web',
-  devtool: process.env.NODE_ENV === 'development' ? 'source-map' : '',
+  devtool: 'source-map',
   mode: process.env.NODE_ENV || 'production'
 })
 
@@ -87,6 +92,26 @@ const visualTests = Object.assign({}, common, {
   devtool: 'cheap-module-eval-source-map'
 })
 
+const dbTests = Object.assign({}, common, {
+  entry: './test/db/dbDumpsNode.js',
+  output: {
+    path: path.resolve(__dirname, 'build-tests'),
+    filename: 'dbDumpsModule.js',
+    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
+  },
+  target: 'node',
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('testperm')
+      }
+    })
+  ],
+  mode: 'development'
+  // devtool: 'source-map'
+})
+
 module.exports = [
-  library, visualTests
+  // library,
+  visualTests, dbTests
 ]

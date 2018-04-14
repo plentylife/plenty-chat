@@ -4,6 +4,11 @@ import {MESSAGE_TABLE} from './MessageTable'
 import {CHANNEL_TABLE} from './ChannelTable'
 import {nSQL} from 'nano-sql'
 
+// import '../../src/db/MessageTable'
+// import '../../src/db/ChannelTable'
+// import '../../src/db/CommunityTable'
+// import '../../src/db/AgentTable'
+
 export function getCommunityOfMsg (msgId: string): Promise<string | null> {
   return nSQL(MESSAGE_TABLE).query('select', [cn(CHANNEL_TABLE, 'communityId')])
     .join({
