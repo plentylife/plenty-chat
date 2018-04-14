@@ -9,7 +9,7 @@ const baseEventModel = [
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'timestamp', type: 'number', props: ['idx']},
   {key: 'eventType', type: 'string'},
-  {key: '*', type: '*'}
+  {key: 'payload', type: 'map'}
 ]
 
 const eventModel = baseEventModel.concat([
@@ -21,8 +21,15 @@ const eventModel = baseEventModel.concat([
 const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM'})
 
 export function pushEvent (event, handledSuccessfully: boolean) {
+  // fixme should payload perhaps be stored as json
   const withTime = Object.assign({timestamp: new Date().getTime(), handledSuccessfully}, event)
   return nSQL(EVENT_TABLE).query('upsert', withTime).exec()
+}
+
+/** Returns all events after a given timestamp in a community */
+export function selectAfterTimestamp (communityId: string, timestamp: number): Promise<Array<any>> {
+  return nSQL(EVENT_TABLE).query('select')
+    .where([['communityId', '=', communityId], 'AND', ['timestamp', '>', timestamp]]).exec()
 }
 
 /* Events coming from ourselves */
