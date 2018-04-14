@@ -28,7 +28,7 @@ export async function handleMessageEvent (event: Event): Promise<boolean> {
 }
 
 // just a stub for now. should throw exception if invalid
-function validatePayload (payload): MessageEventPayload {
+function validatePayload (payload: Object): MessageEventPayload {
   if (!payload) throw new Error('Invalid message payload')
   if (!payload.channelId) throw new Error('Message playload missing channel')
   const p = (payload: MessageEventPayload)

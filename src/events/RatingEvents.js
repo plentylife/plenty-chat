@@ -1,5 +1,5 @@
 // @flow
-import {Event} from './index'
+import type {Event} from './index'
 import {MissingPayload, MissingProperty} from '../utils/Error'
 import {setRating} from '../db/RatingTable'
 

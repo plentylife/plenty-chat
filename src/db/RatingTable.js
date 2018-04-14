@@ -1,3 +1,4 @@
+// @flow
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 
@@ -10,24 +11,25 @@ const ratingTable = nSQL(RATING_TABLE).model([
   {key: 'rating', type: 'float'}
 ]).config({mode: DB_MODE || 'PERM'})
 
-function getRatingQuery (agentId, messageId) {
+function getRatingQuery (agentId: string, messageId: string) {
   return nSQL(RATING_TABLE).query('select', ['id', 'rating'])
     .where([['agentId', '=', agentId], 'AND', ['messageId', '=', messageId]]).exec()
 }
 
-export function getRating (messageId, agentId): Promise<number | null> {
+export function getRating (messageId: string, agentId: string): Promise<number | null> {
   return getRatingQuery(agentId, messageId).then(row => {
     return row.length > 0 ? row[0].rating : null
   })
 }
 
-export function setRating (messageId, agentId, rating) {
+export function setRating (messageId: string, agentId: string, rating: number) {
   let payload = {
     agentId: agentId, messageId: messageId, rating: rating
   }
 
   return getRatingQuery(agentId, messageId).then(row => {
     if (row.length > 0) {
+      // $FlowFixMe
       payload.id = row[0].id
     }
   }).then(() => {
