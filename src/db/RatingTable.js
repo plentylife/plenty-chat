@@ -10,23 +10,23 @@ const ratingTable = nSQL(RATING_TABLE).model([
   {key: 'rating', type: 'float'}
 ]).config({mode: DB_MODE || 'PERM'})
 
-function getRatingQurey (agentId, messageId) {
+function getRatingQuery (agentId, messageId) {
   return nSQL(RATING_TABLE).query('select', ['id', 'rating'])
     .where([['agentId', '=', agentId], 'AND', ['messageId', '=', messageId]]).exec()
 }
 
-export function getRating (agentId, messageId) {
-  return getRatingQurey(agentId, messageId).then(row => {
+export function getRating (messageId, agentId): Promise<number | null> {
+  return getRatingQuery(agentId, messageId).then(row => {
     return row.length > 0 ? row[0].rating : null
   })
 }
 
-export function setRating (agentId, messageId, rating) {
+export function setRating (messageId, agentId, rating) {
   let payload = {
     agentId: agentId, messageId: messageId, rating: rating
   }
 
-  return getRatingQurey(agentId, messageId).then(row => {
+  return getRatingQuery(agentId, messageId).then(row => {
     if (row.length > 0) {
       payload.id = row[0].id
     }
