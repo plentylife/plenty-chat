@@ -9,7 +9,7 @@ export const DB_MODE = (() => {
       return 'PERM'
     case 'testperm':
       // eslint-disable-next-line new-cap
-      return new nSQLiteAdapter('./db-plenty.sqlite3')
+      return new nSQLiteAdapter(process.env.DB_NAME || './db-plenty.sqlite3')
     default:
       return 'TEMP'
   }
