@@ -1,0 +1,27 @@
+import {nSQL} from 'nano-sql/lib/index'
+import {getCommunity, setCommunityOfChannel} from '../../src/db/ChannelTable'
+import test from 'ava/index'
+import {pushMessage} from '../../src/db/MessageTable'
+import {getCommunityOfMsg} from '../../src/db/index'
+import {EVENT_TABLE, pushEvent, selectAfterTimestamp} from '../../src/db/EventTable'
+import {DB_MODE} from '../../src/state/GlobalState'
+
+const AGENT_ID = 'uid'
+const COMMUNITY_ID = 'comid'
+const CHANNEL_ID = 'chid'
+const MSG_ID = 'msid'
+
+console.log('DB Mode is', DB_MODE)
+
+nSQL().connect().then(async (r) => {
+  console.log('Connected to DB', r)
+
+  test('there should be records', async t => {
+    let flag = false
+    await nSQL(EVENT_TABLE).query('select').exec().then(r => {
+      flag = r.length > 0
+      r.forEach(e => console.log(e))
+    })
+    t.true(flag)
+  })
+})
