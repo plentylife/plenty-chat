@@ -45,7 +45,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
       payload.id = r[0].id
     } else {
       // $FlowFixMe
-      payload.creditLimit = DEFAULT_CREDIT_LIMIT
+      payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
     }
     console.log('Setting new balance for [agent] in [community] to [amount]', agentId, communityId, balance)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
@@ -53,6 +53,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
 }
 
 export function walletExists (agentId: string, communityId: string): Promise<boolean> {
+  if (!agentId) throw new TypeError('agentId cannot be null or undefined')
   return getRecord(agentId, communityId).then(r => {
     return r.length > 0
   })

@@ -7,7 +7,7 @@ import {nSQL} from 'nano-sql'
 import {currentAgentId, currentCommunityId, DB_MODE} from './state/GlobalState'
 import {walletExists} from './db/AgentWalletTable'
 import {sendMessage} from './actions/MessageActions'
-import {hasEnoughFundsToSendMessage, initializeAccount, intializeCommunity} from './accounting/Accounting'
+import {hasEnoughFundsToSendMessage, initializeAccount, initializeCommunity} from './accounting/Accounting'
 import {communityExists} from './db/CommunityTable'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
@@ -31,7 +31,7 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
     // fixme do not reupdate every time
     setCommunityOfChannel(channelId, communityId)
     communityExists(communityId).then(e => {
-      if (!e) intializeCommunity(communityId)
+      if (!e) initializeCommunity(communityId)
     })
     walletExists(agentId, communityId).then(e => {
       if (!e) initializeAccount(agentId, communityId)

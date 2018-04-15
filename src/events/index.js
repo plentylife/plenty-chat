@@ -6,6 +6,7 @@ import {handleRatingEvent, RATING_EVENT_TYPE} from './RatingEvents'
 import type {MessageEventPayload} from './MessageEvents'
 import type {RatingEventPayload} from './RatingEvents'
 import {MissingPayload} from '../utils/Error'
+import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -33,6 +34,7 @@ export function handleEvent (event: Event): Promise<boolean> {
     return r
   }).catch(e => {
     console.log(`Failed to handle event: ${e}`, event)
+    return false
   })
 }
 
@@ -40,6 +42,7 @@ function applyHandler (event: Event): Promise<boolean> {
   switch (event.eventType) {
     case MESSAGE_EVENT_TYPE: return handleMessageEvent(event)
     case RATING_EVENT_TYPE: return handleRatingEvent(event)
+    case ADD_AGENT_TO_COMMUNITY_EVEN_TYPE: return handleAddAgentToCommunity(event)
     default: throw new Error('Could not recognize event type')
   }
 }
