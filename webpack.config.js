@@ -138,6 +138,7 @@ const serverTest = Object.assign({}, server, {
       'process.env': {
         NODE_ENV: JSON.stringify('testperm'),
         DB_NAME: JSON.stringify('plenty-test-db.sqlite3')
+        // DEBUG: JSON.stringify('*')
       }
     })
   ]
