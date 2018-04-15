@@ -1,9 +1,7 @@
 // @flow
 
 import type {Event} from './index'
-import {STUB} from '../utils'
-import {walletExists} from '../db/AgentWalletTable'
-import {initializeAccount, initializeCommunity} from '../accounting/Accounting'
+import {initializeCommunity} from '../accounting/Accounting'
 import {communityExists} from '../db/CommunityTable'
 import {setCommunityOfChannel} from '../db/ChannelTable'
 import {MissingProperty} from '../utils/Error'
