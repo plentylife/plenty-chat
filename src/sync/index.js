@@ -1,7 +1,7 @@
 // @flow
 
 import {STUB} from '../utils'
-import {Event} from '../events'
+import {Event, handleEvent as internalEventHandler} from '../events'
 import {getCommunityEvents, getEvents} from '../db/EventTable'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
@@ -45,12 +45,33 @@ export function listenForUpdateRequests (socket): void {
 function listenForEvents (socket) {
   socket.on(EVENT_CHANNEL, (event, ackFn) => {
     ackFn(EVENT_CHANNEL + '.ack')
-    handleEvent(event)
+    backlogEvents(event)
   })
 }
 
-function handleEvent (event) {
+let eventBacklog: Array<Event> = []
+
+function backlogEvents (event) {
   console.log('Event handler', event)
+  eventBacklog.push(event)
+  consumeEvents()
+}
+
+let isConsuming = false
+async function consumeEvents () {
+  if (!isConsuming) {
+    isConsuming = true
+
+    let event = eventBacklog.shift()
+    while (event) {
+      await internalEventHandler(event).catch(e => {
+        console.log('Sync event handler failed', e)
+      })
+      event = eventBacklog.shift()
+    }
+
+    isConsuming = false
+  }
 }
 
 async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {

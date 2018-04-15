@@ -1,6 +1,6 @@
 // @flow
 import type {Event} from './index'
-import {InappropriateAction, MissingPayload, MissingProperty} from '../utils/Error'
+import {InappropriateAction, MissingDatabaseEntry, MissingPayload, MissingProperty} from '../utils/Error'
 import {setRating} from '../db/RatingTable'
 import {getMessage} from '../db/MessageTable'
 
@@ -15,6 +15,7 @@ export async function handleRatingEvent (event: Event): Promise<boolean> {
   const payload = validatePayload(event.payload)
 
   const msg = await getMessage(payload.messageId)
+  if (msg === null) throw new MissingDatabaseEntry('There is not such message with id ' + payload.messageId)
   if (msg.senderId === event.senderId) throw new CannotRateOwnMessage()
 
   return setRating(payload.messageId, event.senderId, payload.rating)

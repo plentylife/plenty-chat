@@ -20,7 +20,7 @@ const eventModel = baseEventModel.concat([
 ])
 const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM'})
 
-export function pushEvent (event, handledSuccessfully: boolean) {
+export function pushEvent (event, handledSuccessfully: boolean): Promise<any> {
   // fixme should payload perhaps be stored as json
   const withTime = Object.assign({timestamp: new Date().getTime(), handledSuccessfully}, event)
   return nSQL(EVENT_TABLE).query('upsert', withTime).exec()

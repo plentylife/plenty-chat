@@ -28,7 +28,7 @@ export function pushMessage (id: string, senderId: string, channelId: string): P
   })
 }
 
-export function getMessage (id: string): Promise<MessageRow> {
+export function getMessage (id: string): Promise<MessageRow | null> {
   return nSQL(MESSAGE_TABLE).query('select').where(['id', '=', id]).exec().then(r => {
     // console.log('getting message (query done) with', id, r)
     return (r.length > 0 ? r[0] : null)

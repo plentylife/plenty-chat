@@ -27,9 +27,12 @@ export function handleEvent (event: Event): Promise<boolean> {
 
   // fixme put a try catch here to log failed events
 
-  return applyHandler(event).then(r => {
-    pushEvent(event, r)
+  return applyHandler(event).then(async r => {
+    console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
+    await pushEvent(event, r)
     return r
+  }).catch(e => {
+    console.log(`Failed to handle event: ${e}`, event)
   })
 }
 
