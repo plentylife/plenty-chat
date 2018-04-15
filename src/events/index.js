@@ -7,6 +7,7 @@ import type {MessageEventPayload} from './MessageEvents'
 import type {RatingEventPayload} from './RatingEvents'
 import {MissingPayload} from '../utils/Error'
 import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
+import {CREATE_CHANNEL_EVENT_TYPE, handleCreateChannelEvent} from './ChannelEvents'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -24,7 +25,7 @@ export function handleEvent (event: Event): Promise<boolean> {
   if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
   if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
   if (!event.eventId) throw new Error('Improperly formatted event. No event id.')
-  if (!event.payload) throw new MissingPayload()
+  if (typeof event.payload !== 'object') throw new MissingPayload()
 
   // fixme put a try catch here to log failed events
 
@@ -43,6 +44,7 @@ function applyHandler (event: Event): Promise<boolean> {
     case MESSAGE_EVENT_TYPE: return handleMessageEvent(event)
     case RATING_EVENT_TYPE: return handleRatingEvent(event)
     case ADD_AGENT_TO_COMMUNITY_EVEN_TYPE: return handleAddAgentToCommunity(event)
+    case CREATE_CHANNEL_EVENT_TYPE: return handleCreateChannelEvent(event)
     default: throw new Error('Could not recognize event type')
   }
 }

@@ -9,6 +9,8 @@ export async function createAgent (agentId: string): Promise<boolean> {
   STUB()
 }
 
+// todo. maybe this should be in a community actions file?
+
 export async function addAgentToCommunity (agentId: string, communityId: string): Promise<boolean> {
   return sendEvent(ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, agentId, communityId, {})
 }

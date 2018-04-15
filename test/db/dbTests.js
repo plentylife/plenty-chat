@@ -1,5 +1,5 @@
 import {nSQL} from 'nano-sql/lib/index'
-import {getCommunity, setCommunityOfChannel} from '../../src/db/ChannelTable'
+import {getCommunityOfChannel, setCommunityOfChannel} from '../../src/db/ChannelTable'
 import test from 'ava/index'
 import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
@@ -19,7 +19,7 @@ nSQL().connect().then(async (r) => {
 
   test.before('setting up channel to community mapping', async t => {
     await setCommunityOfChannel(CHANNEL_ID, COMMUNITY_ID)
-    const c = await getCommunity(CHANNEL_ID)
+    const c = await getCommunityOfChannel(CHANNEL_ID)
 
     t.is(c, COMMUNITY_ID)
   })

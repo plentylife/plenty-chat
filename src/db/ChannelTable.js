@@ -11,7 +11,7 @@ const channelTable = nSQL(CHANNEL_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE}
 ]).config({mode: DB_MODE || 'PERM'})
 
-export function getCommunity (channelId: string): Promise<string> {
+export function getCommunityOfChannel (channelId: string): Promise<string> {
   return nSQL(CHANNEL_TABLE).query('select').where(['channelId', '=', channelId]).exec().then(r => {
     return r.length > 0 ? r[0].communityId : null
   })

@@ -12,7 +12,9 @@ export function initializeAccount (agentId: string, communityId: string): Promis
 }
 
 export function initializeCommunity (communityId: string): Promise<void> {
-  return setCommunityBalance(communityId, 0)
+  return setCommunityBalance(communityId, 0).then(r =>
+    (r.length > 0)
+  )
 }
 
 /**

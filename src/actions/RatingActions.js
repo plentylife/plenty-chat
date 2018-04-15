@@ -2,7 +2,7 @@ import {setRating} from '../db/RatingTable'
 import {sendEvent} from '../events'
 import {RATING_EVENT_TYPE} from '../events/RatingEvents'
 import type {RatingEventPayload} from '../events/RatingEvents'
-import {getCommunity} from '../db/ChannelTable'
+import {getCommunityOfChannel} from '../db/ChannelTable'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 

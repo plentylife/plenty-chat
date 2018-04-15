@@ -2,7 +2,7 @@
 
 import {sendEvent} from '../events'
 import {MESSAGE_EVENT_TYPE} from '../events/MessageEvents'
-import {getCommunity} from '../db/ChannelTable'
+import {getCommunityOfChannel} from '../db/ChannelTable'
 
 /**
  * Takes a message and packages it into an event
@@ -14,7 +14,7 @@ import {getCommunity} from '../db/ChannelTable'
  */
 export async function sendMessage (agentId: string, channelId: string, messageId: string): Promise<boolean> {
   console.log('sendMessage function triggered', agentId, channelId, messageId)
-  const communityId = await getCommunity(channelId)
+  const communityId = await getCommunityOfChannel(channelId)
   if (!communityId) throw new Error('No such channel exists')
   return sendEvent(MESSAGE_EVENT_TYPE, agentId, communityId, {messageId, channelId})
 }
