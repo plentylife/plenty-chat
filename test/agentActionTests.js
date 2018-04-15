@@ -1,20 +1,34 @@
 import test from 'ava'
 import {nSQL} from 'nano-sql'
-import {getBalance} from '../src/db/AgentWalletTable'
+import {getBalance, setBalance} from '../src/db/AgentWalletTable'
 import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {addAgentToCommunity} from '../src/actions/AgentActions'
-
-console.log('NODE_ENV is ', process.env.NODE_ENV)
+import {DB_MODE} from '../src/state/GlobalState'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
 
-nSQL().connect().then(async () => {
-  test('adding agent to community', async t => {
-    const ares = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
-    t.true(ares)
+test.before(t => {
+  t.is(DB_MODE, 'TEMP')
+  return nSQL().connect()
+})
 
-    const wallet = await getBalance(AGENT_ID, COMMUNITY_ID)
-    t.deepEqual(wallet, {balance: 0, creditLimit: DEFAULT_CREDIT_LIMIT})
-  })
+test.serial('adding agent to community', async t => {
+  const ares = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
+  t.true(ares)
+
+  const wallet = await getBalance(AGENT_ID, COMMUNITY_ID)
+  t.deepEqual(wallet, {balance: 0, creditLimit: DEFAULT_CREDIT_LIMIT})
+})
+
+test.serial('adding agent should not affect existing account', async t => {
+  await setBalance(AGENT_ID, COMMUNITY_ID, 10)
+  let wallet = await getBalance(AGENT_ID, COMMUNITY_ID)
+  t.deepEqual(wallet, {balance: 10, creditLimit: DEFAULT_CREDIT_LIMIT})
+
+  const ares = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
+  t.true(ares)
+
+  wallet = await getBalance(AGENT_ID, COMMUNITY_ID)
+  t.deepEqual(wallet, {balance: 10, creditLimit: DEFAULT_CREDIT_LIMIT})
 })
