@@ -141,7 +141,9 @@ const serverTest = Object.assign({}, server, {
         // DEBUG: JSON.stringify('*')
       }
     })
-  ]
+  ],
+  mode: 'development',
+  devtool: 'source-map'
 })
 
 module.exports = [

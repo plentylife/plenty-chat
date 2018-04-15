@@ -7,6 +7,7 @@ import {getCommunityEvents, getEvents} from '../db/EventTable'
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
 const EVENT_CHANNEL = 'event'
+const READY_CHANNEL = 'ready'
 
 export type Peer = {
   socketId: string,
@@ -49,7 +50,7 @@ function listenForEvents (socket) {
 }
 
 function handleEvent (event) {
-  console.log('EVENT', event)
+  console.log('Event handler', event)
 }
 
 async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
@@ -64,7 +65,9 @@ async function handleUpdateRequest (socket, communityId: string, fromTimestamp: 
 
   relevantEntries.forEach(e => {
     console.log('sending event', e)
-    socket.emit('event', e)
+    socket.emit('event', e, ack => {
+      console.log(EVENT_CHANNEL + '.ack')
+    })
   })
 }
 
@@ -74,5 +77,15 @@ export function onConnectToPeer (peer: Peer) {
 
   listenForEvents(peer.socket)
   listenForUpdateRequests(peer.socket)
-  return requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+
+  peer.socket.on(READY_CHANNEL, (empty, ackFn) => {
+    console.log('Peer is ready', peer.socketId)
+    ackFn(READY_CHANNEL + '.ack')
+    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+  })
+
+  peer.socket.emit(READY_CHANNEL, '', ack => {
+    console.log(ack)
+    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+  })
 }
