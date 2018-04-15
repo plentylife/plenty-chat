@@ -27,9 +27,14 @@ export function pushEvent (event, handledSuccessfully: boolean) {
 }
 
 /** Returns all events after a given timestamp in a community */
-export function selectAfterTimestamp (communityId: string, timestamp: number): Promise<Array<any>> {
+export function getCommunityEvents (communityId: string, timestamp: number): Promise<Array<any>> {
   return nSQL(EVENT_TABLE).query('select')
     .where([['communityId', '=', communityId], 'AND', ['timestamp', '>', timestamp]]).exec()
+}
+
+/** Returns all events after a given timestamp in a community */
+export function getEvents (timestamp: number): Promise<Array<any>> {
+  return nSQL(EVENT_TABLE).query('select').where(['timestamp', '>', timestamp]).exec()
 }
 
 /* Events coming from ourselves */

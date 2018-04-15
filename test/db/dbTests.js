@@ -3,7 +3,7 @@ import {getCommunity, setCommunityOfChannel} from '../../src/db/ChannelTable'
 import test from 'ava/index'
 import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
-import {pushEvent, selectAfterTimestamp} from '../../src/db/EventTable'
+import {pushEvent, getCommunityEvents} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
 
 const AGENT_ID = 'uid'
@@ -41,13 +41,13 @@ nSQL().connect().then(async (r) => {
     const event = JSON.parse('{"eventId":1,"communityId":"comid","senderId":"uid","eventType":"rating","payload":{"messageId":"tmid","rating":0}}')
     await pushEvent(event, true)
 
-    let events = await selectAfterTimestamp(COMMUNITY_ID, INITIAL_TIME)
+    let events = await getCommunityEvents(COMMUNITY_ID, INITIAL_TIME)
     events.forEach(e => {
       console.log('Event:', e)
     })
     t.is(events.length, 1)
 
-    events = await selectAfterTimestamp(COMMUNITY_ID, new Date().getTime())
+    events = await getCommunityEvents(COMMUNITY_ID, new Date().getTime())
     t.is(events.length, 0)
   })
 })
