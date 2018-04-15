@@ -2,9 +2,11 @@
 
 import {STUB} from '../utils'
 import {Event} from '../events'
-import {getCommunityEvents} from '../db/EventTable'
+import {getCommunityEvents, getEvents} from '../db/EventTable'
 
-const REQUEST_UPDATE = 'requestUpdate'
+const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
+const REQUEST_UPDATE_ALL = ':all:'
+const EVENT_CHANNEL = 'event'
 
 export type Peer = {
   socketId: string,
@@ -22,28 +24,55 @@ export function requestUpdate (socket): void {
 
 }
 
-export function requestUpdateFromPeer (peer: Peer, communityId: string, fromTimestamp: number): Promise<any> {
+export function requestCommunityUpdate (socket, communityId: string, fromTimestamp: number): Promise<any> {
+  console.log('Requesting update', communityId, fromTimestamp)
   return new Promise(resolve => {
-    peer.socket.emit(REQUEST_UPDATE, {communityId, fromTimestamp}, ack => {
+    socket.emit(REQUEST_UPDATE_CHANNEL, {communityId, fromTimestamp}, ack => {
       resolve(ack)
     })
   })
 }
 
 export function listenForUpdateRequests (socket): void {
-  socket.on(REQUEST_UPDATE, (request, ackFn) => {
-    console.log('Server is asked for update', request)
-    ackFn(REQUEST_UPDATE + '.ack')
+  socket.on(REQUEST_UPDATE_CHANNEL, (request, ackFn) => {
+    console.log('Update requested', request)
+    ackFn(REQUEST_UPDATE_CHANNEL + '.ack')
     handleUpdateRequest(socket, request.communityId, request.fromTimestamp)
   })
 }
 
-export async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
+function listenForEvents (socket) {
+  socket.on(EVENT_CHANNEL, (event, ackFn) => {
+    ackFn(EVENT_CHANNEL + '.ack')
+    handleEvent(event)
+  })
+}
+
+function handleEvent (event) {
+  console.log('EVENT', event)
+}
+
+async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
   console.log('trying to handle an update request', communityId, fromTimestamp)
 
-  const relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
+  let relevantEntries
+  if (communityId === REQUEST_UPDATE_ALL) {
+    relevantEntries = await getEvents(fromTimestamp)
+  } else {
+    relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
+  }
+
   relevantEntries.forEach(e => {
     console.log('sending event', e)
     socket.emit('event', e)
   })
+}
+
+export function onConnectToPeer (peer: Peer) {
+  console.log('Connection established to peer', peer.address, peer.socketId)
+  peers.push(peer)
+
+  listenForEvents(peer.socket)
+  listenForUpdateRequests(peer.socket)
+  return requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
 }

@@ -1,6 +1,6 @@
 // @flow
 import io from 'socket.io-client'
-import {requestUpdateFromPeer} from './index'
+import {onConnectToPeer} from './index'
 import type {Peer} from './index'
 
 export function connectToPeer (peer: string): Promise<Peer> {
@@ -8,7 +8,7 @@ export function connectToPeer (peer: string): Promise<Peer> {
   return new Promise((resolve, reject) => {
     socket.on('connect', (d) => {
       resolve({
-        socket, sockedId: socket.id, address: peer
+        socket, socketId: socket.id, address: peer
       })
     })
   })
@@ -17,10 +17,6 @@ export function connectToPeer (peer: string): Promise<Peer> {
 /** Starts the synchronization process between this agent and the peers */
 export function startSync (peers: Array<string>): void {
   peers.forEach(address => {
-    connectToPeer(address).then(p => {
-      peers.push(p)
-
-      requestUpdateFromPeer(p, 'testcomid')
-    })
+    connectToPeer(address).then(onConnectToPeer)
   })
 }

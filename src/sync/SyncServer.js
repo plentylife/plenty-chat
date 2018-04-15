@@ -1,7 +1,8 @@
 import {DB_MODE} from '../state/GlobalState'
-import {listenForUpdateRequests} from './index'
+import {onConnectToPeer} from './index'
 import '../db/index'
 import {nSQL} from 'nano-sql'
+import type {Peer} from './index'
 
 console.log('Starting server')
 
@@ -21,8 +22,13 @@ console.log('Socket debug', process.env.DEBUG)
 nSQL().connect().then(c => {
   console.log('DB connected', c)
 
-  io.on('connection', (socket) => {
-    console.log('Server connected to ', socket.id)
-    listenForUpdateRequests(socket)
+  io.on('connection', (socket, fn) => {
+    console.log('Server on connect', socket.id, fn)
+    const peer: Peer = {
+      address: null,
+      socket: socket,
+      socketId: socket.id
+    }
+    onConnectToPeer(peer)
   })
 })
