@@ -2,6 +2,7 @@ import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {AGENT_TABLE} from './AgentTable'
+import type {Event} from '../events'
 
 export const EVENT_TABLE = 'Event'
 
@@ -13,17 +14,48 @@ const baseEventModel = [
 ]
 
 const eventModel = baseEventModel.concat([
+  {key: 'globalEventId', type: 'string', props: ['pk']},
   // this even id is created by the agent who sent the event
-  {key: 'eventId', type: 'int'},
-  {key: 'senderId', type: AGENT_TABLE},
+  {key: 'agentEventId', type: 'int', props: ['idx']},
+  {key: 'senderId', type: AGENT_TABLE, props: ['idx']},
+  {key: 'receivedFrom', type: 'string[]'},
   {key: 'handledSuccessfully', type: 'bool'}
 ])
 const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM'})
 
-export function pushEvent (event, handledSuccessfully: boolean): Promise<any> {
-  // fixme should payload perhaps be stored as json
-  const withTime = Object.assign({timestamp: new Date().getTime(), handledSuccessfully}, event)
-  return nSQL(EVENT_TABLE).query('upsert', withTime).exec()
+export function getEvent (globalEventId: string): Promise<Object | null> {
+  return nSQL(EVENT_TABLE).query('select').where(['globalEventId', '=', globalEventId])
+    .exec().then(rows => (rows.length > 0 ? rows[0] : null))
+}
+
+export async function pushEvent (event: Event, handledSuccessfully: boolean): Promise<any> {
+  const updated = await updateEvent(event)
+  // todo. test received from logging
+  if (!updated) {
+    const receivedFrom = []
+    if (event.receivedFrom) receivedFrom.push(event.receivedFrom)
+    const withTime = Object.assign({}, event, {
+      timestamp: new Date().getTime(), handledSuccessfully, receivedFrom
+    })
+    return nSQL(EVENT_TABLE).query('upsert', withTime).exec()
+  }
+}
+
+/**
+ * @return true if event exists, false otherwise
+ */
+export async function updateEvent (event: Event): Promise<boolean> {
+  const existing = await getEvent(event.globalEventId)
+  // todo. test received from logging
+  if (existing) {
+    if (event.receivedFrom && !existing.receivedFrom.includes(event.receivedFrom)) {
+      const receivedFrom = [...existing.receivedFrom]
+      receivedFrom.push(event.receivedFrom)
+      return nSQL(EVENT_TABLE).query('upsert', Object.assign({}, existing, {receivedFrom})).exec().then(() => true)
+    }
+    return true
+  }
+  return false
 }
 
 /** Returns all events after a given timestamp in a community */

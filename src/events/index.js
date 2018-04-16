@@ -13,7 +13,8 @@ export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
 
 export type Event = {
-  eventId: number,
+  globalEventId: string,
+  agentEventId: number,
   senderId: string,
   communityId: string,
   eventType: EventType,
@@ -25,7 +26,7 @@ export function handleEvent (event: Event): Promise<boolean> {
   if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
   if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
   if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
-  if (!event.eventId) throw new Error('Improperly formatted event. No event id.')
+  if (!event.agentEventId) throw new Error('Improperly formatted event. No event id.')
   if (typeof event.payload !== 'object') throw new MissingPayload()
 
   // fixme put a try catch here to log failed events
@@ -55,6 +56,6 @@ export async function sendEvent (eventType: EventType, senderId: string, communi
   payload: EventPayload): Promise<boolean> {
   const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
   return handleEvent({
-    eventId: eventId, communityId: communityId, senderId, eventType, payload
+    globalEventId: senderId + eventId, agentEventId: eventId, communityId, senderId, eventType, payload
   })
 }

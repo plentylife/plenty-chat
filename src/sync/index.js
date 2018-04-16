@@ -54,7 +54,7 @@ let eventBacklog: Array<Event> = []
 
 function backlogEvent (event: Event, peer: Peer) {
   console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
-  event.receivedFrom = peer.agentId
+  event.receivedFrom = peer.agentId.trim()
   eventBacklog.push(event)
   consumeEvents()
 }

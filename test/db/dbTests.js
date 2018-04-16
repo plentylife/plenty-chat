@@ -38,7 +38,7 @@ nSQL().connect().then(async (r) => {
   test('select events after timestamp', async t => {
     t.plan(2)
 
-    const event = JSON.parse('{"eventId":1,"communityId":"comid","senderId":"uid","eventType":"rating","payload":{"messageId":"tmid","rating":0}}')
+    const event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating","payload":{"messageId":"tmid","rating":0}}')
     await pushEvent(event, true)
 
     let events = await getCommunityEvents(COMMUNITY_ID, INITIAL_TIME)
