@@ -8,7 +8,7 @@ export function connectToPeer (peer: string): Promise<Peer> {
   return new Promise((resolve, reject) => {
     socket.on('connect', (d) => {
       resolve({
-        socket, socketId: socket.id, address: peer
+        socket, address: peer
       })
     })
   })

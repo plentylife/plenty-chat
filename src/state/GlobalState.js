@@ -1,6 +1,6 @@
 import {nSQLiteAdapter} from 'nano-sqlite'
 
-export var currentAgentId = 'anton'
+let _currentAgentId = 'anton'
 export var currentCommunityId = 'commid'
 
 export const DB_MODE = (() => {
@@ -14,3 +14,12 @@ export const DB_MODE = (() => {
       return 'TEMP'
   }
 })()
+
+export function getCurrentAgentId (): string {
+  return _currentAgentId
+}
+
+export function setCurrentAgentId (id: string) {
+  console.log('Global (current) Agent ID is set to', id)
+  _currentAgentId = id
+}

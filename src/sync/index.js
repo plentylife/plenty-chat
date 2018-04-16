@@ -3,6 +3,7 @@
 import {STUB} from '../utils'
 import {Event, handleEvent as internalEventHandler} from '../events'
 import {getCommunityEvents, getEvents} from '../db/EventTable'
+import {getCurrentAgentId} from '../state/GlobalState'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
@@ -10,7 +11,7 @@ const EVENT_CHANNEL = 'event'
 const READY_CHANNEL = 'ready'
 
 export type Peer = {
-  socketId: string,
+  agentId: string,
   socket: any,
   address: string
 }
@@ -26,7 +27,7 @@ export function requestUpdate (socket): void {
 }
 
 export function requestCommunityUpdate (socket, communityId: string, fromTimestamp: number): Promise<any> {
-  console.log('Requesting update', communityId, fromTimestamp)
+  console.log('UPDATE -->', communityId, fromTimestamp)
   return new Promise(resolve => {
     socket.emit(REQUEST_UPDATE_CHANNEL, {communityId, fromTimestamp}, ack => {
       resolve(ack)
@@ -36,23 +37,24 @@ export function requestCommunityUpdate (socket, communityId: string, fromTimesta
 
 export function listenForUpdateRequests (socket): void {
   socket.on(REQUEST_UPDATE_CHANNEL, (request, ackFn) => {
-    console.log('Update requested', request)
+    console.log('UPDATE <-- (r)', request)
     ackFn(REQUEST_UPDATE_CHANNEL + '.ack')
     handleUpdateRequest(socket, request.communityId, request.fromTimestamp)
   })
 }
 
-function listenForEvents (socket) {
-  socket.on(EVENT_CHANNEL, (event, ackFn) => {
+function listenForEvents (peer: Peer) {
+  peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     ackFn(EVENT_CHANNEL + '.ack')
-    backlogEvents(event)
+    backlogEvent(event, peer)
   })
 }
 
 let eventBacklog: Array<Event> = []
 
-function backlogEvents (event) {
-  console.log('Event handler', event)
+function backlogEvent (event: Event, peer: Peer) {
+  console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
+  event.receivedFrom = peer.agentId
   eventBacklog.push(event)
   consumeEvents()
 }
@@ -75,7 +77,7 @@ async function consumeEvents () {
 }
 
 async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
-  console.log('trying to handle an update request', communityId, fromTimestamp)
+  console.log('Handling UPDATE request', communityId, fromTimestamp)
 
   let relevantEntries
   if (communityId === REQUEST_UPDATE_ALL) {
@@ -85,18 +87,18 @@ async function handleUpdateRequest (socket, communityId: string, fromTimestamp: 
   }
 
   relevantEntries.forEach(e => {
-    console.log('sending event', e)
-    socket.emit('event', e, ack => {
+    console.log('EVENT -->', e)
+    socket.emit(EVENT_CHANNEL, e, ack => {
       console.log(EVENT_CHANNEL + '.ack')
     })
   })
 }
 
 export function onConnectToPeer (peer: Peer) {
-  console.log('Connection established to peer', peer.address, peer.socketId)
+  console.log('Connection established to peer', peer.address)
   peers.push(peer)
 
-  listenForEvents(peer.socket)
+  listenForEvents(peer)
   listenForUpdateRequests(peer.socket)
 
   let hasRequestedFlag = false
@@ -107,14 +109,15 @@ export function onConnectToPeer (peer: Peer) {
     }
   }
 
-  peer.socket.on(READY_CHANNEL, (empty, ackFn) => {
-    console.log('Peer is ready', peer.socketId)
-    ackFn(READY_CHANNEL + '.ack')
+  peer.socket.on(READY_CHANNEL, (peerInfo, ackFn) => {
+    console.log(`Peer (at address ${peer.address}) Agent ID is set to ${peerInfo.agentId} (L)`)
+    ackFn({agentId: getCurrentAgentId()})
     reqUpd()
   })
 
-  peer.socket.emit(READY_CHANNEL, '', ack => {
-    console.log(ack)
+  peer.socket.emit(READY_CHANNEL, {agentId: getCurrentAgentId()}, peerInfo => {
+    console.log(`Peer (at address ${peer.address}) Agent ID is set to ${peerInfo.agentId} (E)`)
+    peer.agentId = peerInfo.agentId
     reqUpd()
   })
 }

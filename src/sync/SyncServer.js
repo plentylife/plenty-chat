@@ -1,10 +1,14 @@
-import {DB_MODE} from '../state/GlobalState'
+// @flow
+
+import {setCurrentAgentId} from '../state/GlobalState'
 import {onConnectToPeer} from './index'
 import '../db/index'
 import {nSQL} from 'nano-sql'
 import type {Peer} from './index'
 
 console.log('Starting server')
+
+setCurrentAgentId('server-default-id')
 
 const server = require('http').createServer()
 const io = require('socket.io')(server, {
@@ -15,19 +19,18 @@ const port = process.env.PORT || 3000
 server.listen(port, () => console.log('server listening on port ' + port))
 
 console.log('Node env', process.env.NODE_ENV)
-console.log('DB mode', DB_MODE)
+// console.log('DB mode', DB_MODE)
 console.log('DB name', process.env.DB_NAME)
 console.log('Socket debug', process.env.DEBUG)
 
-nSQL().connect().then(c => {
-  console.log('DB connected', c)
+nSQL().connect().then(() => {
+  console.log('DB connected')
 
-  io.on('connection', (socket, fn) => {
-    console.log('Server on connect', socket.id, fn)
+  io.on('connection', (socket) => {
+    console.log('Server socket connect', socket.id)
     const peer: Peer = {
       address: null,
-      socket: socket,
-      socketId: socket.id
+      socket: socket
     }
     onConnectToPeer(peer)
   })

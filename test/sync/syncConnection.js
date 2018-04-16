@@ -27,7 +27,10 @@ test.serial('request for updates should sent', t => {
 test.serial('full setup on onConnect', t => {
   onConnectToPeer(peer)
 
-  return timeout(5000).then(() => t.pass())
+  return timeout(5000).then(() => {
+    t.is(peer.agentId, 'server-default-id')
+    t.pass()
+  })
 })
 
 function timeout (ms) {

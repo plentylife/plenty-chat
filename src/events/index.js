@@ -17,7 +17,8 @@ export type Event = {
   senderId: string,
   communityId: string,
   eventType: EventType,
-  payload: EventPayload
+  payload: EventPayload,
+  receivedFrom: ?string
 }
 
 export function handleEvent (event: Event): Promise<boolean> {
