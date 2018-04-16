@@ -30,6 +30,7 @@ export function handleEvent (event: Event): Promise<boolean> {
   // fixme put a try catch here to log failed events
 
   return applyHandler(event).then(async r => {
+    if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
     console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
     await pushEvent(event, r)
     return r

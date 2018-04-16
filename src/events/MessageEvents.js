@@ -21,7 +21,6 @@ export async function handleMessageEvent (event: Event): Promise<boolean> {
   const fc = await hasEnoughFunds(agentId, communityId, COST_OF_SENDING_MESSAGE)
   if (fc) {
     pushMessage(payload.messageId, agentId, channelId)
-    console.log('Handled message event', event)
     return spend(agentId, communityId, COST_OF_SENDING_MESSAGE).then(r => true)
   }
   return false

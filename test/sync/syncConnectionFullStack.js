@@ -10,6 +10,7 @@ import {getCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getRating} from '../../src/db/RatingTable'
 import {getMessage} from '../../src/db/MessageTable'
 import {getBalance} from '../../src/db/AgentWalletTable'
+import {getEvents} from '../../src/db/EventTable'
 
 const AGENT_ID = 'uid'
 const AGENT_RATER_ID = 'rater_uid'
@@ -30,6 +31,12 @@ test.before(async t => {
   t.is(msg.id, MSG_ID)
   await rateMessage(MSG_ID, AGENT_RATER_ID, 2, 2)
   t.is(await getRating(MSG_ID, AGENT_RATER_ID), 1)
+
+  const events = await getEvents(0)
+  events.forEach(e => {
+    if (!e.handledSuccessfully) console.log('Did not handle successfully', e)
+    t.true(e.handledSuccessfully)
+  })
 })
 
 test.serial('full setup on onConnect', t => {
