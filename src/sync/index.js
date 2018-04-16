@@ -29,6 +29,7 @@ export function requestUpdate (socket): void {
 }
 
 export function requestCommunityUpdate (socket, communityId: string, fromTimestamp: number): Promise<any> {
+  if (typeof fromTimestamp !== 'number') throw new TypeError('fromTimestamp must be a number')
   console.log('UPDATE -->', communityId, fromTimestamp)
   return new Promise(resolve => {
     socket.emit(REQUEST_UPDATE_CHANNEL, {communityId, fromTimestamp}, ack => {
@@ -138,7 +139,7 @@ export function onConnectToPeer (peer: Peer) {
   const reqUpd = async () => {
     if (!hasRequestedFlag) {
       hasRequestedFlag = true
-      const timestamp = getSyncedUpToInAll(peer.agentId)
+      const timestamp = await getSyncedUpToInAll(peer.agentId)
       requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, timestamp) // todo. updateAll is a hack
     }
   }

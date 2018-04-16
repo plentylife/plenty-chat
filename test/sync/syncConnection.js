@@ -7,14 +7,17 @@ import sinon from 'sinon'
 import {createChannel} from '../../src/actions/ChannelActions'
 import {getCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getEvents} from '../../src/db/EventTable'
-import {DB_MODE} from '../../src/state/GlobalState'
+import {DB_MODE, setCurrentAgentId} from '../../src/state/GlobalState'
 import {CREATE_CHANNEL_EVENT_TYPE} from '../../src/events/ChannelEvents'
+import {getSyncedUpTo, getSyncedUpToInAll} from '../../src/db/PeerSyncTable'
 
-let peer = null
+let globalTestPeer = null
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
 const CHANNEL_ID = 'chid'
+
+const INITIAL_TIME = new Date().getTime()
 
 test.before(t => {
   t.is(DB_MODE, 'TEMP')
@@ -23,31 +26,30 @@ test.before(t => {
 
 test.serial('connection should succeed', t => {
   return connectToPeer('http://localhost:3000').then(p => {
-    peer = p
+    globalTestPeer = p
     t.truthy(p)
   })
 })
 
 test.serial('request for updates should sent', t => {
-  return requestCommunityUpdate(peer.socket, COMMUNITY_ID, 0).then(ack => {
+  return requestCommunityUpdate(globalTestPeer.socket, COMMUNITY_ID, 0).then(ack => {
     console.log('TEST. update request ack', ack)
     t.pass()
   })
 })
 
 test.serial('full setup on onConnect', t => {
-  onConnectToPeer(peer)
+  onConnectToPeer(globalTestPeer)
 
   return timeout(1000).then(() => {
-    t.is(peer.agentId, 'server-default-id')
-    t.pass()
+    t.is(globalTestPeer.agentId, 'server-default-id')
   })
 })
 
 test.serial('new events should be sent out', async t => {
   console.log('\n\n========\n\n')
   // stub the peer
-  const spy = sinon.spy(peer.socket, 'emit').withArgs(EVENT_CHANNEL)
+  const spy = sinon.spy(globalTestPeer.socket, 'emit').withArgs(EVENT_CHANNEL)
   registerSendEventsObserver()
 
   const time = new Date().getTime()
@@ -63,11 +65,23 @@ test.serial('new events should be sent out', async t => {
   t.is(spy.firstCall.args[1].receivedFrom.length, 0)
 })
 
+test.serial('another peer should get updates', async t => {
+  setCurrentAgentId('another-peer')
+  let lPeer = null
+  await connectToPeer('http://localhost:3000').then(p => {
+    lPeer = p
+    t.truthy(p)
+  })
+  onConnectToPeer(lPeer)
 
-
-// test.serial('requesting an existing event from a peer should only log that it has been received from the peer', t => {
-//
-// })
+  return timeout(1000).then(async () => {
+    const lastSyncTime = await getSyncedUpToInAll(lPeer.agentId)
+    console.log('Last sync time is', lastSyncTime)
+    t.is(lPeer.agentId, 'server-default-id')
+    t.true(lastSyncTime > INITIAL_TIME)
+    t.true(lastSyncTime < (new Date().getTime()))
+  })
+})
 
 function timeout (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
