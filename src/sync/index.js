@@ -75,12 +75,15 @@ export function registerSendEventsObserver () {
 let eventBacklog: Array<Event> = []
 
 function backlogEvent (event: Event, peer: Peer) {
+  delete event.handledEventSuccessfully
   console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
+
+  if (!(event.receivedFrom instanceof Array)) {
+    throw new TypeError('Could not backlog event. `receivedFrom` is not an array')
+  }
+  event.receivedFrom = new Set(event.receivedFrom)
+
   if (peer.agentId) {
-    if (!(event.receivedFrom instanceof Array)) {
-      throw new TypeError('Could not backlog event. `receivedFrom` is not an array')
-    }
-    event.receivedFrom = new Set(event.receivedFrom)
     event.receivedFrom.add(peer.agentId.trim())
   }
   eventBacklog.push(event)

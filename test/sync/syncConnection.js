@@ -63,6 +63,10 @@ test.serial('new events should be sent out', async t => {
   t.is(spy.firstCall.args[1].receivedFrom.length, 0)
 })
 
+// test.serial('requesting an existing event from a peer should only log that it has been received from the peer', t => {
+//
+// })
+
 function timeout (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }

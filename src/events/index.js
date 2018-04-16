@@ -26,15 +26,16 @@ export function handleEvent (event: Event): Promise<boolean> {
   if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
   if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
   if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
-  if (!event.agentEventId) throw new Error('Improperly formatted event. No event id.')
+  if (!event.agentEventId) throw new Error('Improperly formatted event. No agent event id.')
+  if (!event.globalEventId) throw new Error('Improperly formatted event. No global event id.')
   if (typeof event.payload !== 'object') throw new MissingPayload()
 
   // fixme put a try catch here to log failed events
 
   return applyHandler(event).then(async r => {
     if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
-    console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
     await pushEvent(event, r)
+    console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
     return r
   }).catch(e => {
     console.error(`Failed to handle event: ${e}`, event)

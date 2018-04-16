@@ -136,7 +136,8 @@ const serverTest = Object.assign({}, server, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('testperm'),
+        // NODE_ENV: JSON.stringify('testperm'),
+        NODE_ENV: JSON.stringify('test'),
         DB_NAME: JSON.stringify('plenty-test-db.sqlite3')
         // DEBUG: JSON.stringify('*')
       }
