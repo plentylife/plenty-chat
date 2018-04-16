@@ -29,7 +29,7 @@ export function getEvent (globalEventId: string): Promise<Object | null> {
 }
 
 export async function pushEvent (event: Event, handledSuccessfully: boolean): Promise<any> {
-  if (!event.receivedFrom || !(event.receivedFrom instanceof Set)) {
+  if (event.receivedFrom && !(event.receivedFrom instanceof Set)) {
     throw new TypeError('Event property `receivedFrom` must be a Set')
   }
   const updated = await updateEvent(event)

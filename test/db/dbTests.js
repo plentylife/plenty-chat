@@ -3,7 +3,7 @@ import {getCommunityOfChannel, setCommunityOfChannel} from '../../src/db/Channel
 import test from 'ava/index'
 import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
-import {pushEvent, getCommunityEvents, getEvent} from '../../src/db/EventTable'
+import {pushEvent, getCommunityEvents, getEvent, getEvents} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
 import {dumpPeerSyncTable, getSyncedUpTo, getSyncedUpToInAll, logSync} from '../../src/db/PeerSyncTable'
 
@@ -40,7 +40,7 @@ nSQL().connect().then(async (r) => {
     t.plan(2)
 
     let event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating",' +
-      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uid1"}')
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uidseltime1"}')
     event.receivedFrom = new Set(['anton'])
     await pushEvent(event, true)
 
@@ -48,7 +48,7 @@ nSQL().connect().then(async (r) => {
     events.forEach(e => {
       console.log('Event:', e)
     })
-    t.is(events.length, 1)
+    t.true(events.map(e => (e.globalEventId)).includes('uidseltime1'))
 
     events = await getCommunityEvents(COMMUNITY_ID, new Date().getTime())
     t.is(events.length, 0)
@@ -56,18 +56,25 @@ nSQL().connect().then(async (r) => {
 
   test('create and update event', async t => {
     let event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating",' +
-      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uid1"}')
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uidcu1"}')
     event.receivedFrom = new Set(['anton'])
 
     await pushEvent(event, true)
-    let e = await getEvent('uid1')
+    let e = await getEvent('uidcu1')
 
     t.deepEqual(e.receivedFrom, ['anton'])
 
     event.communityId = 'other'
     event.receivedFrom = new Set(['john'])
     await pushEvent(event, true)
-    e = await getEvent('uid1')
+    e = await getEvent('uidcu1')
+
+    t.deepEqual(e.receivedFrom, ['anton', 'john'])
+    t.is(e.communityId, 'comid')
+
+    event.receivedFrom = null
+    await pushEvent(event, true)
+    e = await getEvent('uidcu1')
 
     t.deepEqual(e.receivedFrom, ['anton', 'john'])
     t.is(e.communityId, 'comid')
@@ -110,5 +117,29 @@ nSQL().connect().then(async (r) => {
     t.is(await getSyncedUpToInAll(AGENT_ID), 15)
     t.is(await getSyncedUpTo(AGENT_ID, COMMUNITY_ID), 10)
     t.is(await getSyncedUpTo(AGENT_ID, CID2), 15)
+  })
+
+  test('events are sorted by timestamp', async t => {
+    const COMID = 'timecid'
+
+    let event = JSON.parse('{"agentEventId":1,"communityId":"timecid","senderId":"uid","eventType":"rating",' +
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uidtime1"}')
+    await pushEvent(event, true)
+
+    event = JSON.parse('{"agentEventId":2,"communityId":"timecid","senderId":"uid","eventType":"rating",' +
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uidtime2"}')
+    await pushEvent(event, true)
+
+    let events = await getEvents(0)
+    let testFlag = true
+    let lastTime = 0
+    events.forEach(e => {
+      if (e.timestamp < lastTime) testFlag = false
+      lastTime = e.timestamp
+    })
+    t.true(testFlag)
+
+    events = await getCommunityEvents(COMID, 0)
+    t.true(events[0].timestamp < events[1].timestamp)
   })
 })
