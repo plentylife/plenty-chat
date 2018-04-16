@@ -32,4 +32,8 @@ function validatePayload (payload: Object): RatingEventPayload {
 
 export class InvalidRating extends Error {}
 
-export class CannotRateOwnMessage extends InappropriateAction {}
+export class CannotRateOwnMessage extends InappropriateAction {
+  constructor () {
+    super('Cannot rate your own message')
+  }
+}

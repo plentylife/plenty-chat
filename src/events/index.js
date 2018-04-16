@@ -34,7 +34,7 @@ export function handleEvent (event: Event): Promise<boolean> {
     await pushEvent(event, r)
     return r
   }).catch(e => {
-    console.log(`Failed to handle event: ${e}`, event)
+    console.error(`Failed to handle event: ${e}`, event)
     return false
   })
 }

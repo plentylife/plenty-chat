@@ -1,8 +1,8 @@
-import {setRating} from '../db/RatingTable'
+// @flow
+
 import {sendEvent} from '../events'
 import {RATING_EVENT_TYPE} from '../events/RatingEvents'
 import type {RatingEventPayload} from '../events/RatingEvents'
-import {getCommunityOfChannel} from '../db/ChannelTable'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 
