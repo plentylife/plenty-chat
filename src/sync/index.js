@@ -137,13 +137,15 @@ export function onConnectToPeer (peer: Peer) {
     }
   }
 
+  const myPeerInfo = {agentId: getCurrentAgentId()}
   peer.socket.on(READY_CHANNEL, (peerInfo, ackFn) => {
     console.log(`Peer (at address ${peer.address}) Agent ID is set to ${peerInfo.agentId} (L)`)
-    ackFn({agentId: getCurrentAgentId()})
+    peer.agentId = peerInfo.agentId
+    ackFn(myPeerInfo)
     reqUpd()
   })
 
-  peer.socket.emit(READY_CHANNEL, {agentId: getCurrentAgentId()}, peerInfo => {
+  peer.socket.emit(READY_CHANNEL, myPeerInfo, peerInfo => {
     console.log(`Peer (at address ${peer.address}) Agent ID is set to ${peerInfo.agentId} (E)`)
     peer.agentId = peerInfo.agentId
     reqUpd()
