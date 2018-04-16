@@ -6,6 +6,7 @@ import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 
 export function initializeAccount (agentId: string, communityId: string): Promise<void> {
+  // todo. share points are not intialized; currently they get stuck into db by default.
   return setBalance(agentId, communityId, 0).then(r =>
     (r.length > 0)
   )
@@ -59,4 +60,8 @@ export async function spend (agentId: string, communityId: string, byAmount: num
 
   const cb = await getCommunityBalance(communityId)
   return setCommunityBalance(communityId, cb + byAmount)
+}
+
+export function getCommunitySharePointsForMessageRating (rating: number) {
+  return rating * COST_OF_SENDING_MESSAGE
 }
