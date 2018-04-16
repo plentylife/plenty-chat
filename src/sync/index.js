@@ -99,14 +99,22 @@ export function onConnectToPeer (peer: Peer) {
   listenForEvents(peer.socket)
   listenForUpdateRequests(peer.socket)
 
+  let hasRequestedFlag = false
+  const reqUpd = () => {
+    if (!hasRequestedFlag) {
+      hasRequestedFlag = true
+      requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+    }
+  }
+
   peer.socket.on(READY_CHANNEL, (empty, ackFn) => {
     console.log('Peer is ready', peer.socketId)
     ackFn(READY_CHANNEL + '.ack')
-    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+    reqUpd()
   })
 
   peer.socket.emit(READY_CHANNEL, '', ack => {
     console.log(ack)
-    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+    reqUpd()
   })
 }
