@@ -49,12 +49,15 @@ export async function pushEvent (event: Event, handledSuccessfully: boolean): Pr
  */
 export async function updateEvent (event: Event): Promise<boolean> {
   const existing = await getEvent(event.globalEventId)
-  // todo. test received from logging
   if (existing) {
-    if (event.receivedFrom && !existing.receivedFrom.includes(event.receivedFrom)) {
-      const receivedFrom = [...existing.receivedFrom]
-      receivedFrom.push(event.receivedFrom)
-      return nSQL(EVENT_TABLE).query('upsert', Object.assign({}, existing, {receivedFrom})).exec().then(() => true)
+    if (event.receivedFrom) {
+      const exLength = existing.receivedFrom.length
+      const receivedFromSet = new Set(existing.receivedFrom)
+      event.receivedFrom.forEach(r => receivedFromSet.add(r))
+      if (receivedFromSet.size !== exLength) {
+        const receivedFrom = Array.from(receivedFromSet)
+        return nSQL(EVENT_TABLE).query('upsert', Object.assign({}, existing, {receivedFrom})).exec().then(() => true)
+      }
     }
     return true
   }

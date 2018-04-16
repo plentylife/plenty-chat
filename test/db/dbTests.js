@@ -3,7 +3,7 @@ import {getCommunityOfChannel, setCommunityOfChannel} from '../../src/db/Channel
 import test from 'ava/index'
 import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
-import {pushEvent, getCommunityEvents} from '../../src/db/EventTable'
+import {pushEvent, getCommunityEvents, getEvent} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
 
 const AGENT_ID = 'uid'
@@ -38,7 +38,9 @@ nSQL().connect().then(async (r) => {
   test('select events after timestamp', async t => {
     t.plan(2)
 
-    const event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating","payload":{"messageId":"tmid","rating":0}}')
+    let event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating",' +
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uid1"}')
+    event.receivedFrom = new Set(['anton'])
     await pushEvent(event, true)
 
     let events = await getCommunityEvents(COMMUNITY_ID, INITIAL_TIME)
@@ -49,5 +51,24 @@ nSQL().connect().then(async (r) => {
 
     events = await getCommunityEvents(COMMUNITY_ID, new Date().getTime())
     t.is(events.length, 0)
+  })
+
+  test('create and update event', async t => {
+    let event = JSON.parse('{"agentEventId":1,"communityId":"comid","senderId":"uid","eventType":"rating",' +
+      '"payload":{"messageId":"tmid","rating":0}, "globalEventId": "uid1"}')
+    event.receivedFrom = new Set(['anton'])
+
+    await pushEvent(event, true)
+    let e = await getEvent('uid1')
+
+    t.deepEqual(e.receivedFrom, ['anton'])
+
+    event.communityId = 'other'
+    event.receivedFrom = new Set(['john'])
+    await pushEvent(event, true)
+    e = await getEvent('uid1')
+
+    t.deepEqual(e.receivedFrom, ['anton', 'john'])
+    t.is(e.communityId, 'comid')
   })
 })
