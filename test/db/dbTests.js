@@ -5,6 +5,7 @@ import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
 import {pushEvent, getCommunityEvents, getEvent} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
+import {dumpPeerSyncTable, getSyncedUpTo, getSyncedUpToInAll, logSync} from '../../src/db/PeerSyncTable'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
@@ -70,5 +71,44 @@ nSQL().connect().then(async (r) => {
 
     t.deepEqual(e.receivedFrom, ['anton', 'john'])
     t.is(e.communityId, 'comid')
+  })
+
+  test('Sync logs should give accurate information', async t => {
+    const CID2 = 'comid2'
+    const AID2 = 'agentid2'
+
+    await logSync(AGENT_ID, COMMUNITY_ID, 10)
+    t.is(await getSyncedUpToInAll(AGENT_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, COMMUNITY_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, CID2), 0)
+
+    console.log('block 1 end')
+
+    await logSync(AGENT_ID, CID2, 9)
+    t.is(await getSyncedUpToInAll(AGENT_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, COMMUNITY_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, CID2), 9)
+
+    console.log('block 2 end')
+
+    await logSync(AID2, CID2, 15)
+    t.is(await getSyncedUpToInAll(AGENT_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, COMMUNITY_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, CID2), 9)
+
+    let dump = await dumpPeerSyncTable()
+    dump.forEach(r => console.log(r))
+    console.log(`dumped ${dump.length} records`)
+
+    console.log('block 3 end')
+
+    await logSync(AGENT_ID, CID2, 15)
+    dump = await dumpPeerSyncTable()
+    dump.forEach(r => console.log(r))
+    console.log(`dumped ${dump.length} records`)
+
+    t.is(await getSyncedUpToInAll(AGENT_ID), 15)
+    t.is(await getSyncedUpTo(AGENT_ID, COMMUNITY_ID), 10)
+    t.is(await getSyncedUpTo(AGENT_ID, CID2), 15)
   })
 })

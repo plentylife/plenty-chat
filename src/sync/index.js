@@ -5,6 +5,7 @@ import {Event, handleEvent as internalEventHandler} from '../events'
 import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
 import {getCurrentAgentId} from '../state/GlobalState'
 import {nSQL} from 'nano-sql'
+import {getSyncedUpToInAll, logSync} from '../db/PeerSyncTable'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
@@ -87,6 +88,7 @@ function backlogEvent (event: Event, peer: Peer) {
     event.receivedFrom.add(peer.agentId.trim())
   }
   eventBacklog.push(event)
+  logSync(peer.agentId, event.communityId, event.timestamp)
   consumeEvents()
 }
 
@@ -133,10 +135,11 @@ export function onConnectToPeer (peer: Peer) {
   listenForUpdateRequests(peer.socket)
 
   let hasRequestedFlag = false
-  const reqUpd = () => {
+  const reqUpd = async () => {
     if (!hasRequestedFlag) {
       hasRequestedFlag = true
-      requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, 0)
+      const timestamp = getSyncedUpToInAll(peer.agentId)
+      requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, timestamp) // todo. updateAll is a hack
     }
   }
 

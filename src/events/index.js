@@ -19,7 +19,8 @@ export type Event = {
   communityId: string,
   eventType: EventType,
   payload: EventPayload,
-  receivedFrom: Set<string>
+  receivedFrom: Set<string>,
+  timestamp: number
 }
 
 export function handleEvent (event: Event): Promise<boolean> {
