@@ -9,6 +9,7 @@ import {createChannel} from '../../src/actions/ChannelActions'
 import {getCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getRating} from '../../src/db/RatingTable'
 import {getMessage} from '../../src/db/MessageTable'
+import {getBalance} from '../../src/db/AgentWalletTable'
 
 const AGENT_ID = 'uid'
 const AGENT_RATER_ID = 'rater_uid'
@@ -24,6 +25,8 @@ test.before(async t => {
   t.is(await getCommunityOfChannel(CHANNEL_ID), COMMUNITY_ID)
   await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID)
   const msg = await getMessage(MSG_ID)
+  const wallet = await getBalance(AGENT_ID, COMMUNITY_ID)
+  t.is(wallet.balance, -1)
   t.is(msg.id, MSG_ID)
   await rateMessage(MSG_ID, AGENT_RATER_ID, 2, 2)
   t.is(await getRating(MSG_ID, AGENT_RATER_ID), 1)
