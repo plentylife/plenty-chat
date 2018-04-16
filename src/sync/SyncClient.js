@@ -1,6 +1,6 @@
 // @flow
 import io from 'socket.io-client'
-import {onConnectToPeer} from './index'
+import {onConnectToPeer, registerSendEventsObserver} from './index'
 import type {Peer} from './index'
 
 export function connectToPeer (peer: string): Promise<Peer> {
@@ -16,6 +16,7 @@ export function connectToPeer (peer: string): Promise<Peer> {
 
 /** Starts the synchronization process between this agent and the peers */
 export function startSync (peers: Array<string>): void {
+  registerSendEventsObserver()
   peers.forEach(address => {
     connectToPeer(address).then(onConnectToPeer)
   })

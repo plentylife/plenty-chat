@@ -2,12 +2,13 @@
 
 import {STUB} from '../utils'
 import {Event, handleEvent as internalEventHandler} from '../events'
-import {getCommunityEvents, getEvents} from '../db/EventTable'
+import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
 import {getCurrentAgentId} from '../state/GlobalState'
+import {nSQL} from 'nano-sql'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
-const EVENT_CHANNEL = 'event'
+export const EVENT_CHANNEL = 'event'
 const READY_CHANNEL = 'ready'
 
 export type Peer = {
@@ -35,7 +36,7 @@ export function requestCommunityUpdate (socket, communityId: string, fromTimesta
   })
 }
 
-export function listenForUpdateRequests (socket): void {
+function listenForUpdateRequests (socket): void {
   socket.on(REQUEST_UPDATE_CHANNEL, (request, ackFn) => {
     console.log('UPDATE <-- (r)', request)
     ackFn(REQUEST_UPDATE_CHANNEL + '.ack')
@@ -50,11 +51,38 @@ function listenForEvents (peer: Peer) {
   })
 }
 
+/** watch the database for new events, and send them out to all peers */
+export function registerSendEventsObserver () {
+  nSQL(EVENT_TABLE).on('upsert', (queryEvent) => {
+    peers.forEach(peer => {
+      if (peer.socket.connected) {
+        queryEvent.affectedRows.forEach(event => {
+          // checking that this event didn't come from the peer
+          if (!event.receivedFrom.includes(peer.agentId)) {
+            console.log(`EVENT (n) --> ${peer.agentId}`)
+            peer.socket.emit(EVENT_CHANNEL, event, ack => {
+              console.log(EVENT_CHANNEL + '.new.ack')
+            })
+          } else {
+            console.log(`Skipping sending new event to ${peer.agentId}`)
+          }
+        })
+      }
+    })
+  })
+}
+
 let eventBacklog: Array<Event> = []
 
 function backlogEvent (event: Event, peer: Peer) {
   console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
-  event.receivedFrom = peer.agentId.trim()
+  if (peer.agentId) {
+    if (!(event.receivedFrom instanceof Array)) {
+      throw new TypeError('Could not backlog event. `receivedFrom` is not an array')
+    }
+    event.receivedFrom = new Set(event.receivedFrom)
+    event.receivedFrom.add(peer.agentId.trim())
+  }
   eventBacklog.push(event)
   consumeEvents()
 }

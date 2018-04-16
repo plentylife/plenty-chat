@@ -29,11 +29,14 @@ export function getEvent (globalEventId: string): Promise<Object | null> {
 }
 
 export async function pushEvent (event: Event, handledSuccessfully: boolean): Promise<any> {
+  if (!event.receivedFrom || !(event.receivedFrom instanceof Set)) {
+    throw new TypeError('Event property `receivedFrom` must be a Set')
+  }
   const updated = await updateEvent(event)
   // todo. test received from logging
   if (!updated) {
-    const receivedFrom = []
-    if (event.receivedFrom) receivedFrom.push(event.receivedFrom)
+    let receivedFrom = []
+    if (event.receivedFrom) receivedFrom = Array.from(event.receivedFrom)
     const withTime = Object.assign({}, event, {
       timestamp: new Date().getTime(), handledSuccessfully, receivedFrom
     })

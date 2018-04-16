@@ -1,7 +1,7 @@
 // @flow
 
 import {setCurrentAgentId} from '../state/GlobalState'
-import {onConnectToPeer} from './index'
+import {onConnectToPeer, registerSendEventsObserver} from './index'
 import '../db/index'
 import {nSQL} from 'nano-sql'
 import type {Peer} from './index'
@@ -22,6 +22,8 @@ console.log('Node env', process.env.NODE_ENV)
 // console.log('DB mode', DB_MODE)
 console.log('DB name', process.env.DB_NAME)
 console.log('Socket debug', process.env.DEBUG)
+
+registerSendEventsObserver() // sends out new events as they come in
 
 nSQL().connect().then(() => {
   console.log('DB connected')

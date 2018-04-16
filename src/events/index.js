@@ -19,7 +19,7 @@ export type Event = {
   communityId: string,
   eventType: EventType,
   payload: EventPayload,
-  receivedFrom: ?string
+  receivedFrom: Set<string>
 }
 
 export function handleEvent (event: Event): Promise<boolean> {
@@ -56,6 +56,6 @@ export async function sendEvent (eventType: EventType, senderId: string, communi
   payload: EventPayload): Promise<boolean> {
   const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
   return handleEvent({
-    globalEventId: senderId + eventId, agentEventId: eventId, communityId, senderId, eventType, payload
+    globalEventId: senderId + eventId, agentEventId: eventId, communityId, senderId, eventType, payload, receivedFrom: new Set()
   })
 }
