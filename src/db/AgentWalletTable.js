@@ -56,6 +56,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
 }
 
 export function addCommunitySharePoints (agentId: string, communityId: string, pointsToAdd: number): Promise<any> {
+  assertInt(pointsToAdd)
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
       throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)

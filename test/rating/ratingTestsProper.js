@@ -24,8 +24,9 @@ async function testMessage (t, rating, expected) {
   const ratingInDb = await getRating(MSG_ID, AGENT_ID)
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
+  console.log('community share points', msgSenderPoints)
   t.is(raterPoints, 0)
-  t.is(msgSenderPoints, Math.pow(expected, 2))
+  t.is(msgSenderPoints, Math.pow(expected, 2) * 100)
   t.true(apEq(ratingInDb, expected, 0.01))
 }
 testMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input} = ${expected}`.trim()
@@ -53,7 +54,7 @@ test.serial('adding inappropriate message rating', async t => {
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
   t.is(raterPoints, 0)
-  t.is(msgSenderPoints, 1)
+  t.is(msgSenderPoints, 100)
 })
 
 test.serial('wrong star setup', async t => {
@@ -69,5 +70,5 @@ test.serial('wrong star setup', async t => {
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
   t.is(raterPoints, 0)
-  t.is(msgSenderPoints, 1)
+  t.is(msgSenderPoints, 100)
 })
