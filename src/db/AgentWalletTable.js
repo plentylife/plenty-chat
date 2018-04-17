@@ -16,7 +16,7 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'balance', type: 'int'},
   {key: 'creditLimit', type: 'int'},
-  {key: 'communitySharePoints', type: 'int', default: DEFAULT_COMMUNITY_SHARE_POINTS} // todo. bug? default is not getting set
+  {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS} // todo. bug? default is not getting set
 ]).config({mode: DB_MODE || 'PERM'})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
@@ -56,7 +56,6 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
 }
 
 export function addCommunitySharePoints (agentId: string, communityId: string, pointsToAdd: number): Promise<any> {
-  assertInt(pointsToAdd)
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
       throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
@@ -69,11 +68,20 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
   })
 }
 
-export function getCommunitySharePoints (communityId: string): Promise<Array<{
+export type SharePointsBalance = {
   agentId: string, communitySharePoints: number
-}>> {
+}
+
+export function getAllCommunitySharePoints (communityId: string): Promise<Array<SharePointsBalance>> {
   return nSQL(AGENT_WALLET_TABLE).query('select', ['agentId', 'communitySharePoints'])
     .where(['communityId', '=', communityId]).exec()
+}
+
+export function getCommunitySharePoints (agentId: string, communityId: string): Promise<number | null> {
+  return nSQL(AGENT_WALLET_TABLE).query('select', ['communitySharePoints'])
+    .where([['communityId', '=', communityId], 'AND', ['agentId', '=', agentId]]).exec().then(r => {
+      return r.length > 0 ? r[0].communitySharePoints : null
+    })
 }
 
 export function walletExists (agentId: string, communityId: string): Promise<boolean> {

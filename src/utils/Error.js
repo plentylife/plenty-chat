@@ -17,3 +17,5 @@ export class MissingProperty extends Error {
 export class MissingDatabaseEntry extends Error {}
 
 export class InappropriateAction extends Error {}
+
+export class WrongValue extends Error {}

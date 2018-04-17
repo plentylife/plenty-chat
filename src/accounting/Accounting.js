@@ -1,9 +1,12 @@
 // @flow
 
-import {getBalance, setBalance} from '../db/AgentWalletTable'
-import {assertPositive, assertInt} from './utils'
+import {addCommunitySharePoints, getBalance, getCommunitySharePoints, setBalance} from '../db/AgentWalletTable'
+import {assertPositive, assertInt, assertBetweenZeroOne} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
+import type {MessageRow} from '../db/MessageTable'
+import {getCommunityOfMsg} from '../db'
+import {CommunityIdNotInferrable, MissingDatabaseEntry} from '../utils/Error'
 
 export function initializeAccount (agentId: string, communityId: string): Promise<void> {
   // todo. share points are not intialized; currently they get stuck into db by default.
@@ -62,6 +65,20 @@ export async function spend (agentId: string, communityId: string, byAmount: num
   return setCommunityBalance(communityId, cb + byAmount)
 }
 
-export function getCommunitySharePointsForMessageRating (rating: number) {
+export function calculateCommunitySharePointsForMessageRating (rating: number) {
   return rating * COST_OF_SENDING_MESSAGE
+}
+
+export async function accountingForMessageRating (message: MessageRow, rating: number): Promise<void> {
+  assertBetweenZeroOne(rating) // not quite necessary
+
+  const communityId = await getCommunityOfMsg(message.id)
+  if (!communityId) throw new CommunityIdNotInferrable()
+
+  const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)
+  const existingPoints = await getCommunitySharePoints(message.senderId, communityId)
+  let points = pointsTotal
+  if (existingPoints !== null) points -= existingPoints
+
+  return addCommunitySharePoints(message.senderId, communityId, points)
 }

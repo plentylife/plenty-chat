@@ -2,7 +2,7 @@ import {nSQL} from 'nano-sql/lib/index'
 import test from 'ava/index'
 import {DB_MODE} from '../../src/state/GlobalState'
 import {initializeAccount} from '../../src/accounting/Accounting'
-import {addCommunitySharePoints, getCommunitySharePoints} from '../../src/db/AgentWalletTable'
+import {addCommunitySharePoints, getAllCommunitySharePoints} from '../../src/db/AgentWalletTable'
 
 const COMMUNITY_ID = 'comid'
 const AGENT_ID = 'aid'
@@ -17,7 +17,7 @@ test.before(t => {
 })
 
 async function testPointAmount (t, amount) {
-  const cps = await getCommunitySharePoints(COMMUNITY_ID)
+  const cps = await getAllCommunitySharePoints(COMMUNITY_ID)
   t.is(cps.length, 1)
   t.is(cps[0].communitySharePoints, amount)
   t.is(cps[0].agentId, AGENT_ID)
