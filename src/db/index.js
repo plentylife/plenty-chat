@@ -4,14 +4,17 @@ import {MESSAGE_TABLE} from './MessageTable'
 import {CHANNEL_TABLE} from './ChannelTable'
 import {nSQL} from 'nano-sql'
 
-// import '../../src/db/MessageTable'
-// import '../../src/db/ChannelTable'
-import '../../src/db/AgentTable'
-import '../../src/db/AgentWalletTable'
-import '../../src/db/CommunityTable'
-import '../../src/db/EventTable'
-import '../../src/db/PeerSyncTable'
-import '../../src/db/RatingTable'
+import {AGENT_TABLE} from './AgentTable'
+import {AGENT_WALLET_TABLE} from './AgentWalletTable'
+import {COMMUNITY_TABLE} from './CommunityTable'
+import {EVENT_TABLE, SELF_EVENT_TABLE} from './EventTable'
+import {PEER_SYNC_TABLE} from './PeerSyncTable'
+import {RATING_TABLE} from './RatingTable'
+
+export const ALL_TABLES = [
+  AGENT_TABLE, AGENT_WALLET_TABLE, CHANNEL_TABLE, COMMUNITY_TABLE, EVENT_TABLE, SELF_EVENT_TABLE, MESSAGE_TABLE,
+  PEER_SYNC_TABLE, RATING_TABLE
+]
 
 export function getCommunityOfMsg (msgId: string): Promise<string | null> {
   return nSQL(MESSAGE_TABLE).query('select', [cn(CHANNEL_TABLE, 'communityId')])
