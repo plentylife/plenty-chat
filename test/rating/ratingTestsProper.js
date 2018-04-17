@@ -5,8 +5,7 @@ import {rateMessage} from '../../src/actions/RatingActions'
 import {getRating} from '../../src/db/RatingTable'
 import apEq from 'approximately-equal'
 import {setCommunityOfChannel} from '../../src/db/ChannelTable'
-import {getAllCommunitySharePoints, getCommunitySharePoints} from '../../src/db/AgentWalletTable'
-import {calculateCommunitySharePointsForMessageRating} from '../../src/accounting/Accounting'
+import {getCommunitySharePoints} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
@@ -26,7 +25,7 @@ async function testMessage (t, rating, expected) {
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
   t.is(raterPoints, 0)
-  t.is(msgSenderPoints, expected)
+  t.is(msgSenderPoints, Math.pow(expected, 2))
   t.true(apEq(ratingInDb, expected, 0.01))
 }
 testMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input} = ${expected}`.trim()

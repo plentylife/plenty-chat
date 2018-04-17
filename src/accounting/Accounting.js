@@ -66,7 +66,7 @@ export async function spend (agentId: string, communityId: string, byAmount: num
 }
 
 export function calculateCommunitySharePointsForMessageRating (rating: number) {
-  return rating * COST_OF_SENDING_MESSAGE
+  return Math.pow(rating, 2) * COST_OF_SENDING_MESSAGE
 }
 
 export async function accountingForMessageRating (message: MessageRow, rating: number): Promise<void> {
@@ -82,3 +82,4 @@ export async function accountingForMessageRating (message: MessageRow, rating: n
 
   return addCommunitySharePoints(message.senderId, communityId, points)
 }
+
