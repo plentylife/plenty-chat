@@ -16,9 +16,9 @@ const TIMESTAMP = new Date().getTime()
 console.log(`Now is ${TIMESTAMP}`)
 
 test.before(t => {
-  setupDb(t).then(async () => {
-    addAgentToCommunity(AGENT_ID_POOR, COMMUNITY_ID)
-    addAgentToCommunity(AGENT_ID_RICH, COMMUNITY_ID)
+  return setupDb(t).then(async () => {
+    await addAgentToCommunity(AGENT_ID_POOR, COMMUNITY_ID)
+    await addAgentToCommunity(AGENT_ID_RICH, COMMUNITY_ID)
   })
 })
 
@@ -37,6 +37,9 @@ function makeDemurrageTimestamps (balance, communitySharePoints) {
   }
 }
 
+let firstTimestamps = {}
+AGENTS.forEach(a => { firstTimestamps[a] = {} })
+
 test.serial('doing demurrage on a new agents', async t => {
   await applyDemurrageToAll()
   await macroCheckWallets(t, [
@@ -45,34 +48,54 @@ test.serial('doing demurrage on a new agents', async t => {
   // check that dates changed
   const now = new Date().getTime()
   const wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
-  const wr = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  const wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
+
+  firstTimestamps[AGENTS[0]] = wp.demurrageTimestamps
+  firstTimestamps[AGENTS[1]] = wr.demurrageTimestamps
+
   t.true(apEq(wp.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wr.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wp.demurrageTimestamps.communitySharePoints, now, 50))
   t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
 })
 
+// let lastTimestamps
+
 test.serial('doing demurrage on a older agents that do not have community share points', async t => {
   const ts = TIMESTAMP - LENGTH_OF_DAY
   const dts = makeDemurrageTimestamps(ts, ts)
-  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
-  await _setDemurrageTimestamps(AGENT_ID_RICH, COMMUNITY_ID, dts)
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 50)
   await setBalance(AGENT_ID_RICH, COMMUNITY_ID, 100)
+
+  // increasing balance from zero should change timestamps
+  let wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  let wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
+  t.false(wp.demurrageTimestamps.balance === firstTimestamps[AGENTS[0]].balance)
+  t.false(wr.demurrageTimestamps.balance === firstTimestamps[AGENTS[1]].balance)
+  t.true(wp.demurrageTimestamps.communitySharePoints === firstTimestamps[AGENTS[0]].communitySharePoints)
+  t.true(wr.demurrageTimestamps.communitySharePoints === firstTimestamps[AGENTS[1]].communitySharePoints)
+
+  // setting timestamps after, because of the above
+  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
+  await _setDemurrageTimestamps(AGENT_ID_RICH, COMMUNITY_ID, dts)
 
   await applyDemurrageToAll()
 
   await macroCheckWallets(t, [
     {b: 49, sp: 0}, {b: 98, sp: 0}
   ])
-  const wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
-  const wr = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
 
   const now = new Date().getTime()
+  t.false(wp.demurrageTimestamps.balance === ts)
+  t.false(wr.demurrageTimestamps.balance === ts)
   t.true(apEq(wp.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wr.demurrageTimestamps.balance, now, 50))
-  t.true(apEq(wp.demurrageTimestamps.communitySharePoints, now, 50))
-  t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
+
+  // the community share points timestamps don't need to change, since balance is 0
+  t.true(wp.demurrageTimestamps.communitySharePoints === ts)
+  t.true(wr.demurrageTimestamps.communitySharePoints === ts)
 })
 
 test.serial('some community share points', async t => {

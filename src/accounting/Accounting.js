@@ -17,12 +17,12 @@ import {CommunityIdNotInferrable} from '../utils/Error'
 export async function initializeAccount (agentId: string, communityId: string): Promise<void> {
   // todo. share points are not intialized; currently they get stuck into db by default.
   const now = new Date().getTime()
-  await _setDemurrageTimestamps(agentId, communityId, {
-    balance: now, communitySharePoints: now
+  return setBalance(agentId, communityId, 0).then(async r => {
+    const dr = await _setDemurrageTimestamps(agentId, communityId, {
+      balance: now, communitySharePoints: now
+    })
+    return (r.length > 0 && dr.length > 0)
   })
-  return setBalance(agentId, communityId, 0).then(r =>
-    (r.length > 0)
-  )
 }
 
 export function initializeCommunity (communityId: string): Promise<void> {

@@ -95,7 +95,7 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
   })
 }
 
-export function applyDemurrageToWallet (agentId: string, communityId: string, delta: Object): Promise<any> {
+export function applyDemurrageToWallet (agentId: string, communityId: string, delta: Object): Promise<Array<any>> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
       throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
@@ -103,20 +103,22 @@ export function applyDemurrageToWallet (agentId: string, communityId: string, de
     const now = new Date().getTime()
     let flagAny = false
     const newBalances = {}
-    const timestamps: DemurrageTimestamps = {}
+    const timestamps: DemurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps)
 
     WALLET_DELTA_PROPERTIES.forEach(prop => {
       if (delta[prop]) {
         const cb = r[0][prop]
-        newBalances[prop] = cb + delta[prop]
+        newBalances[prop] = cb - delta[prop]
         timestamps[prop] = now
         flagAny = true
       }
     })
 
     if (flagAny) {
-      const upsert = Object.assign({id: r[0].id}, newBalances)
+      const upsert = Object.assign({id: r[0].id}, newBalances, {demurrageTimestamps: timestamps})
       return nSQL(AGENT_WALLET_TABLE).query('upsert', upsert).exec()
+    } else {
+      return []
     }
   })
 }
