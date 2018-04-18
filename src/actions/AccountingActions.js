@@ -10,8 +10,16 @@ export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
   const sentPromises = wallets.map(w => {
     const d = calculateDemurrageForAgent(w)
-    const paylaod = Object.assign({}, w, d) // fixme remove unnecessary properties from payload
-    return sendEvent(DEMURRAGE_EVEN_TYPE, getCurrentAgentId(), w.communityId, paylaod)
+    let hasAnyNonZero = 0
+    Object.keys(d).forEach(k => {
+      hasAnyNonZero += d[k]
+    })
+    if (hasAnyNonZero > 0) {
+      const paylaod = Object.assign({}, w, d) // fixme remove unnecessary properties from payload
+      return sendEvent(DEMURRAGE_EVEN_TYPE, getCurrentAgentId(), w.communityId, paylaod)
+    } else {
+      return Promise.resolve(true)
+    }
   })
   return Promise.all(sentPromises)
 }
