@@ -10,7 +10,8 @@ export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
   const sentPromises = wallets.map(w => {
     const d = calculateDemurrageForAgent(w)
-    sendEvent(DEMURRAGE_EVEN_TYPE, getCurrentAgentId(), w.communityId, d)
+    const paylaod = Object.assign({}, d, w)
+    sendEvent(DEMURRAGE_EVEN_TYPE, getCurrentAgentId(), w.communityId, paylaod)
   })
   return Promise.all(sentPromises)
 }

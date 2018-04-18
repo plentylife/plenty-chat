@@ -8,6 +8,7 @@ import type {RatingEventPayload} from './RatingEvents'
 import {MissingPayload} from '../utils/Error'
 import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
 import {CREATE_CHANNEL_EVENT_TYPE, handleCreateChannelEvent} from './ChannelEvents'
+import {DEMURRAGE_EVEN_TYPE, handleDemurrageEvent} from './AccountingEvents'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -50,6 +51,7 @@ function applyHandler (event: Event): Promise<boolean> {
     case RATING_EVENT_TYPE: return handleRatingEvent(event)
     case ADD_AGENT_TO_COMMUNITY_EVEN_TYPE: return handleAddAgentToCommunity(event)
     case CREATE_CHANNEL_EVENT_TYPE: return handleCreateChannelEvent(event)
+    case DEMURRAGE_EVEN_TYPE: return handleDemurrageEvent(event)
     default: throw new Error('Could not recognize event type')
   }
 }
