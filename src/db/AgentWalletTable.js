@@ -16,7 +16,8 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'balance', type: 'int'},
   {key: 'creditLimit', type: 'int'},
-  {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
+  {key: 'communitySharePoints', type: 'number'},
+  // {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
   {key: 'demurrageTimestamps', type: 'map'}
 ]).config({mode: DB_MODE || 'PERM'})
 
@@ -67,6 +68,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
     } else {
       // $FlowFixMe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
+      payload.communitySharePoints = DEFAULT_COMMUNITY_SHARE_POINTS
     }
     console.log('Setting new balance for [agent] in [community] to [amount]', agentId, communityId, balance)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
@@ -123,7 +125,8 @@ export function applyDemurrageToWallet (agentId: string, communityId: string, de
   })
 }
 
-export function _setDemurrageTimestamps (agentId: string, communityId: string, timestamps: DemurrageTimestamps): Promise<any> {
+export function _setDemurrageTimestamps (agentId: string, communityId: string,
+  timestamps: DemurrageTimestamps): Promise<any> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
       throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
@@ -131,7 +134,9 @@ export function _setDemurrageTimestamps (agentId: string, communityId: string, t
     const updated = Object.assign({}, r[0].demurrageTimestamps, timestamps)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', {
       id: r[0].id, demurrageTimestamps: updated
-    }).exec()
+    }).exec().then(ar => {
+      return ar.length > 0
+    })
   })
 }
 

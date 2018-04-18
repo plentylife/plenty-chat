@@ -37,6 +37,14 @@ function makeDemurrageTimestamps (balance, communitySharePoints) {
   }
 }
 
+async function setTimestampsToPast (days) {
+  const ts = TIMESTAMP - LENGTH_OF_DAY
+  const dts = makeDemurrageTimestamps(ts, ts)
+  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
+  await _setDemurrageTimestamps(AGENT_ID_RICH, COMMUNITY_ID, dts)
+  return ts
+}
+
 let firstTimestamps = {}
 AGENTS.forEach(a => { firstTimestamps[a] = {} })
 
@@ -59,11 +67,9 @@ test.serial('doing demurrage on a new agents', async t => {
   t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
 })
 
-// let lastTimestamps
+let lastTimestamps = {}
 
 test.serial('doing demurrage on a older agents that do not have community share points', async t => {
-  const ts = TIMESTAMP - LENGTH_OF_DAY
-  const dts = makeDemurrageTimestamps(ts, ts)
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 50)
   await setBalance(AGENT_ID_RICH, COMMUNITY_ID, 100)
 
@@ -76,9 +82,7 @@ test.serial('doing demurrage on a older agents that do not have community share 
   t.true(wr.demurrageTimestamps.communitySharePoints === firstTimestamps[AGENTS[1]].communitySharePoints)
 
   // setting timestamps after, because of the above
-  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
-  await _setDemurrageTimestamps(AGENT_ID_RICH, COMMUNITY_ID, dts)
-
+  const ts = await setTimestampsToPast()
   await applyDemurrageToAll()
 
   await macroCheckWallets(t, [
@@ -96,41 +100,57 @@ test.serial('doing demurrage on a older agents that do not have community share 
   // the community share points timestamps don't need to change, since balance is 0
   t.true(wp.demurrageTimestamps.communitySharePoints === ts)
   t.true(wr.demurrageTimestamps.communitySharePoints === ts)
+
+  lastTimestamps[AGENTS[0]] = wp.demurrageTimestamps
+  lastTimestamps[AGENTS[1]] = wr.demurrageTimestamps
 })
 
 test.serial('some community share points', async t => {
   await addCommunitySharePoints(AGENT_ID_POOR, COMMUNITY_ID, 1)
-  await addCommunitySharePoints(AGENT_ID_POOR, COMMUNITY_ID, 100)
-  const wpStart = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  await addCommunitySharePoints(AGENT_ID_RICH, COMMUNITY_ID, 100)
+  let wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  let wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
+  let now = new Date().getTime()
 
+  t.true(wp.demurrageTimestamps.balance === lastTimestamps[AGENT_ID_POOR].balance)
+  t.true(wr.demurrageTimestamps.balance === lastTimestamps[AGENT_ID_RICH].balance)
+  // because community share points went from 0 to something
+  t.true(wp.demurrageTimestamps.communitySharePoints !== lastTimestamps[AGENT_ID_POOR].communitySharePoints)
+  t.true(wr.demurrageTimestamps.communitySharePoints !== lastTimestamps[AGENT_ID_RICH].communitySharePoints)
+  t.true(apEq(wp.demurrageTimestamps.communitySharePoints, now, 50))
+  t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
+
+  const ts = await setTimestampsToPast()
   await applyDemurrageToAll()
   await macroCheckWallets(t, [
     {b: 48, sp: 1}, {b: 96, sp: 98}
   ])
 
-  const wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
-  const wr = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
 
-  const now = new Date().getTime()
+  now = new Date().getTime()
   t.true(apEq(wp.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wr.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
 
   // timestamps for community share points should not change (for poor)
-  t.is(wp.demurrageTimestamps.communitySharePoints, wpStart.demurrageTimestamps.communitySharePoints)
+  t.is(wp.demurrageTimestamps.communitySharePoints, ts)
 })
 
 test.serial('gone broke', async t => {
-  await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 1)
+  await setBalance(AGENT_ID_POOR, COMMUNITY_ID, -1)
   const wpStart = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
 
   await applyDemurrageToAll()
   await macroCheckWallets(t, [
-    {b: 1, sp: 1}, {b: 96, sp: 98}
+    {b: -1, sp: 1}, {b: 94, sp: 96}
   ])
 
+  // todo test amounts of community points
+
   const wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
-  const wr = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+  const wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
 
   const now = new Date().getTime()
 
@@ -141,3 +161,5 @@ test.serial('gone broke', async t => {
   // timestamps for balance should not change
   t.is(wp.demurrageTimestamps.balance, wpStart.demurrageTimestamps.balance)
 })
+
+test.todo('nagative balance to positive balance should log proper timestamps')
