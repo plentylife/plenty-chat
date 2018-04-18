@@ -1,5 +1,5 @@
 import test from 'ava'
-import {getBalance, setBalance} from '../../src/db/AgentWalletTable'
+import {getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {hasEnoughFunds} from '../../src/accounting/Accounting'
 import {nSQL} from 'nano-sql'
 import {DEFAULT_CREDIT_LIMIT} from '../../src/accounting/AccountingGlobals'
@@ -22,7 +22,7 @@ nSQL().connect().then(() => {
 
   test.serial('setBalance does not affect existing credit limit', async t => {
     await setBalance(AGENT_ID, COMMUNITY_ID, 0)
-    const b = await getBalance(AGENT_ID, COMMUNITY_ID)
+    const b = await getWallet(AGENT_ID, COMMUNITY_ID)
 
     if (b === null) throw new Error('Failed to get balance')
     t.is(b.creditLimit, DEFAULT_CREDIT_LIMIT)

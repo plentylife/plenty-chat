@@ -2,7 +2,7 @@ import test from 'ava'
 import {pushMessage, getMessage} from '../src/db/MessageTable'
 import {nSQL} from 'nano-sql'
 import {sendMessage} from '../src/actions/MessageActions'
-import {getBalance, setBalance} from '../src/db/AgentWalletTable'
+import {getWallet, setBalance} from '../src/db/AgentWalletTable'
 import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {getCommunityBalance} from '../src/db/CommunityTable'
 import {getCommunityOfChannel, setCommunityOfChannel} from '../src/db/ChannelTable'
@@ -37,7 +37,7 @@ nSQL().connect().then(async () => {
 
     t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
-    const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
+    const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
 
     t.is(cb, 0)
@@ -52,7 +52,7 @@ nSQL().connect().then(async () => {
     await setBalance(AGENT_ID, COMMUNITY_ID, initBalance)
     t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
-    const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
+    const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
 
     t.is(cb, 0)
@@ -66,7 +66,7 @@ nSQL().connect().then(async () => {
     await setBalance(AGENT_ID, COMMUNITY_ID, 0)
     await t.true(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
-    const balance = await getBalance(AGENT_ID, COMMUNITY_ID)
+    const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
 
     t.is(cb, 1)

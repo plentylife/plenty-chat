@@ -1,18 +1,10 @@
 import test from 'ava'
-import {getBalance, setBalance} from '../../src/db/AgentWalletTable'
-import {nSQL} from 'nano-sql'
 import {DEFAULT_DEMURRAGE_RATE, LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
-import {setupDb} from '../utils'
 import {_calculateDemurrage, calculateDemurrageForAgent} from '../../src/accounting/Demurrage'
 import {getBaseLog} from '../../src/accounting/utils'
 import apEq from 'approximately-equal'
 
-const AGENT_ID = 'uid'
-const COMMUNITY_ID = 'cid'
-
 const invertedRate = 1 - DEFAULT_DEMURRAGE_RATE
-
-test.before(setupDb)
 
 function cdMacro (t, b, p, ex) {
   t.is(ex, _calculateDemurrage(b, DEFAULT_DEMURRAGE_RATE, p))
