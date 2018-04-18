@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {AGENT_WALLET_TABLE, getBalance} from '../../db/AgentWalletTable'
+import {AGENT_WALLET_TABLE, getWallet} from '../../db/AgentWalletTable'
 import type {Wallet} from '../../db/AgentWalletTable'
 import './style.css'
 import {TENGE} from '../utils'
@@ -16,7 +16,7 @@ class AccountStatus extends PureComponent<Props> {
   }
 
   static onChange (event: any, complete: any => void) {
-    let q = getBalance(this.props.agentId, this.props.communityId)
+    let q = getWallet(this.props.agentId, this.props.communityId)
 
     q.then((wallet) => {
       console.log('AccountStatus component. Agent, community, wallet, event',

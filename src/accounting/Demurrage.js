@@ -1,5 +1,4 @@
 // @flow
-import {STUB} from '../utils'
 import {assertPositive} from './utils'
 import type {Wallet} from '../db/AgentWalletTable'
 import {DEFAULT_DEMURRAGE_PERIOD, DEFAULT_DEMURRAGE_RATE} from './AccountingGlobals'
@@ -25,13 +24,14 @@ export type DemurrageByProperty = {
   communitySharePoints: number
 }
 
-/**
- * @param lastApplied time demurrage was last applied
- */
-export function calculateDemurrageForAgent (agentWallet: Wallet, lastApplied: number): DemurrageByProperty {
-  const p = _calculatePeriods(lastApplied, DEFAULT_DEMURRAGE_PERIOD)
+function _cda (w: Wallet, p: string) {
+  const periods = _calculatePeriods(w.demurrageTimestamps[p], DEFAULT_DEMURRAGE_PERIOD)
+  return _calculateDemurrage(w[p], DEFAULT_DEMURRAGE_RATE, periods)
+}
+
+export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByProperty {
   return {
-    balance: _calculateDemurrage(agentWallet.balance, DEFAULT_DEMURRAGE_RATE, p),
-    communitySharePoints: _calculateDemurrage(agentWallet.communitySharePoints, DEFAULT_DEMURRAGE_RATE, p)
+    balance: _cda(agentWallet, 'balance'),
+    communitySharePoints: _cda(agentWallet, 'communitySharePoints')
   }
 }

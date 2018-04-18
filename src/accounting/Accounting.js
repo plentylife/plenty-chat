@@ -1,6 +1,6 @@
 // @flow
 
-import {addCommunitySharePoints, getBalance, getCommunitySharePoints, setBalance} from '../db/AgentWalletTable'
+import {addCommunitySharePoints, getWallet, getCommunitySharePoints, setBalance} from '../db/AgentWalletTable'
 import {assertPositive, assertInt, assertBetweenZeroOne} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
@@ -31,7 +31,7 @@ export function initializeCommunity (communityId: string): Promise<void> {
 export function hasEnoughFunds (agentId: string, communityId: string, amount: number): Promise<boolean> {
   if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
 
-  return getBalance(agentId, communityId).then(b => {
+  return getWallet(agentId, communityId).then(b => {
     if (b !== null) {
       const check = b.balance + b.creditLimit >= amount
       return check
@@ -55,7 +55,7 @@ export async function spend (agentId: string, communityId: string, byAmount: num
   assertInt(byAmount)
   assertPositive(byAmount)
 
-  await getBalance(agentId, communityId).then(b => {
+  await getWallet(agentId, communityId).then(b => {
     if (b === null) throw new Error('No record of balance for agent ' + agentId)
     const nb = b.balance - byAmount
     return setBalance(agentId, communityId, nb)
@@ -82,4 +82,3 @@ export async function accountingForMessageRating (message: MessageRow, rating: n
 
   return addCommunitySharePoints(message.senderId, communityId, points)
 }
-

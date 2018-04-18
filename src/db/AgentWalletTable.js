@@ -16,7 +16,8 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'balance', type: 'int'},
   {key: 'creditLimit', type: 'int'},
-  {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS} // todo. bug? default is not getting set
+  {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
+  {key: 'demurrageTimestamps', type: 'map'}
 ]).config({mode: DB_MODE || 'PERM'})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
@@ -24,14 +25,25 @@ function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
     .where([['agentId', '=', agentId], 'AND', ['communityId', '=', communityId]]).exec()
 }
 
-export type Wallet = {balance: number, creditLimit: number, communitySharePoints: number}
+export type DemurrageTimestamps = {
+  balance: number, communitySharePoints: number
+}
+export type Wallet = {
+  agentId: string, communityId: string,
+  balance: number, creditLimit: number, communitySharePoints: number,
+  demurrageTimestamps: DemurrageTimestamps}
 
-export function getBalance (agentId: string, communityId: string): Promise<(Wallet | null)> {
+export function getWallet (agentId: string, communityId: string): Promise<(Wallet | null)> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length > 0) {
-      let b: Wallet = {balance: r[0].balance,
+      let b: Wallet = {
+        agentId: r[0].agentId,
+        communityId: r[0].communityId,
+        balance: r[0].balance,
         creditLimit: r[0].creditLimit,
-        communitySharePoints: r[0].communitySharePoints}
+        communitySharePoints: r[0].communitySharePoints,
+        demurrageTimestamps: r[0].demurrageTimestamps
+      }
       return b
     }
     return null
@@ -71,6 +83,18 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
   })
 }
 
+export function _setDemurrageTimestamps (agentId: string, communityId: string, timestamps: DemurrageTimestamps): Promise<any> {
+  return getRecord(agentId, communityId).then(r => {
+    if (r.length !== 1) {
+      throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
+    }
+    const updated = Object.assign({}, r[0].demurrageTimestamps, timestamps)
+    return nSQL(AGENT_WALLET_TABLE).query('upsert', {
+      id: r[0].id, demurrageTimestamps: updated
+    }).exec()
+  })
+}
+
 export type SharePointsBalance = {
   agentId: string, communitySharePoints: number
 }
@@ -92,6 +116,10 @@ export function walletExists (agentId: string, communityId: string): Promise<boo
   return getRecord(agentId, communityId).then(r => {
     return r.length > 0
   })
+}
+
+export function getAllWallets (): Promise<Array<Wallet>> {
+  return nSQL(AGENT_WALLET_TABLE).query('select').exec()
 }
 
 export default agentWalletTable
