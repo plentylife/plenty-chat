@@ -134,9 +134,7 @@ export function _setDemurrageTimestamps (agentId: string, communityId: string,
     const updated = Object.assign({}, r[0].demurrageTimestamps, timestamps)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', {
       id: r[0].id, demurrageTimestamps: updated
-    }).exec().then(ar => {
-      return ar.length > 0
-    })
+    }).exec()
   })
 }
 
