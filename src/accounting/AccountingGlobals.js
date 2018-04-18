@@ -8,3 +8,6 @@ export const DEFAULT_DEMURRAGE_RATE = 0.02
 
 /** in milliseconds */
 export const DEFAULT_DEMURRAGE_PERIOD = 1000 * 60 * 24 * 24
+
+/** in milliseconds */
+export const LENGTH_OF_DAY = 1000 * 60 * 24 * 24

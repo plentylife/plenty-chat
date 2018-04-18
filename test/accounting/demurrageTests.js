@@ -1,10 +1,11 @@
 import test from 'ava'
 import {getBalance, setBalance} from '../../src/db/AgentWalletTable'
 import {nSQL} from 'nano-sql'
-import {DEFAULT_DEMURRAGE_RATE} from '../../src/accounting/AccountingGlobals'
+import {DEFAULT_DEMURRAGE_RATE, LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
 import {setupDb} from '../utils'
-import {_calculateDemurrage} from '../../src/accounting/Demurrage'
+import {_calculateDemurrage, calculateDemurrageForAgent} from '../../src/accounting/Demurrage'
 import {getBaseLog} from '../../src/accounting/utils'
+import apEq from 'approximately-equal'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'cid'
@@ -39,10 +40,43 @@ test('negative balances are illegal', t => {
 })
 
 test('negative periods are illegal', t => {
-  t.throws(() => _calculateDemurrage(1, 0.1, -1), {instanceOf: RangeError, message: 'Period cannot be negative'})
+  t.throws(() => _calculateDemurrage(1, 0.1, -1), {instanceOf: RangeError, message: /Period.*cannot.*negative/})
 })
 
 test('rate should be within [0,1]', async t => {
   await t.throws(() => _calculateDemurrage(1, -0.1, 1), {instanceOf: RangeError, message: 'Rate has to be 0 or more'})
   await t.throws(() => _calculateDemurrage(1, 1.1, 1), RangeError, 'Rate has to be 1 or less')
+})
+
+/* Calculations on wallets */
+
+function cdaMacro (t, w, la, ex) {
+  const res = calculateDemurrageForAgent(w, la * LENGTH_OF_DAY)
+  t.true(apEq(ex.balance, res.balance))
+  t.true(apEq(ex.communitySharePoints, res.communitySharePoints))
+}
+cdaMacro.title = (t, w, la, ex) => `${t} - ${JSON.stringify(w)} at ${la} => ${JSON.stringify(ex)}`
+
+test('calculating demurrage for agent', cdaMacro, {
+  balance: 100, communitySharePoints: 110
+}, 1, {
+  balance: 2, communitySharePoints: 2
+})
+
+test('calculating demurrage for agent', cdaMacro, {
+  balance: 1, communitySharePoints: 100
+}, 1, {
+  balance: 0, communitySharePoints: 2
+})
+
+test('calculating demurrage for agent', cdaMacro, {
+  balance: 1, communitySharePoints: 110
+}, 35, {
+  balance: 1, communitySharePoints: 56
+})
+
+test('calculating demurrage for agent', cdaMacro, {
+  balance: 100, communitySharePoints: 1
+}, 0.5, {
+  balance: 1, communitySharePoints: 0
 })

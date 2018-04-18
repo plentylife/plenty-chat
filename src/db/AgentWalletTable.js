@@ -24,12 +24,14 @@ function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
     .where([['agentId', '=', agentId], 'AND', ['communityId', '=', communityId]]).exec()
 }
 
-export type Wallet = {balance: number, creditLimit: number}
+export type Wallet = {balance: number, creditLimit: number, communitySharePoints: number}
 
 export function getBalance (agentId: string, communityId: string): Promise<(Wallet | null)> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length > 0) {
-      let b: Wallet = {balance: r[0].balance, creditLimit: r[0].creditLimit}
+      let b: Wallet = {balance: r[0].balance,
+        creditLimit: r[0].creditLimit,
+        communitySharePoints: r[0].communitySharePoints}
       return b
     }
     return null
