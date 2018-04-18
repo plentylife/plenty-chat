@@ -11,6 +11,7 @@
     "nano-sql": "^1.4.8",
     "nano-sql-react": "^1.3.3",
     "nano-sqlite": "^1.2.0",
+    "promise-timeout": "^1.3.0",
     "react": "^16.3.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.1",

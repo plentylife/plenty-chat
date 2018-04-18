@@ -8,7 +8,13 @@ import type {RatingEventPayload} from './RatingEvents'
 import {MissingPayload} from '../utils/Error'
 import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
 import {CREATE_CHANNEL_EVENT_TYPE, handleCreateChannelEvent} from './ChannelEvents'
-import {DEMURRAGE_EVEN_TYPE, handleDemurrageEvent} from './AccountingEvents'
+import {
+  COMMUNITY_POT_SPLIT,
+  DEMURRAGE_EVEN_TYPE,
+  handleCommunityPotSplit,
+  handleDemurrageEvent
+} from './AccountingEvents'
+import { timeout, TimeoutError } from 'promise-timeout'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -24,7 +30,14 @@ export type Event = {
   timestamp: number
 }
 
-export function handleEvent (event: Event): Promise<boolean> {
+// todo. make sure that events are handled one after the next
+let lastEvent = Promise.resolve(true)
+
+export async function handleEvent (event: Event): Promise<boolean> {
+  await timeout(lastEvent, 1000 * 60).catch(e => {
+    if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
+  }) // todo. add timeout
+
   if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
   if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
   if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
@@ -34,7 +47,7 @@ export function handleEvent (event: Event): Promise<boolean> {
 
   // fixme put a try catch here to log failed events
 
-  return applyHandler(event).then(async r => {
+  lastEvent = applyHandler(event).then(async r => {
     if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
     await pushEvent(event, r)
     console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
@@ -43,6 +56,7 @@ export function handleEvent (event: Event): Promise<boolean> {
     console.error(`Failed to handle event: ${e}`, event)
     return false
   })
+  return lastEvent
 }
 
 function applyHandler (event: Event): Promise<boolean> {
@@ -52,6 +66,7 @@ function applyHandler (event: Event): Promise<boolean> {
     case ADD_AGENT_TO_COMMUNITY_EVEN_TYPE: return handleAddAgentToCommunity(event)
     case CREATE_CHANNEL_EVENT_TYPE: return handleCreateChannelEvent(event)
     case DEMURRAGE_EVEN_TYPE: return handleDemurrageEvent(event)
+    case COMMUNITY_POT_SPLIT: return handleCommunityPotSplit(event)
     default: throw new Error('Could not recognize event type')
   }
 }

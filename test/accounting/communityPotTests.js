@@ -39,14 +39,14 @@ function macroCheckWallets (t, ex) {
   return Promise.all(ps)
 }
 
-test('nothing is split if pot is empty', async t => {
+test.serial('nothing is split if pot is empty', async t => {
   await splitAllCommunityPots()
   await macroCheckWallets(t, [
     {b: 0, sp: 10}, {b: 0, sp: 20}, {b: 0, sp: 30}
   ])
 })
 
-test('pot is split properly', async t => {
+test.serial('pot is split properly', async t => {
   await setCommunityBalance(COMMUNITY_ID, 60)
   await splitAllCommunityPots()
 
@@ -56,12 +56,12 @@ test('pot is split properly', async t => {
   t.is(await getCommunityBalance(COMMUNITY_ID), 0)
 })
 
-test('if pot cannot be split fully with whole numbers, some thanks are left over for next time', async t => {
+test.serial('if pot cannot be split fully with whole numbers, some thanks are left over for next time', async t => {
   await setCommunityBalance(COMMUNITY_ID, 61)
   await splitAllCommunityPots()
 
   await macroCheckWallets(t, [
-    {b: 10, sp: 10}, {b: 20, sp: 20}, {b: 30, sp: 30}
+    {b: 20, sp: 10}, {b: 40, sp: 20}, {b: 60, sp: 30}
   ])
   t.is(await getCommunityBalance(COMMUNITY_ID), 1)
 })

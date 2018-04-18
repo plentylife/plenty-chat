@@ -3,8 +3,10 @@
 import {getAllWallets} from '../db/AgentWalletTable'
 import {calculateDemurrageForAgent} from '../accounting/Demurrage'
 import {sendEvent} from '../events'
-import {DEMURRAGE_EVEN_TYPE} from '../events/AccountingEvents'
+import {COMMUNITY_POT_SPLIT, DEMURRAGE_EVEN_TYPE} from '../events/AccountingEvents'
 import {getCurrentAgentId} from '../state/GlobalState'
+import {getAllCommunities} from '../db/CommunityTable'
+import {calculateCommunityPotSplit} from '../accounting/CommunityPot'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
@@ -22,4 +24,14 @@ export async function applyDemurrageToAll (): Promise<boolean> {
     }
   })
   return Promise.all(sentPromises)
+}
+
+export async function splitAllCommunityPots (): Promise<boolean> {
+  const communities = await getAllCommunities()
+  const promises = communities.map(c => {
+    return calculateCommunityPotSplit(c.communityId, c.balance).then(splits => {
+      return sendEvent(COMMUNITY_POT_SPLIT, getCurrentAgentId(), c.communityId, splits)
+    })
+  })
+  return Promise.all(promises)
 }

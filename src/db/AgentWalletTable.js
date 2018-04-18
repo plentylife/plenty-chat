@@ -53,6 +53,7 @@ export function getWallet (agentId: string, communityId: string): Promise<(Walle
 }
 
 export function setBalance (agentId: string, communityId: string, balance: number): Promise<any> {
+  /** Setting new balance for  an agent */
   // fixme check that balance is not below credit limit
   if (!Number.isInteger(balance)) throw new Error('Balance has to be an integer')
   let payload = {

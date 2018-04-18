@@ -38,4 +38,8 @@ export function communityExists (communityId: string): Promise<boolean> {
   })
 }
 
+export function getAllCommunities (communityId: string): Promise<Array<any>> {
+  return nSQL(COMMUNITY_TABLE).query('select').exec()
+}
+
 export default communityTable
