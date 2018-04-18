@@ -1,15 +1,25 @@
 // @flow
 
-import {addCommunitySharePoints, getWallet, getCommunitySharePoints, setBalance} from '../db/AgentWalletTable'
+import {
+  addCommunitySharePoints,
+  getWallet,
+  getCommunitySharePoints,
+  setBalance,
+  _setDemurrageTimestamps
+} from '../db/AgentWalletTable'
 import {assertPositive, assertInt, assertBetweenZeroOne} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 import type {MessageRow} from '../db/MessageTable'
 import {getCommunityOfMsg} from '../db'
-import {CommunityIdNotInferrable, MissingDatabaseEntry} from '../utils/Error'
+import {CommunityIdNotInferrable} from '../utils/Error'
 
-export function initializeAccount (agentId: string, communityId: string): Promise<void> {
+export async function initializeAccount (agentId: string, communityId: string): Promise<void> {
   // todo. share points are not intialized; currently they get stuck into db by default.
+  const now = new Date().getTime()
+  await _setDemurrageTimestamps(agentId, communityId, {
+    balance: now, communitySharePoints: now
+  })
   return setBalance(agentId, communityId, 0).then(r =>
     (r.length > 0)
   )

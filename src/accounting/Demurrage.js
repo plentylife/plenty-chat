@@ -25,7 +25,8 @@ export type DemurrageByProperty = {
 }
 
 function _cda (w: Wallet, p: string) {
-  const periods = _calculatePeriods(w.demurrageTimestamps[p], DEFAULT_DEMURRAGE_PERIOD)
+  const now = new Date().getTime()
+  const periods = _calculatePeriods(now - w.demurrageTimestamps[p], DEFAULT_DEMURRAGE_PERIOD)
   return _calculateDemurrage(w[p], DEFAULT_DEMURRAGE_RATE, periods)
 }
 

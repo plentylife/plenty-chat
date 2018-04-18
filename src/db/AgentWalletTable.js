@@ -25,6 +25,7 @@ function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
     .where([['agentId', '=', agentId], 'AND', ['communityId', '=', communityId]]).exec()
 }
 
+export const WALLET_DELTA_PROPERTIES = ['balance', 'communitySharePoints']
 export type DemurrageTimestamps = {
   balance: number, communitySharePoints: number
 }
@@ -60,6 +61,9 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
     if (r.length > 0) {
       // $FlowFixMe
       payload.id = r[0].id
+      if (r[0].balance <= 0 && balance > 0) {
+        payload.demurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps, {balance: (new Date().getTime())})
+      }
     } else {
       // $FlowFixMe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
@@ -77,24 +81,35 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
     }
     const newPoints = r[0].communitySharePoints + pointsToAdd
     if (newPoints < 0) throw new InappropriateAction('Community share points cannot be below 0')
-    return nSQL(AGENT_WALLET_TABLE).query('upsert', {
+    let upsert = {
       id: r[0].id, communitySharePoints: newPoints
-    }).exec()
+    }
+
+    if (r[0].communitySharePoints === 0 && pointsToAdd > 0) {
+      upsert.demurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps,
+        {communitySharePoints: (new Date().getTime())}
+      )
+    }
+
+    return nSQL(AGENT_WALLET_TABLE).query('upsert', upsert).exec()
   })
 }
 
-const walletDeltaProperties = ['balance', 'communitySharePoints']
-
-export function applyDeltaToWallet (agentId: string, communityId: string, delta: Object): Promise<any> {
+export function applyDemurrageToWallet (agentId: string, communityId: string, delta: Object): Promise<any> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
       throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
     }
+    const now = new Date().getTime()
     let flagAny = false
     const newBalances = {}
-    walletDeltaProperties.forEach(prop => {
+    const timestamps: DemurrageTimestamps = {}
+
+    WALLET_DELTA_PROPERTIES.forEach(prop => {
       if (delta[prop]) {
-        newBalances[prop] = r[0][prop] + delta[prop]
+        const cb = r[0][prop]
+        newBalances[prop] = cb + delta[prop]
+        timestamps[prop] = now
         flagAny = true
       }
     })
