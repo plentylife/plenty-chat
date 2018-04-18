@@ -170,4 +170,22 @@ test.serial('nagative balance to positive balance should log proper timestamps',
   t.true(apEq(wp.demurrageTimestamps.balance, now, 50))
 })
 
-test.todo('even small amounts should eventually dissipate')
+test.serial('even small amounts should eventually dissipate', async t => {
+  const tsUnder = TIMESTAMP - (LENGTH_OF_DAY * 34)
+  const tsOver = TIMESTAMP - (LENGTH_OF_DAY * 35)
+  let dts = makeDemurrageTimestamps(tsOver, tsUnder)
+  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
+
+  await applyDemurrageToAll()
+  await macroCheckWallets(t, [
+    {b: 0, sp: 1}, {b: 94, sp: 96}
+  ])
+
+  dts = makeDemurrageTimestamps(tsOver, tsOver)
+  await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
+
+  await applyDemurrageToAll()
+  await macroCheckWallets(t, [
+    {b: 0, sp: 0}, {b: 94, sp: 96}
+  ])
+})
