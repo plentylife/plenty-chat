@@ -37,8 +37,8 @@ function makeDemurrageTimestamps (balance, communitySharePoints) {
   }
 }
 
-async function setTimestampsToPast (days) {
-  const ts = TIMESTAMP - LENGTH_OF_DAY
+async function setTimestampsToPast (days = 1) {
+  const ts = TIMESTAMP - (LENGTH_OF_DAY * days)
   const dts = makeDemurrageTimestamps(ts, ts)
   await _setDemurrageTimestamps(AGENT_ID_POOR, COMMUNITY_ID, dts)
   await _setDemurrageTimestamps(AGENT_ID_RICH, COMMUNITY_ID, dts)
@@ -142,6 +142,7 @@ test.serial('gone broke', async t => {
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, -1)
   const wpStart = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
 
+  const ts = await setTimestampsToPast()
   await applyDemurrageToAll()
   await macroCheckWallets(t, [
     {b: -1, sp: 1}, {b: 94, sp: 96}
@@ -154,12 +155,14 @@ test.serial('gone broke', async t => {
 
   const now = new Date().getTime()
 
-  t.true(apEq(wp.demurrageTimestamps.communitySharePoints, now, 50))
   t.true(apEq(wr.demurrageTimestamps.balance, now, 50))
   t.true(apEq(wr.demurrageTimestamps.communitySharePoints, now, 50))
 
   // timestamps for balance should not change
-  t.is(wp.demurrageTimestamps.balance, wpStart.demurrageTimestamps.balance)
+  t.is(wp.demurrageTimestamps.communitySharePoints, ts)
+  t.is(wp.demurrageTimestamps.balance, ts)
 })
 
 test.todo('nagative balance to positive balance should log proper timestamps')
+
+test.todo('even small amounts should eventually dissipate')
