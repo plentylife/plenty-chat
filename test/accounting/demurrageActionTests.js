@@ -140,7 +140,6 @@ test.serial('some community share points', async t => {
 
 test.serial('gone broke', async t => {
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, -1)
-  const wpStart = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
 
   const ts = await setTimestampsToPast()
   await applyDemurrageToAll()
@@ -163,6 +162,12 @@ test.serial('gone broke', async t => {
   t.is(wp.demurrageTimestamps.balance, ts)
 })
 
-test.todo('nagative balance to positive balance should log proper timestamps')
+test.serial('nagative balance to positive balance should log proper timestamps', async t => {
+  await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 1)
+  const wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
+
+  const now = new Date().getTime()
+  t.true(apEq(wp.demurrageTimestamps.balance, now, 50))
+})
 
 test.todo('even small amounts should eventually dissipate')
