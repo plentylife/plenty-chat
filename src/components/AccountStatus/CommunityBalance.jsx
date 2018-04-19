@@ -23,7 +23,11 @@ class CommunityBalance extends Component<Props> {
     return getCommunityBalance(this.props.communityId).then(communityBalance => {
       calculateCommunityPotSplit(this.props.communityId, communityBalance).then(shares => {
         let share = shares.find(s => (s.agentId === this.props.agentId))
-        if (share) share = share.amount
+        if (share) {
+          share = share.amount
+        } else {
+          share = '- '
+        }
 
         console.log('Community balance', this.props.communityId, communityBalance, share, shares)
         complete({communityBalance, share})

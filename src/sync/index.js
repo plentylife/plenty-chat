@@ -1,6 +1,5 @@
 // @flow
 
-import {STUB} from '../utils'
 import {Event, handleEvent as internalEventHandler} from '../events'
 import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
 import {getCurrentAgentId} from '../state/GlobalState'
@@ -19,10 +18,6 @@ export type Peer = {
 }
 
 export var peers: Array<Peer> = []
-
-export function notifyPeers (event: Event): void {
-  STUB()
-}
 
 export function requestUpdate (socket): void {
 

@@ -1,7 +1,7 @@
 import {nSQLiteAdapter} from 'nano-sqlite'
 
 let _currentAgentId = 'anton'
-export var currentCommunityId = 'commid'
+let _currentCommunityId = 'commid'
 
 /** time between demurrage and community pot splits; in minutes */
 export const CRON_TIME = 10
@@ -30,4 +30,13 @@ export function getCurrentAgentId (): string {
 export function setCurrentAgentId (id: string) {
   console.log('Global (current) Agent ID is set to', id)
   _currentAgentId = id
+}
+
+export function setCurrentCommunityId (id: string) {
+  console.log('Global (current) Community ID is set to', id)
+  _currentCommunityId = id
+}
+
+export function getCurrentCommunityId (): string {
+  return _currentCommunityId
 }

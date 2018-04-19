@@ -31,7 +31,7 @@ export type Event = {
 }
 
 // todo. make sure that events are handled one after the next
-let lastEvent = Promise.resolve(true)
+export let lastEvent = Promise.resolve(true)
 
 export async function handleEvent (event: Event): Promise<boolean> {
   await timeout(lastEvent, 1000 * 60).catch(e => {

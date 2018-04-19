@@ -18,6 +18,7 @@ export function connectToPeer (peer: string): Promise<Peer> {
 export function startSync (peers: Array<string>): void {
   registerSendEventsObserver()
   peers.forEach(address => {
+    console.log('Starting sync with', address)
     connectToPeer(address).then(onConnectToPeer)
   })
 }

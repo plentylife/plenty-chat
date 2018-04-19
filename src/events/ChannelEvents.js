@@ -15,7 +15,7 @@ export const CREATE_CHANNEL_EVENT_TYPE: 'createChannel' = 'createChannel'
  */
 export async function handleCreateChannelEvent (event: Event): Promise<boolean> {
   const payload = validatePayload(event.payload)
-  await setCommunityOfChannel(payload.channelId, event.communityId)
+  await setCommunityOfChannel(payload.channelId, event.communityId) // todo do not reset??
   return communityExists(event.communityId).then(e => {
     if (!e) {
       return initializeCommunity(event.communityId)

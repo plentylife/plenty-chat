@@ -3,36 +3,41 @@
 import AccountStatus from './components/AccountStatus/AccountStatus'
 import MessageRating from './components/Rating/MessageRating'
 import {nSQL} from 'nano-sql'
-import {currentAgentId, currentCommunityId, DB_MODE} from './state/GlobalState'
-import {walletExists} from './db/AgentWalletTable'
+import {
+  DB_MODE,
+  setCurrentAgentId,
+  setCurrentCommunityId
+} from './state/GlobalState'
 import {sendMessage} from './actions/MessageActions'
-import {hasEnoughFundsToSendMessage, initializeAccount, initializeCommunity} from './accounting/Accounting'
-import {communityExists} from './db/CommunityTable'
+import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
-import {setCommunityOfChannel} from './db/ChannelTable'
+import {startSync} from './sync/SyncClient'
+import {createChannel} from './actions/ChannelActions'
+import {addAgentToCommunity} from './actions/AgentActions'
 
 function plentyInit () {
   console.log('Initializing Plenty')
   console.log('DB Mode', DB_MODE)
+  console.log('DB Name', process.env.DB_NAME)
 
-  nSQL().connect()
-
-  /* TESTING MM INTEGRATION; REMOVE */
-  window.nsql = nSQL
-  /* END: TESTING MM INTEGRATION; REMOVE */
+  nSQL().connect().then(() => {
+    console.log('DB connected (connect.then)')
+    startSync(['http://localhost:3000'])
+  })
 }
 
 export function onChannelView (agentId: string, channelId: string, communityId: string) {
+  setCurrentAgentId(agentId)
+  setCurrentCommunityId(communityId)
+  plentyInit()
+
   return nSQL().onConnected(async () => {
     // fixme do not reupdate every time
-    await setCommunityOfChannel(channelId, communityId)
-    await communityExists(communityId).then(e => {
-      if (!e) return initializeCommunity(communityId)
-    })
-    await walletExists(agentId, communityId).then(e => {
-      if (!e) return initializeAccount(agentId, communityId)
-    })
+
+    console.log('DB connected (onConnected)')
+    await createChannel(agentId, channelId, communityId)
+    await addAgentToCommunity(agentId, communityId)
 
     /* TESTING MM INTEGRATION; REMOVE */
     // setTimeout(() => {
@@ -44,5 +49,4 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
 }
 
 export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
-  plentyInit, currentAgentId, currentCommunityId,
   sendMessage, hasEnoughFundsToSendMessage}

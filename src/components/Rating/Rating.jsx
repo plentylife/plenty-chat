@@ -28,7 +28,7 @@ class Rating extends PureComponent {
   }
 
   static onChange (event, complete) {
-    console.log('message rating change event', event)
+    // console.log('message rating change event', event)
 
     getRating(this.props.messageId, this.props.agentId).then(rows => {
       if (rows && rows.length > 0) {

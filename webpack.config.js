@@ -131,6 +131,13 @@ const server = Object.assign({}, common, {
     filename: 'server-lib.js',
     libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        DB_NAME: JSON.stringify('db-plenty-prod.sqlite3')
+      }
+    })
+  ],
   target: 'node',
   mode: 'production',
   devtool: 'source-map'
@@ -158,7 +165,7 @@ const serverTest = Object.assign({}, server, {
 
 module.exports = [
   // serverTest,
-  // server
+  server,
   library
   // visualTests
   // dbTests
