@@ -60,17 +60,26 @@ nSQL().connect().then(async () => {
     t.is(msg, null)
   })
 
-  test.serial('sending message', async t => {
-    const MSG_ID = 'tmid_sending'
+  async function sendingMessageMacro (t, times) {
+    console.log(`Sending message. ${times} times`)
+    const MSG_ID = 'tmid_sending' + times
 
-    await setBalance(AGENT_ID, COMMUNITY_ID, 0)
     await t.true(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
     const msg = await getMessage(MSG_ID)
     const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
 
-    t.is(cb, 1)
-    t.is(balance.balance, -1)
+    t.is(cb, 1 * times)
+    t.is(balance.balance, -1 * times)
     t.is(msg.id, MSG_ID)
+  }
+
+  test.serial('sending message', async t => {
+    await setBalance(AGENT_ID, COMMUNITY_ID, 0)
+    let i = 1
+    while (i < 5) {
+      await sendingMessageMacro(t, i)
+      i += 1
+    }
   })
 })
