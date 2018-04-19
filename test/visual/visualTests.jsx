@@ -4,7 +4,7 @@ import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../..
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {getCurrentCommunityId, getCurrentAgentId} from '../../src/state/GlobalState'
-import {addCommunitySharePoints, setBalance} from '../../src/db/AgentWalletTable'
+import {addCommunitySharePoints, AGENT_WALLET_TABLE, getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
 import {setCommunityBalance} from '../../src/db/CommunityTable'
@@ -30,6 +30,19 @@ nSQL().onConnected(async () => {
     setBalance(getCurrentAgentId(), getCurrentCommunityId(), (b += 1))
     setCommunityBalance(getCurrentCommunityId(), b += 1)
   }, 3000)
+
+  await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
+    console.log('connected all wallets', all)
+  })
+
+  await nSQL(AGENT_WALLET_TABLE).query('select')
+    .where([['agentId', '=', getCurrentAgentId()], 'AND', ['communityId', '=', getCurrentCommunityId()]]).exec().then(r => {
+      console.log('specific wallet (query)', r)
+    })
+
+  await getWallet(getCurrentAgentId(), getCurrentCommunityId()).then(w => {
+    console.log('specific wallet', w)
+  })
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')

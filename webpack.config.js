@@ -1,5 +1,6 @@
 const webpack = require('webpack') // to access built-in plugins
 var path = require('path')
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
 
 const common = {
   module: {
@@ -52,7 +53,13 @@ const common = {
     'nano-sqlite': 'commonjs nano-sqlite',
     'sqlite3': 'commonjs sqlite3',
     'leveldown': 'commonjs leveldown'
-  }
+  },
+  plugins: [
+    new DuplicatePackageCheckerPlugin({
+      verbose: true,
+      emitError: true
+    })
+  ]
 }
 
 const library = Object.assign({}, common, {
@@ -75,15 +82,15 @@ const library = Object.assign({}, common, {
     })
   ],
   target: 'web',
-  // devtool: 'source-map',
+  // devtool: 'cheap-module-eval-source-map',
   mode: process.env.NODE_ENV || 'production'
 })
 library.externals = Object.assign({}, library.externals, {
   'react': 'commonjs react',
-  // 'React': 'commonjs react',
+  'React': 'commonjs react',
   'react-dom': 'commonjs react-dom',
   'react-bootstrap': 'commonjs react-bootstrap',
-  'react-animate-on-change': 'commonjs react-animate-on-change'
+  // 'react-animate-on-change': 'commonjs react-animate-on-change'
 })
 
 const visualTests = Object.assign({}, common, {
@@ -139,8 +146,7 @@ const server = Object.assign({}, common, {
     })
   ],
   target: 'node',
-  mode: 'production',
-  devtool: 'source-map'
+  mode: 'production'
 })
 
 const serverTest = Object.assign({}, server, {
@@ -162,6 +168,8 @@ const serverTest = Object.assign({}, server, {
   mode: 'development',
   devtool: 'source-map'
 })
+
+console.log('LIBRARY CONFIG', library)
 
 module.exports = [
   // serverTest,
