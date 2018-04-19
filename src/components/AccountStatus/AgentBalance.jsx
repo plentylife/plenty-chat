@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import {AGENT_WALLET_TABLE, getWallet} from '../../db/AgentWalletTable'
 import type {Wallet} from '../../db/AgentWalletTable'
 import './style.css'
@@ -12,7 +12,7 @@ type Props = {
   nSQLdata: Wallet
 }
 
-class AgentBalance extends PureComponent<Props> {
+class AgentBalance extends Component<Props> {
   static tables () {
     return [AGENT_WALLET_TABLE] // listen for changes on this table
   }

@@ -24,14 +24,14 @@ function plentyInit () {
 }
 
 export function onChannelView (agentId: string, channelId: string, communityId: string) {
-  nSQL().onConnected(() => {
+  return nSQL().onConnected(async () => {
     // fixme do not reupdate every time
-    setCommunityOfChannel(channelId, communityId)
-    communityExists(communityId).then(e => {
-      if (!e) initializeCommunity(communityId)
+    await setCommunityOfChannel(channelId, communityId)
+    await communityExists(communityId).then(e => {
+      if (!e) return initializeCommunity(communityId)
     })
-    walletExists(agentId, communityId).then(e => {
-      if (!e) initializeAccount(agentId, communityId)
+    await walletExists(agentId, communityId).then(e => {
+      if (!e) return initializeAccount(agentId, communityId)
     })
 
     /* TESTING MM INTEGRATION; REMOVE */

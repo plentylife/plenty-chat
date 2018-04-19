@@ -62,11 +62,11 @@ const library = Object.assign({}, common, {
     filename: 'index.js',
     libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
-  externals: {
-    'react': 'commonjs react', // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
-    'react-bootstrap': 'commonjs react-bootstrap',
-    'react-transition-group': 'commonjs react-transition-group'
-  },
+  // externals: {
+  //   'react': 'commonjs react', // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
+  //   'react-bootstrap': 'commonjs react-bootstrap',
+  //   'react-transition-group': 'commonjs react-transition-group'
+  // },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
@@ -77,6 +77,13 @@ const library = Object.assign({}, common, {
   target: 'web',
   devtool: 'source-map',
   mode: process.env.NODE_ENV || 'production'
+})
+library.externals = Object.assign({}, library.externals, {
+  'react': 'commonjs react',
+  // 'React': 'commonjs react',
+  'react-dom': 'commonjs react-dom',
+  'react-bootstrap': 'commonjs react-bootstrap',
+  'react-animate-on-change': 'commonjs react-animate-on-change'
 })
 
 const visualTests = Object.assign({}, common, {
@@ -152,7 +159,7 @@ const serverTest = Object.assign({}, server, {
 module.exports = [
   // serverTest,
   // server
-  // library,
-  visualTests
+  library
+  // visualTests
   // dbTests
 ]

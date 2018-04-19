@@ -3,11 +3,14 @@
 - Scroll channel down to the bottom
 - Notify user if server is down
 - Hide account status if requested or small screen
+- Tutorial
 
 ## SYNC
 - Reconnect logic
 - Disconnect logic (remove event pushers)
 - Last sync time logic needs quite a bit of work. It's naive right now, assuming that events always come in order.
+- Demurrage
+    * food for thought: only nodes that have been on in the past x amount of time can perform demurrage
 
 ## Tests
 - Demurrage calc. tests need update

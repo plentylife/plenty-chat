@@ -10,7 +10,9 @@ import {initializeCommunity} from '../../src/accounting/Accounting'
 import {setCommunityBalance} from '../../src/db/CommunityTable'
 
 nSQL().onConnected(async () => {
+  const OTHER_AGENT_ID = 'oid'
   await addAgentToCommunity(getCurrentAgentId(), currentCommunityId)
+  await addAgentToCommunity(OTHER_AGENT_ID, currentCommunityId)
   const success = await initializeCommunity(currentCommunityId)
 
   console.log('Initialized community', success)
@@ -18,7 +20,8 @@ nSQL().onConnected(async () => {
   await setCommunityBalance(currentCommunityId, 10)
   // await setBalance(getCurrentAgentId(), currentCommunityId, 20)
   await setBalance(getCurrentAgentId(), currentCommunityId, -1)
-  // await addCommunitySharePoints(getCurrentAgentId(), currentCommunityId, 1)
+  await addCommunitySharePoints(getCurrentAgentId(), currentCommunityId, 1)
+  await addCommunitySharePoints(OTHER_AGENT_ID, currentCommunityId, 2)
 
   let b = 1
   setInterval(() => {
