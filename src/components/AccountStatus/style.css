@@ -25,7 +25,7 @@
 }
 .account-status-block .info {
     font-size: smaller;
-    color: darkgray;
+    color: #7c7c7c;
 }
 .account-status-block .accounting-info {
     display: flex;
