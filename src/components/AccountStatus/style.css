@@ -30,6 +30,7 @@
 .account-status-block .accounting-info {
     display: flex;
     justify-content: space-between;
+    flex-direction: row;
 }
 
 .account-status-block .balance {
@@ -43,6 +44,10 @@
 }
 .account-status-block .balance.danger {
     color: #a94442;
+}
+
+.account-status-block .community-share-block {
+    flex-direction: column;
 }
 /*.agent-balance > span {*/
     /*display: flex;*/

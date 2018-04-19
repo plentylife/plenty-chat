@@ -6,6 +6,7 @@ import {calculateCommunityPotSplit} from '../../accounting/CommunityPot'
 import {bindNSQL} from 'nano-sql-react/index'
 import {AGENT_WALLET_TABLE} from '../../db/AgentWalletTable'
 import Balance from './Balance'
+import {CRON_TIME} from '../../state/GlobalState'
 
 type Props = {
   agentId: string,
@@ -45,7 +46,10 @@ class CommunityBalance extends PureComponent<Props> {
         // eslint-disable-next-line no-unused-expressions
         return <span className={'community-block'}>
           <span className={'accounting-info'}><label>Community pot</label><Balance amount={data.communityBalance}/></span>
-          <span className={'accounting-info'}><label>Your share</label><Balance amount={data.share}/></span>
+          <span className={'community-share-block'}>
+            <span className={'accounting-info'}><label>Your share</label><Balance amount={data.share}/></span>
+            <span className={'info'}>Distributed every {CRON_TIME} minutes</span>
+          </span>
         </span>
       }
     }
