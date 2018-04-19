@@ -8,8 +8,8 @@
 </head>
 <body>
     <script>
-      window.require = function () {
-        console.log('Fake require')
+      window.require = function (name) {
+        console.log('Fake require', name)
       }
     </script>
     <div id="root"></div>
