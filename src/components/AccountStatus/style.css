@@ -31,6 +31,7 @@
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+    position: relative; /* for animation */
 }
 
 .account-status-block .balance {
@@ -55,4 +56,29 @@
 
 .account-status-block label {
     margin-right: 1em;
+}
+
+.account-status-block .balance-animation {
+    animation: balance-animation-keyframes 1s ease-out;
+}
+
+@keyframes balance-animation-keyframes {
+    from {
+        position: absolute;
+        right: 0;
+        background-color: white;
+    }
+    10% {
+        color: orange;
+        font-weight: bold;
+        font-size: 2em;
+    }
+    30% {
+        color: orange;
+    }
+    to {
+        position: absolute;
+        right: 0;
+        background-color: white;
+    }
 }

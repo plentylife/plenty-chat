@@ -18,7 +18,13 @@ nSQL().onConnected(async () => {
   await setCommunityBalance(currentCommunityId, 10)
   // await setBalance(getCurrentAgentId(), currentCommunityId, 20)
   await setBalance(getCurrentAgentId(), currentCommunityId, -1)
-  await addCommunitySharePoints(getCurrentAgentId(), currentCommunityId, 1)
+  // await addCommunitySharePoints(getCurrentAgentId(), currentCommunityId, 1)
+
+  let b = 1
+  setInterval(() => {
+    setBalance(getCurrentAgentId(), currentCommunityId, (b += 1))
+    setCommunityBalance(currentCommunityId, b += 1)
+  }, 3000)
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')

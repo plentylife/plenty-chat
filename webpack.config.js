@@ -64,7 +64,8 @@ const library = Object.assign({}, common, {
   },
   externals: {
     'react': 'commonjs react', // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
-    'react-bootstrap': 'commonjs react-bootstrap'
+    'react-bootstrap': 'commonjs react-bootstrap',
+    'react-transition-group': 'commonjs react-transition-group'
   },
   plugins: [
     new webpack.DefinePlugin({

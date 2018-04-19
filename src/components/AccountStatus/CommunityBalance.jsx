@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import type {Wallet} from '../../db/AgentWalletTable'
 import './style.css'
 import {COMMUNITY_TABLE, getCommunityBalance} from '../../db/CommunityTable'
@@ -11,10 +11,10 @@ import {CRON_TIME} from '../../state/GlobalState'
 type Props = {
   agentId: string,
   communityId: string,
-  nSQLdata: Wallet
+  nSQLdata: Wallet // todo. wrong
 }
 
-class CommunityBalance extends PureComponent<Props> {
+class CommunityBalance extends Component<Props> {
   static tables () {
     return [COMMUNITY_TABLE, AGENT_WALLET_TABLE] // listen for changes on this table
   }
@@ -29,6 +29,10 @@ class CommunityBalance extends PureComponent<Props> {
         complete({communityBalance, share})
       })
     })
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return JSON.stringify(this.props.nSQLdata) !== JSON.stringify(nextProps.nSQLdata)
   }
 
   static Unavailable () {

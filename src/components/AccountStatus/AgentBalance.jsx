@@ -29,6 +29,10 @@ class AgentBalance extends PureComponent<Props> {
     // fixme optimize at some point to react only to the appropriate change
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    return JSON.stringify(this.props.nSQLdata) !== JSON.stringify(nextProps.nSQLdata)
+  }
+
   static Unavailable () {
     return <div className="unavailable">Wallet info unavailable</div>
   }
