@@ -92,6 +92,7 @@ const visualTests = Object.assign({}, common, {
       }
     })
   ],
+  // externals: [],
   mode: 'development',
   devtool: 'cheap-module-eval-source-map'
 })
@@ -123,7 +124,7 @@ const server = Object.assign({}, common, {
     libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
   target: 'node',
-  // mode: process.env.NODE_ENV || 'development',
+  mode: 'production',
   devtool: 'source-map'
 })
 
@@ -148,8 +149,9 @@ const serverTest = Object.assign({}, server, {
 })
 
 module.exports = [
-  serverTest
+  // serverTest,
   // server
   // library,
-  // visualTests, dbTests
+  visualTests
+  // dbTests
 ]

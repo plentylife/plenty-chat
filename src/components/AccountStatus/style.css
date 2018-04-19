@@ -1,13 +1,53 @@
-.agent-balance {
+/*font-family: 'Raleway', sans-serif;*/
+/*font-family: 'Comfortaa', cursive;*/
+
+.account-status-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    font-family: 'Comfortaa', cursive;
+}
+
+.account-status-block > span {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
 }
 
-.agent-balance > span {
+.account-status-block > span:first-child {
+    margin-right: 0.6em;
+    padding-right: 0.6em;
+    border-right: 1px solid lightgray;
+}
+
+.account-status-block .agent-block .balance-block {
     display: flex;
+    flex-direction: column;
+}
+.account-status-block .info {
+    font-size: smaller;
+    color: darkgray;
+}
+.account-status-block .accounting-info {
+    display: flex;
+    justify-content: space-between;
 }
 
-.agent-balance label {
+.account-status-block .balance {
+    font-family: 'Raleway', sans-serif;
+}
+.account-status-block .balance.good-standing {
+    color: forestgreen;
+}
+.account-status-block .balance.warning {
+    color: #b9872a;
+}
+.account-status-block .balance.danger {
+    color: #a94442;
+}
+/*.agent-balance > span {*/
+    /*display: flex;*/
+/*}*/
+
+.account-status-block label {
     margin-right: 1em;
 }

@@ -3,11 +3,41 @@ import ReactDOM from 'react-dom'
 import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
-import {currentAgentId, currentCommunityId} from '../../src/state/GlobalState'
-import {setBalance} from '../../src/db/AgentWalletTable'
+import {currentCommunityId, getCurrentAgentId} from '../../src/state/GlobalState'
+import {addCommunitySharePoints, setBalance} from '../../src/db/AgentWalletTable'
+import {addAgentToCommunity} from '../../src/actions/AgentActions'
+import {initializeCommunity} from '../../src/accounting/Accounting'
+import {setCommunityBalance} from '../../src/db/CommunityTable'
 
-nSQL().onConnected(() => {
-  setBalance(currentAgentId, currentCommunityId, 20)
+nSQL().onConnected(async () => {
+  await addAgentToCommunity(getCurrentAgentId(), currentCommunityId)
+  const success = await initializeCommunity(currentCommunityId)
+
+  console.log('Initialized community', success)
+
+  await setCommunityBalance(currentCommunityId, 10)
+  // await setBalance(getCurrentAgentId(), currentCommunityId, 20)
+  await setBalance(getCurrentAgentId(), currentCommunityId, -1)
+  await addCommunitySharePoints(getCurrentAgentId(), currentCommunityId, 1)
+
+  function ComponentDisplay () {
+    console.log('Test Component Display rendering')
+    return <div className={'tests-container'}>
+      <div><AccountStatus agentId={getCurrentAgentId()} communityId={currentCommunityId}/></div>
+      <div>
+        Rating
+        <MessageRating/>
+      </div>
+      <div>
+        <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
+      </div>
+    </div>
+  }
+
+  ReactDOM.render(
+    <ComponentDisplay/>,
+    document.getElementById('root')
+  )
 })
 
 nSQL().connect()
@@ -15,22 +45,3 @@ nSQL().connect()
 // function onRating (index) {
 //   console.log('Selected rating index', index)
 // }
-
-function ComponentDisplay () {
-  console.log('Test Component Display rendering')
-  return <div className={'tests-container'}>
-    <div><AccountStatus agentId={currentAgentId} communityId={currentCommunityId}/></div>
-    <div>
-      Rating
-      <MessageRating/>
-    </div>
-    <div>
-      <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
-    </div>
-  </div>
-}
-
-ReactDOM.render(
-  <ComponentDisplay/>,
-  document.getElementById('root')
-)

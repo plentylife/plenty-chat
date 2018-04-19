@@ -1,6 +1,5 @@
 // @flow
 
-import {bindNSQL} from 'nano-sql-react'
 import AccountStatus from './components/AccountStatus/AccountStatus'
 import MessageRating from './components/Rating/MessageRating'
 import {nSQL} from 'nano-sql'
@@ -12,8 +11,6 @@ import {communityExists} from './db/CommunityTable'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
 import {setCommunityOfChannel} from './db/ChannelTable'
-
-const AccountStatusSql = bindNSQL(AccountStatus)
 
 function plentyInit () {
   console.log('Initializing Plenty')
@@ -46,6 +43,6 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
   })
 }
 
-export {AccountStatusSql as AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
+export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
   plentyInit, currentAgentId, currentCommunityId,
   sendMessage, hasEnoughFundsToSendMessage}

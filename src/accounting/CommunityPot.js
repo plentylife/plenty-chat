@@ -14,7 +14,11 @@ export async function calculateCommunityPotSplit (communityId: string, community
   const sum = points.reduce((acc, next) => (acc + next.communitySharePoints), 0)
   return points.map(p => {
     const pn = Object.assign({}, p)
-    pn.amount = Math.floor((p.communitySharePoints / sum) * communityBalance)
+    if (sum !== 0) {
+      pn.amount = Math.floor((p.communitySharePoints / sum) * communityBalance)
+    } else {
+      pn.amount = 0
+    }
     return pn
   })
 }

@@ -65,3 +65,5 @@ test.serial('if pot cannot be split fully with whole numbers, some thanks are le
   ])
   t.is(await getCommunityBalance(COMMUNITY_ID), 1)
 })
+
+test.todo('when communty pot is nothing. division by zero')
