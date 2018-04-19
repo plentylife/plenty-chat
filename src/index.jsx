@@ -19,7 +19,7 @@ import {AGENT_WALLET_TABLE} from './db/AgentWalletTable'
 
 import './db/index'
 
-export function plentyInit () {
+function plentyInit () {
   console.log('Initializing Plenty')
   console.log('DB Mode', DB_MODE)
   console.log('DB Name', process.env.DB_NAME)
@@ -29,13 +29,13 @@ export function plentyInit () {
   window.nsql = nSQL
 }
 
-export function plentyInitSync (agentId, communityId, cb) {
+function plentyInitSync (agentId, communityId, cb) {
   if (agentId && communityId) {
     setCurrentAgentId(agentId)
     setCurrentCommunityId(communityId)
     cb()
 
-    nSQL().onConnected().then(() => {
+    nSQL().onConnected(() => {
       console.log('DB connected (sync init)')
       startSync(['http://localhost:3000'])
     })
@@ -84,4 +84,6 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
 }
 
 export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
-  sendMessage, hasEnoughFundsToSendMessage}
+  sendMessage, hasEnoughFundsToSendMessage,
+  plentyInit, plentyInitSync
+}

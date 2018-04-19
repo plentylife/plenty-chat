@@ -67,7 +67,7 @@ const library = Object.assign({}, common, {
   output: {
     path: path.resolve(__dirname, 'build-module'),
     filename: 'index.js',
-    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
+    libraryTarget: 'commonjs' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
   // externals: {
   //   'react': 'commonjs react', // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
@@ -90,6 +90,8 @@ library.externals = Object.assign({}, library.externals, {
   'React': 'commonjs react',
   'react-dom': 'commonjs react-dom',
   'react-bootstrap': 'commonjs react-bootstrap',
+  'nano-sql': 'nano-sql',
+  'nano-sql-react': 'nano-sql-react'
   // 'react-animate-on-change': 'commonjs react-animate-on-change'
 })
 
@@ -136,7 +138,7 @@ const server = Object.assign({}, common, {
   output: {
     path: path.resolve(__dirname, 'server'),
     filename: 'server-lib.js',
-    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
+    libraryTarget: 'commonjs' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
   plugins: [
     new webpack.DefinePlugin({
