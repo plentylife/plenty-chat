@@ -20,6 +20,7 @@ class CommunityBalance extends Component<Props> {
   }
 
   static onChange (event: any, complete: any => void) {
+    console.log('Community balance event', event)
     return getCommunityBalance(this.props.communityId).then(communityBalance => {
       calculateCommunityPotSplit(this.props.communityId, communityBalance).then(shares => {
         let share = shares.find(s => (s.agentId === this.props.agentId))

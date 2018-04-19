@@ -75,7 +75,7 @@ const library = Object.assign({}, common, {
     })
   ],
   target: 'web',
-  devtool: 'source-map',
+  // devtool: 'source-map',
   mode: process.env.NODE_ENV || 'production'
 })
 library.externals = Object.assign({}, library.externals, {
@@ -166,7 +166,7 @@ const serverTest = Object.assign({}, server, {
 module.exports = [
   // serverTest,
   server,
-  library
-  // visualTests
+  library,
+  visualTests
   // dbTests
 ]

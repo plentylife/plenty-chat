@@ -25,6 +25,8 @@ function plentyInit () {
     console.log('DB connected (connect.then)')
     startSync(['http://localhost:3000'])
   })
+
+  window.nsql = nSQL
 }
 
 export function onChannelView (agentId: string, channelId: string, communityId: string) {
