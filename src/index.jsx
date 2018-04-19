@@ -24,12 +24,22 @@ export function plentyInit () {
   console.log('DB Mode', DB_MODE)
   console.log('DB Name', process.env.DB_NAME)
 
-  nSQL().connect().then(() => {
-    console.log('DB connected (connect.then)')
-    startSync(['http://localhost:3000'])
-  })
+  nSQL().connect()
 
   window.nsql = nSQL
+}
+
+export function plentyInitSync (agentId, communityId, cb) {
+  if (agentId && communityId) {
+    setCurrentAgentId(agentId)
+    setCurrentCommunityId(communityId)
+    cb()
+
+    nSQL().onConnected().then(() => {
+      console.log('DB connected (sync init)')
+      startSync(['http://localhost:3000'])
+    })
+  }
 }
 
 export function onChannelView (agentId: string, channelId: string, communityId: string) {
