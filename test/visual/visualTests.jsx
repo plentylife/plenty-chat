@@ -16,6 +16,7 @@ nSQL().onConnected(async () => {
   const CH_ID = 'channelid'
   const MSG_ID = 'rating-test-msg'
   console.log('Visual tests. Db connected in mode', DB_MODE)
+  console.log('Visual tests.', getCurrentAgentId(), getCurrentCommunityId())
 
   const OTHER_AGENT_ID = 'oid'
   await addAgentToCommunity(getCurrentAgentId(), getCurrentCommunityId())
@@ -32,7 +33,7 @@ nSQL().onConnected(async () => {
   await addCommunitySharePoints(OTHER_AGENT_ID, getCurrentCommunityId(), 2)
 
   await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
-  await rateMessage(MSG_ID, getCurrentAgentId(), 3, 3)
+  await rateMessage(MSG_ID, getCurrentAgentId(), 1, 3)
 
   // let b = 1
   // setInterval(() => {

@@ -86,7 +86,7 @@ export async function accountingForMessageRating (message: MessageRow, rating: n
   if (!communityId) throw new CommunityIdNotInferrable()
 
   const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)
-  const existingPoints = await getCommunitySharePoints(message.senderId, communityId)
+  const existingPoints = await getCommunitySharePoints(message.senderId, communityId) // fixme this is a bug
   let points = pointsTotal
   if (existingPoints !== null) points -= existingPoints
 
