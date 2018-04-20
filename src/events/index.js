@@ -34,28 +34,33 @@ export type Event = {
 export let lastEvent = Promise.resolve(true)
 
 export async function handleEvent (event: Event): Promise<boolean> {
-  await timeout(lastEvent, 1000 * 60).catch(e => {
-    if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
-  }) // todo. add timeout
+  try {
+    console.log('handleEvent', event)
+    await timeout(lastEvent, 1000 * 60).catch(e => {
+      if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
+    }) // todo. add timeout
 
-  if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
-  if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
-  if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
-  if (!event.agentEventId) throw new Error('Improperly formatted event. No agent event id.')
-  if (!event.globalEventId) throw new Error('Improperly formatted event. No global event id.')
-  if (typeof event.payload !== 'object') throw new MissingPayload()
+    if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
+    if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
+    if (!event.senderId) throw new Error('Improperly formatted event. No sender id.')
+    if (!event.agentEventId) throw new Error('Improperly formatted event. No agent event id.')
+    if (!event.globalEventId) throw new Error('Improperly formatted event. No global event id.')
+    if (typeof event.payload !== 'object') throw new MissingPayload()
 
-  // fixme put a try catch here to log failed events
+    // fixme put a try catch here to log failed events
 
-  lastEvent = applyHandler(event).then(async r => {
-    if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
-    await pushEvent(event, r)
-    console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
-    return r
-  }).catch(e => {
-    console.error(`Failed to handle event: ${e}`, event)
-    return false
-  })
+    lastEvent = applyHandler(event).then(async r => {
+      if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
+      await pushEvent(event, r)
+      console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
+      return r
+    }).catch(e => {
+      console.error(`Failed to handle event: ${e}`, event)
+      return false
+    })
+  } catch (e) {
+    console.log('handleEvent failed totally', e)
+  }
   return lastEvent
 }
 
@@ -73,8 +78,24 @@ function applyHandler (event: Event): Promise<boolean> {
 
 export async function sendEvent (eventType: EventType, senderId: string, communityId: string,
   payload: EventPayload): Promise<boolean> {
-  const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
-  return handleEvent({
-    globalEventId: senderId + eventId, agentEventId: eventId, communityId, senderId, eventType, payload, receivedFrom: new Set()
-  })
+  console.log('sending event into db', eventType, senderId, communityId, payload)
+  try {
+    console.log('sending event right before push')
+    const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
+    console.log('sending event pushed to self db')
+    if (eventId !== false) {
+      return handleEvent({
+        globalEventId: senderId + eventId,
+        agentEventId: eventId,
+        communityId,
+        senderId,
+        eventType,
+        payload,
+        receivedFrom: new Set()
+      })
+    }
+  } catch (e) {
+    console.error('sendEvent failed', e)
+    return Promise.resolve(false)
+  }
 }

@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {getRating, RATING_TABLE} from '../../db/RatingTable'
+// import {RATING_TABLE} from '../../db/RatingTable'
 import Star from './Star'
 import './rating.css'
 
@@ -28,7 +29,9 @@ class Rating extends PureComponent {
   }
 
   static onChange (event, complete) {
-    // console.log('message rating change event', event)
+    if (event.affectedRows.length > 0) {
+      console.log('message rating change event', event)
+    }
 
     getRating(this.props.messageId, this.props.agentId).then(rows => {
       if (rows && rows.length > 0) {

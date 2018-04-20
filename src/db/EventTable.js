@@ -90,10 +90,16 @@ const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode
  * @return the id of the event
  */
 export function pushSelfEvent (eventType: string, communtyId: string, payload: Object): Promise<number> {
-  const row = Object.assign({eventType: eventType, timestamp: new Date().getTime(), communityId: communtyId}, payload)
-  return nSQL(SELF_EVENT_TABLE).query('upsert', row).exec().then(r => {
-    return r[0].affectedRows[0].eventId
-  })
+  try {
+    console.log('trying to push into self events', eventType, communtyId, payload)
+    const row = Object.assign({eventType: eventType, timestamp: new Date().getTime(), communityId: communtyId}, payload)
+    return nSQL(SELF_EVENT_TABLE).query('upsert', row).exec().then(r => {
+      return r[0].affectedRows[0].eventId
+    })
+  } catch (e) {
+    console.log('pushSelfEvent failed', eventType, communtyId, payload, e)
+    return Promise.resolve(false)
+  }
 }
 
 export {eventTable, selfEventTable}

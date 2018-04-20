@@ -25,7 +25,7 @@ export function requestUpdate (socket): void {
 
 export function requestCommunityUpdate (socket, communityId: string, fromTimestamp: number): Promise<any> {
   if (typeof fromTimestamp !== 'number') throw new TypeError('fromTimestamp must be a number')
-  console.log('UPDATE -->', communityId, fromTimestamp)
+  console.log('UPDATE -->', communityId, new Date(fromTimestamp))
   return new Promise(resolve => {
     socket.emit(REQUEST_UPDATE_CHANNEL, {communityId, fromTimestamp}, ack => {
       resolve(ack)
@@ -43,6 +43,7 @@ function listenForUpdateRequests (socket): void {
 
 function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
+    console.log(`EVENT <-- ${peer.agentId}`, event)
     ackFn(EVENT_CHANNEL + '.ack')
     backlogEvent(event, peer)
   })
@@ -106,7 +107,7 @@ async function consumeEvents () {
 }
 
 async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
-  console.log('Handling UPDATE request', communityId, fromTimestamp)
+  console.log('Handling UPDATE request', communityId, new Date(fromTimestamp))
 
   let relevantEntries
   if (communityId === REQUEST_UPDATE_ALL) {

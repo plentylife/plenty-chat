@@ -1,4 +1,5 @@
 // @flow
+// import 'babel-polyfill'
 
 import AccountStatus from './components/AccountStatus/AccountStatus'
 import MessageRating from './components/Rating/MessageRating'
@@ -15,9 +16,9 @@ import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughF
 import {startSync} from './sync/SyncClient'
 import {createChannel} from './actions/ChannelActions'
 import {addAgentToCommunity} from './actions/AgentActions'
-import {AGENT_WALLET_TABLE} from './db/AgentWalletTable'
 
 import './db/index'
+import {AGENT_WALLET_TABLE} from './db/AgentWalletTable'
 
 function plentyInit () {
   console.log('Initializing Plenty')
@@ -50,14 +51,12 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
   return nSQL().onConnected(async () => {
     console.log('DB connected (onConnected)')
 
-    console.log(`agent '${agentId}' community '${communityId}'`)
-
-    await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
-      console.log('connected all wallets', all)
-    })
-    await nSQL('AgentWallet').query('select').where([['agentId', '=', '6oog8o5f4inj5d47terzjttyqa'], 'AND', ['communityId', '=', 'mqpni5abyjr69boge5om4t3fbc']])
-      .exec().then(q => console.log('strings wallet', q))
-
+    // await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
+    //   console.log('connected all wallets', all)
+    // })
+    // await nSQL('AgentWallet').query('select').where([['agentId', '=', '6oog8o5f4inj5d47terzjttyqa'], 'AND', ['communityId', '=', 'mqpni5abyjr69boge5om4t3fbc']])
+    //   .exec().then(q => console.log('strings wallet', q))
+    //
     await nSQL(AGENT_WALLET_TABLE).query('select')
       .where(['communityId', '=', communityId]).exec().then(r => {
         console.log('any community wallet', r)

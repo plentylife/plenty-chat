@@ -20,6 +20,7 @@ const communityTable = nSQL(COMMUNITY_TABLE).model([
  */
 export function getCommunityBalance (communityId: string): Promise<number> {
   return nSQL(COMMUNITY_TABLE).query('select').where(['communityId', '=', communityId]).exec().then(r => {
+    console.log('getting community balance', communityId, r)
     return r.length > 0 ? r[0].balance : 0
   })
 }

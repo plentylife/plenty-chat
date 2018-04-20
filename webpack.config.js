@@ -67,13 +67,8 @@ const library = Object.assign({}, common, {
   output: {
     path: path.resolve(__dirname, 'build-module'),
     filename: 'index.js',
-    libraryTarget: 'commonjs' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
+    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
-  // externals: {
-  //   'react': 'commonjs react', // this line is just to use the React dependency of our parent-testing-project instead of using our own React.
-  //   'react-bootstrap': 'commonjs react-bootstrap',
-  //   'react-transition-group': 'commonjs react-transition-group'
-  // },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
@@ -83,16 +78,18 @@ const library = Object.assign({}, common, {
   ],
   target: 'web',
   // devtool: 'cheap-module-eval-source-map',
+  devtool: 'source-map',
   mode: process.env.NODE_ENV || 'production'
 })
 library.externals = Object.assign({}, library.externals, {
   'react': 'commonjs react',
   'React': 'commonjs react',
   'react-dom': 'commonjs react-dom',
-  'react-bootstrap': 'commonjs react-bootstrap',
-  'nano-sql': 'nano-sql',
-  'nano-sql-react': 'nano-sql-react'
-  // 'react-animate-on-change': 'commonjs react-animate-on-change'
+  'react-bootstrap': 'commonjs react-bootstrap'
+  // 'nano-sql': 'commonjs nano-sql',
+  // 'nano-sql-react': 'commonjs nano-sql-react',
+  // 'react-animate-on-change': 'commonjs react-animate-on-change',
+  // 'babel-polyfill': 'commonjs babel-polyfill'
 })
 
 const visualTests = Object.assign({}, common, {
@@ -105,32 +102,13 @@ const visualTests = Object.assign({}, common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
       }
     })
   ],
   // externals: [],
-  mode: 'development',
+  mode: process.env.NODE_ENV || 'development',
   devtool: 'cheap-module-eval-source-map'
-})
-
-const dbTests = Object.assign({}, common, {
-  entry: './test/db/dbDumpsNode.js',
-  output: {
-    path: path.resolve(__dirname, 'build-tests'),
-    filename: 'dbDumpsModule.js',
-    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
-  },
-  target: 'node',
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('testperm')
-      }
-    })
-  ],
-  mode: 'development'
-  // devtool: 'source-map'
 })
 
 const server = Object.assign({}, common, {
@@ -175,7 +153,7 @@ console.log('LIBRARY CONFIG', library)
 
 module.exports = [
   // serverTest,
-  server,
+  // server,
   library,
   visualTests
   // dbTests

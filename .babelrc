@@ -1,6 +1,11 @@
 {
   "presets": ["env", "es2015", "stage-0", "react", "flow"],
   "plugins": [
+    "syntax-async-functions",
+    "syntax-async-generators",
+//    "transform-async-to-generator",
+    "transform-regenerator",
+
     ["babel-plugin-transform-builtin-extend", {
       "globals": ["Error", "Array"]
     }],
