@@ -13,6 +13,7 @@ import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
 import type {MessageRow} from '../db/MessageTable'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
+import {getRating} from '../db/RatingTable'
 
 export async function initializeAccount (agentId: string, communityId: string): Promise<boolean> {
   // todo. share points are not intialized; currently they get stuck into db by default.
@@ -86,7 +87,8 @@ export async function accountingForMessageRating (message: MessageRow, rating: n
   if (!communityId) throw new CommunityIdNotInferrable()
 
   const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)
-  const existingPoints = await getCommunitySharePoints(message.senderId, communityId) // fixme this is a bug
+  const existingRating = await getRating(message.id, message.senderId) // fixme this is a bug // sould be fixed
+  const existingPoints = calculateCommunitySharePointsForMessageRating(existingRating) // fixme this is a bug
   let points = pointsTotal
   if (existingPoints !== null) points -= existingPoints
 
