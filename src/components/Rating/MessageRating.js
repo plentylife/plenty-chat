@@ -13,7 +13,8 @@ const NUM_STARS = 3
 
 function onRating (index, agentId, messageId) {
   console.log('Selected rating index', index, agentId, messageId)
-  return rateMessage(messageId, agentId, index, NUM_STARS)
+  const rating = index + 1 // index is not the rating
+  return rateMessage(messageId, agentId, rating, NUM_STARS)
 }
 
 const RatingSql = bindNSQL(Rating)

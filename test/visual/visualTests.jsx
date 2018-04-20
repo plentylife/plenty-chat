@@ -10,9 +10,11 @@ import {initializeCommunity} from '../../src/accounting/Accounting'
 import {setCommunityBalance} from '../../src/db/CommunityTable'
 import {sendMessage} from '../../src'
 import {createChannel} from '../../src/actions/ChannelActions'
+import {rateMessage} from '../../src/actions/RatingActions'
 
 nSQL().onConnected(async () => {
   const CH_ID = 'channelid'
+  const MSG_ID = 'rating-test-msg'
   console.log('Visual tests. Db connected in mode', DB_MODE)
 
   const OTHER_AGENT_ID = 'oid'
@@ -28,6 +30,9 @@ nSQL().onConnected(async () => {
   await setBalance(getCurrentAgentId(), getCurrentCommunityId(), -1)
   await addCommunitySharePoints(getCurrentAgentId(), getCurrentCommunityId(), 1)
   await addCommunitySharePoints(OTHER_AGENT_ID, getCurrentCommunityId(), 2)
+
+  await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
+  await rateMessage(MSG_ID, getCurrentAgentId(), 3, 3)
 
   // let b = 1
   // setInterval(() => {
@@ -59,7 +64,7 @@ nSQL().onConnected(async () => {
       </div>
       <div>
         Rating
-        <MessageRating/>
+        <MessageRating agentId={getCurrentAgentId()} messageId={MSG_ID}/>
       </div>
       <div>
         <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>

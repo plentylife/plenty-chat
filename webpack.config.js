@@ -113,7 +113,7 @@ const visualTests = Object.assign({}, common, {
 })
 
 const server = Object.assign({}, common, {
-  entry: './src/sync/SyncServer.js',
+  entry: ['babel-polyfill', './src/sync/SyncServer.js'],
   output: {
     path: path.resolve(__dirname, 'server'),
     filename: 'server-lib.js',
@@ -153,7 +153,7 @@ const serverTest = Object.assign({}, server, {
 console.log('LIBRARY CONFIG', library)
 
 module.exports = [
-  // serverTest,
+  serverTest,
   // server,
   library,
   visualTests

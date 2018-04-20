@@ -13,7 +13,7 @@ import {sendMessage} from './actions/MessageActions'
 import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
-// import {startSync} from './sync/SyncClient'
+import {startSync} from './sync/SyncClient'
 import {createChannel} from './actions/ChannelActions'
 import {addAgentToCommunity} from './actions/AgentActions'
 
@@ -44,7 +44,7 @@ function plentyInitSync (agentId, communityId, cb) {
 
     nSQL().config({cache: false}).onConnected(() => {
       console.log('DB connected (sync init)')
-      // startSync(['http://localhost:3000'])
+      startSync(['http://localhost:3000'])
     })
   }
 }
