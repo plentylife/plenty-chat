@@ -71,6 +71,7 @@ export async function spend (agentId: string, communityId: string, byAmount: num
   })
 
   const cb = await getCommunityBalance(communityId)
+  console.log('SPEND', cb, byAmount)
   return setCommunityBalance(communityId, cb + byAmount)
 }
 

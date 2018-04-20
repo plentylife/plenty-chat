@@ -13,32 +13,38 @@ import {sendMessage} from './actions/MessageActions'
 import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
-import {startSync} from './sync/SyncClient'
+// import {startSync} from './sync/SyncClient'
 import {createChannel} from './actions/ChannelActions'
 import {addAgentToCommunity} from './actions/AgentActions'
 
 import './db/index'
 import {AGENT_WALLET_TABLE} from './db/AgentWalletTable'
+import communityTable from './db/CommunityTable'
 
 function plentyInit () {
   console.log('Initializing Plenty')
   console.log('DB Mode', DB_MODE)
   console.log('DB Name', process.env.DB_NAME)
 
-  nSQL().connect()
+  const d = nSQL()
+  console.log('DB obj', d)
+  const c = d.connect()
+  console.log('DB con', c)
+  c.then(() => console.log('NSQL connected'))
 
   window.nsql = nSQL
 }
 
 function plentyInitSync (agentId, communityId, cb) {
   if (agentId && communityId) {
+    console.log('PLETY INTI SYNC')
     setCurrentAgentId(agentId)
     setCurrentCommunityId(communityId)
     cb()
 
-    nSQL().onConnected(() => {
+    nSQL().config({cache: false}).onConnected(() => {
       console.log('DB connected (sync init)')
-      startSync(['http://localhost:3000'])
+      // startSync(['http://localhost:3000'])
     })
   }
 }
@@ -50,6 +56,7 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
 
   return nSQL().onConnected(async () => {
     console.log('DB connected (onConnected)')
+    console.log('Community table', communityTable.getConfig())
 
     // await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
     //   console.log('connected all wallets', all)
@@ -84,5 +91,6 @@ export function onChannelView (agentId: string, channelId: string, communityId: 
 
 export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
   sendMessage, hasEnoughFundsToSendMessage,
+  nSQL,
   plentyInit, plentyInitSync
 }

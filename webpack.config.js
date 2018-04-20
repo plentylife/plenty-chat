@@ -26,7 +26,8 @@ const common = {
         test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'test')
+          path.resolve(__dirname, 'test'),
+          path.resolve(__dirname, 'node_modules/nano-sql')
         ],
         exclude: /(node_modules|bower_components|build)/,
         loader: 'babel-loader'
@@ -43,9 +44,9 @@ const common = {
       React: 'react'
     },
     modules: [
-      path.resolve('./src/components'),
-      path.resolve('./src/db'),
-      path.resolve('./src/state'),
+      // path.resolve('./src/components'),
+      // path.resolve('./src/db'),
+      // path.resolve('./src/state'),
       path.resolve('./node_modules')
     ]
   },
@@ -85,7 +86,7 @@ library.externals = Object.assign({}, library.externals, {
   'react': 'commonjs react',
   'React': 'commonjs react',
   'react-dom': 'commonjs react-dom',
-  'react-bootstrap': 'commonjs react-bootstrap'
+  'react-bootstrap': 'commonjs react-bootstrap',
   // 'nano-sql': 'commonjs nano-sql',
   // 'nano-sql-react': 'commonjs nano-sql-react',
   // 'react-animate-on-change': 'commonjs react-animate-on-change',
@@ -93,7 +94,7 @@ library.externals = Object.assign({}, library.externals, {
 })
 
 const visualTests = Object.assign({}, common, {
-  entry: './test/visual/visualTests.jsx',
+  entry: ['babel-polyfill', './test/visual/visualTests.jsx'],
   output: {
     path: path.resolve(__dirname, 'build-tests'),
     filename: 'visualTests.js'
@@ -108,7 +109,7 @@ const visualTests = Object.assign({}, common, {
   ],
   // externals: [],
   mode: process.env.NODE_ENV || 'development',
-  devtool: 'cheap-module-eval-source-map'
+  devtool: 'source-map'
 })
 
 const server = Object.assign({}, common, {

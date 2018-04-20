@@ -11,7 +11,10 @@ const communityTable = nSQL(COMMUNITY_TABLE).model([
   {key: 'communityId', type: 'uuid', props: ['pk']},
   {key: 'balance', type: 'int'}
   // {key: 'channels', type: CHANNEL_TABLE + '[]', props: ['ref=>communityId']}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({
+  mode: DB_MODE || 'PERM',
+  cache: false
+})
 
 /**
  *
@@ -30,7 +33,10 @@ export function setCommunityBalance (communityId: string, balance: number): Prom
   assertPositive(balance, /* zero allowed */ true)
   return nSQL(COMMUNITY_TABLE).query('upsert', {
     communityId, balance
-  }).exec()
+  }).exec().then(r => {
+    console.log('SET COMM Balance', r)
+    return r
+  })
 }
 
 export function communityExists (communityId: string): Promise<boolean> {

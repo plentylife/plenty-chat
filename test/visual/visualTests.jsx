@@ -73,7 +73,8 @@ nSQL().onConnected(async () => {
   )
 })
 
-nSQL().connect()
+const c = nSQL().connect()
+console.log('DB con promise', c)
 
 // function onRating (index) {
 //   console.log('Selected rating index', index)

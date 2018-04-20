@@ -1,16 +1,31 @@
+//{
+//  "presets": ["env", "es2015", "stage-0", "react", "flow"],
+//  "plugins": [
+//    "syntax-async-functions",
+//    "syntax-async-generators",
+////    "transform-async-to-generator",
+//    "transform-regenerator",
+//
+//    ["babel-plugin-transform-builtin-extend", {
+//      "globals": ["Error", "Array"]
+//    }],
+//    "transform-object-rest-spread",
+//    "transform-react-jsx",
+////    "transform-runtime"
+//    ["transform-runtime", {
+//      "helpers": true,
+//      "polyfill": true,
+//      "regenerator": true,
+//    }],
+//    "es6-promise"
+//  ]
+//}
+
 {
   "presets": ["env", "es2015", "stage-0", "react", "flow"],
   "plugins": [
-    "syntax-async-functions",
-    "syntax-async-generators",
-//    "transform-async-to-generator",
-    "transform-regenerator",
-
     ["babel-plugin-transform-builtin-extend", {
-      "globals": ["Error", "Array"]
-    }],
-    "transform-object-rest-spread",
-    "transform-react-jsx",
-    "transform-runtime"
+      "globals": ["Error"]
+    }]
   ]
 }

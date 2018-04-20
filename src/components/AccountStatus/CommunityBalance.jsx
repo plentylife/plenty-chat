@@ -7,6 +7,7 @@ import {bindNSQL} from 'nano-sql-react/index'
 import {AGENT_WALLET_TABLE} from '../../db/AgentWalletTable'
 import Balance from './Balance'
 import {CRON_TIME} from '../../state/GlobalState'
+import {nSQL} from 'nano-sql/lib/index'
 
 type Props = {
   agentId: string,
@@ -21,7 +22,14 @@ class CommunityBalance extends Component<Props> {
 
   static onChange (event: any, complete: any => void) {
     console.log('Community balance event', event)
+    nSQL(COMMUNITY_TABLE).query('select').where(['communityId', '=', this.props.communityId]).exec().then(r => {
+      console.log('onChange com balance', r)
+      return r.length > 0 ? r[0].balance : 0
+    })
+
     return getCommunityBalance(this.props.communityId).then(communityBalance => {
+      console.log('Community balance', this.props.communityId, communityBalance)
+      // console.log('Community balance', this.props.communityId, communityBalance, share, shares)
       calculateCommunityPotSplit(this.props.communityId, communityBalance).then(shares => {
         let share = shares.find(s => (s.agentId === this.props.agentId))
         if (share) {
@@ -30,7 +38,6 @@ class CommunityBalance extends Component<Props> {
           share = '- '
         }
 
-        console.log('Community balance', this.props.communityId, communityBalance, share, shares)
         complete({communityBalance, share})
       })
     })
