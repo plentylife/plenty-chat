@@ -3,7 +3,6 @@
 import {
   addCommunitySharePoints,
   getWallet,
-  getCommunitySharePoints,
   setBalance,
   _setDemurrageTimestamps
 } from '../db/AgentWalletTable'
@@ -80,15 +79,15 @@ export function calculateCommunitySharePointsForMessageRating (rating: number) {
   return Math.round(Math.pow(rating, 2) * COST_OF_SENDING_MESSAGE * 100)
 }
 
-export async function accountingForMessageRating (message: MessageRow, rating: number): Promise<void> {
+export async function accountingForMessageRating (message: MessageRow, ratingAgentId, rating: number): Promise<void> {
   assertBetweenZeroOne(rating) // not quite necessary
 
   const communityId = await getCommunityOfMsg(message.id)
   if (!communityId) throw new CommunityIdNotInferrable()
 
   const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)
-  const existingRating = await getRating(message.id, message.senderId) // fixme this is a bug // sould be fixed
-  const existingPoints = calculateCommunitySharePointsForMessageRating(existingRating) // fixme this is a bug
+  const existingRating = await getRating(message.id, ratingAgentId) // fixme it's the rater that we need, not the the sender
+  const existingPoints = existingRating !== null ? calculateCommunitySharePointsForMessageRating(existingRating) : 0
   let points = pointsTotal
   if (existingPoints !== null) points -= existingPoints
 
