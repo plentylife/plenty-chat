@@ -10,7 +10,7 @@ const baseEventModel = [
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'timestamp', type: 'number', props: ['idx']},
   {key: 'eventType', type: 'string'},
-  {key: 'payload', type: 'map'}
+  {key: 'payload', type: 'any'}
 ]
 
 const eventModel = baseEventModel.concat([

@@ -13,6 +13,7 @@
     * food for thought: only nodes that have been on in the past x amount of time can perform demurrage
 - Global event id to include timestamp
 - TEST: existing events aren't processed again
+- When handling update request make sure that you're not sending events that recipient knows about
 
 ## System
 - start people off with 100 community share points

@@ -1,12 +1,15 @@
 import test from 'ava'
-import {_setDemurrageTimestamps, addCommunitySharePoints, getWallet, setBalance} from '../../src/db/AgentWalletTable'
-import {LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
 import {setupDb} from '../utils'
 import apEq from 'approximately-equal'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
-import {applyDemurrageToAll, splitAllCommunityPots} from '../../src/actions/AccountingActions'
+import {splitAllCommunityPots} from '../../src/actions/AccountingActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
 import {getCommunityBalance, setCommunityBalance} from '../../src/db/CommunityTable'
+import {EVENT_TABLE} from '../../src/db/EventTable'
+import {COMMUNITY_POT_SPLIT} from '../../src/events/AccountingEvents'
+import {nSQL} from 'nano-sql'
+import {addCommunitySharePoints, getWallet} from '../../src/db/AgentWalletTable'
+import {DEFAULT_COMMUNITY_SHARE_POINTS} from '../../src/accounting/AccountingGlobals'
 
 const NUM_AGENTS = 3
 const AGENTS = []
@@ -20,6 +23,7 @@ test.before(t => {
   return setupDb(t).then(async () => {
     await Promise.all(AGENTS.map(async (a, i) => {
       await addAgentToCommunity(a, COMMUNITY_ID)
+      await addCommunitySharePoints(a, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS) // fixme
       await addCommunitySharePoints(a, COMMUNITY_ID, AGENT_POINTS[i])
     }))
     await initializeCommunity(COMMUNITY_ID)
@@ -64,6 +68,14 @@ test.serial('if pot cannot be split fully with whole numbers, some thanks are le
     {b: 20, sp: 10}, {b: 40, sp: 20}, {b: 60, sp: 30}
   ])
   t.is(await getCommunityBalance(COMMUNITY_ID), 1)
+})
+
+test.serial('pot split event should have an array as payload', async t => {
+  const rows = await nSQL(EVENT_TABLE).query('select').where(['eventType', '=', COMMUNITY_POT_SPLIT]).exec()
+  rows.forEach((r) => {
+    t.true(r.payload instanceof Array)
+    t.true(r.payload.length === NUM_AGENTS)
+  })
 })
 
 test.todo('when communty pot is nothing. division by zero')

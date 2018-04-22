@@ -1,10 +1,11 @@
 // @flow
 
-import {setCurrentAgentId} from '../state/GlobalState'
+import {CRON_TIME, setCurrentAgentId} from '../state/GlobalState'
 import {onConnectToPeer, registerSendEventsObserver} from './index'
 import '../db/index'
 import {nSQL} from 'nano-sql'
 import type {Peer} from './index'
+import {applyDemurrageToAll, splitAllCommunityPots} from '../actions/AccountingActions'
 
 console.log('Starting server')
 
@@ -36,4 +37,10 @@ nSQL().connect().then(() => {
     }
     onConnectToPeer(peer)
   })
+
+  setInterval(async () => {
+    console.log('\nCRON\n')
+    await applyDemurrageToAll()
+    await splitAllCommunityPots()
+  }, CRON_TIME * 60 * 1000)
 })
