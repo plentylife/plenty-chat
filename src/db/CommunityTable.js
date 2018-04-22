@@ -33,10 +33,7 @@ export function setCommunityBalance (communityId: string, balance: number): Prom
   assertPositive(balance, /* zero allowed */ true)
   return nSQL(COMMUNITY_TABLE).query('upsert', {
     communityId, balance
-  }).exec().then(r => {
-    console.log('SET COMM Balance', r[0].affectedRows)
-    return r
-  })
+  }).exec()
 }
 
 export function communityExists (communityId: string): Promise<boolean> {

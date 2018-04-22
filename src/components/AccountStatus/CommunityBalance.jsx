@@ -7,7 +7,6 @@ import {bindNSQL} from 'nano-sql-react/index'
 import {AGENT_WALLET_TABLE} from '../../db/AgentWalletTable'
 import Balance from './Balance'
 import {CRON_TIME} from '../../state/GlobalState'
-import {nSQL} from 'nano-sql/lib/index'
 
 type Props = {
   agentId: string,
@@ -22,10 +21,6 @@ class CommunityBalance extends Component<Props> {
 
   static onChange (event: any, complete: any => void) {
     console.log('Community balance event', event)
-    nSQL(COMMUNITY_TABLE).query('select').where(['communityId', '=', this.props.communityId]).exec().then(r => {
-      console.log('onChange com balance', r)
-      return r.length > 0 ? r[0].balance : 0
-    })
 
     return getCommunityBalance(this.props.communityId).then(communityBalance => {
       console.log('Community balance', this.props.communityId, communityBalance)
@@ -53,12 +48,6 @@ class CommunityBalance extends Component<Props> {
   }
 
   render () {
-    setTimeout(() => {
-      getCommunityBalance(this.props.communityId).then(communityBalance => {
-        console.log('comm render timeout balance', communityBalance)
-      })
-    }, 3000)
-
     const data = this.props.nSQLdata
     // $FlowFixMe
     const disp = () => {

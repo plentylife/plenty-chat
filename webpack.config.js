@@ -116,7 +116,7 @@ const server = Object.assign({}, common, {
   entry: ['babel-polyfill', './src/sync/SyncServer.js'],
   output: {
     path: path.resolve(__dirname, 'server'),
-    filename: 'server-lib.js',
+    filename: 'server.js',
     libraryTarget: 'commonjs' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
   plugins: [
@@ -133,29 +133,25 @@ const server = Object.assign({}, common, {
 const serverTest = Object.assign({}, server, {
   output: {
     path: path.resolve(__dirname, 'server'),
-    filename: 'server-test-lib.js',
+    filename: 'server-test.js',
     libraryTarget: 'umd'
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        // NODE_ENV: JSON.stringify('testperm'),
         NODE_ENV: JSON.stringify('test'),
         DB_NAME: JSON.stringify('plenty-test-db.sqlite3')
-        // DEBUG: JSON.stringify('*')
       }
     })
   ],
-  mode: 'development',
-  devtool: 'source-map'
+  mode: 'development'
 })
 
 console.log('LIBRARY CONFIG', library)
 
 module.exports = [
-  // serverTest,
+  serverTest,
   // server,
-  // library,
-  visualTests
-  // dbTests
+  library,
+  // visualTests
 ]
