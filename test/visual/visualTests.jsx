@@ -7,15 +7,24 @@ import {getCurrentCommunityId, getCurrentAgentId, DB_MODE} from '../../src/state
 import {addCommunitySharePoints, AGENT_WALLET_TABLE, getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
-import {setCommunityBalance} from '../../src/db/CommunityTable'
+import communityTable, {COMMUNITY_TABLE, getCommunityBalance, setCommunityBalance} from '../../src/db/CommunityTable'
 import {sendMessage} from '../../src'
 import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
 
 nSQL().onConnected(async () => {
+  window.commb = () => {
+    return getCommunityBalance(getCurrentCommunityId()).then(communityBalance => {
+      console.log('balance', communityBalance)
+      return communityBalance
+    })
+  }
+
   const CH_ID = 'channelid'
   const MSG_ID = 'rating-test-msg'
   console.log('Visual tests. Db connected in mode', DB_MODE)
+  console.log('Visual tests. Db config', nSQL().getConfig())
+  console.log('Visual tests. Db comm_table config', COMMUNITY_TABLE, communityTable.getConfig())
   console.log('Visual tests.', getCurrentAgentId(), getCurrentCommunityId())
 
   const OTHER_AGENT_ID = 'oid'
@@ -79,9 +88,9 @@ nSQL().onConnected(async () => {
   )
 })
 
+// const c = nSQL().config({
+//   mode: DB_MODE,
+//   cache: false
+// }).connect()
 const c = nSQL().connect()
 console.log('DB con promise', c)
-
-// function onRating (index) {
-//   console.log('Selected rating index', index)
-// }

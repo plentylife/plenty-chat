@@ -1,4 +1,4 @@
-import {nSQLiteAdapter} from 'nano-sqlite'
+// import {nSQLiteAdapter} from 'nano-sqlite'
 
 let _currentAgentId = 'anton'
 let _currentCommunityId = 'commid'
@@ -10,16 +10,22 @@ export const DB_MODE = (() => {
   switch (process.env.NODE_ENV) {
     case 'production':
       // eslint-disable-next-line new-cap
-      if (process.env.DB_NAME) return new nSQLiteAdapter(process.env.DB_NAME)
-      return 'PERM'
+      // if (process.env.DB_NAME) return new nSQLiteAdapter(process.env.DB_NAME)
+
+      // return 'PERM'
+      // return 'IDB_WW'
+      // return 'IDB'
+      // return 'WSQL'
+      return 'LS'
     case 'testperm':
-      // import('nano-sqlite').then(nsqlite => {
-      // import {nSQLiteAdapter} from 'nano-sqlite'
       // eslint-disable-next-line new-cap
-      return new nSQLiteAdapter(process.env.DB_NAME || './db-plenty.sqlite3')
-      // })
+
+      // return new nSQLiteAdapter(process.env.DB_NAME || './db-plenty.sqlite3')
+      return null
+
     default:
-      return 'TEMP'
+      return 'IDB'
+      // return 'TEMP'
   }
 })()
 

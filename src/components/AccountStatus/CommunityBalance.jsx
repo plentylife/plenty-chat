@@ -44,7 +44,8 @@ class CommunityBalance extends Component<Props> {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return JSON.stringify(this.props.nSQLdata) !== JSON.stringify(nextProps.nSQLdata)
+    return true
+    // return JSON.stringify(this.props.nSQLdata) !== JSON.stringify(nextProps.nSQLdata)
   }
 
   static Unavailable () {
@@ -52,6 +53,12 @@ class CommunityBalance extends Component<Props> {
   }
 
   render () {
+    setTimeout(() => {
+      getCommunityBalance(this.props.communityId).then(communityBalance => {
+        console.log('comm render timeout balance', communityBalance)
+      })
+    }, 3000)
+
     const data = this.props.nSQLdata
     // $FlowFixMe
     const disp = () => {

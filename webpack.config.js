@@ -27,7 +27,7 @@ const common = {
         include: [
           path.resolve(__dirname, 'src'),
           path.resolve(__dirname, 'test'),
-          path.resolve(__dirname, 'node_modules/nano-sql')
+          // path.resolve(__dirname, 'node_modules/nano-sql')
         ],
         exclude: /(node_modules|bower_components|build)/,
         loader: 'babel-loader'
@@ -153,9 +153,9 @@ const serverTest = Object.assign({}, server, {
 console.log('LIBRARY CONFIG', library)
 
 module.exports = [
-  serverTest,
+  // serverTest,
   // server,
-  library,
+  // library,
   visualTests
   // dbTests
 ]

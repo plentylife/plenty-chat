@@ -13,7 +13,7 @@ import {sendMessage} from './actions/MessageActions'
 import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
-import {startSync} from './sync/SyncClient'
+// import {startSync} from './sync/SyncClient'
 import {createChannel} from './actions/ChannelActions'
 import {addAgentToCommunity} from './actions/AgentActions'
 
@@ -26,11 +26,13 @@ function plentyInit () {
   console.log('DB Mode', DB_MODE)
   console.log('DB Name', process.env.DB_NAME)
 
+  // const c = agentWalletTable.connect()
+
   const d = nSQL()
   console.log('DB obj', d)
   const c = d.connect()
   console.log('DB con', c)
-  c.then(() => console.log('NSQL connected'))
+  c.then(() => console.log('plentyInit NSQL connected'))
 
   window.nsql = nSQL
 }
@@ -42,9 +44,9 @@ function plentyInitSync (agentId, communityId, cb) {
     setCurrentCommunityId(communityId)
     cb()
 
-    nSQL().config({cache: false}).onConnected(() => {
+    nSQL().onConnected(() => {
       console.log('DB connected (sync init)')
-      startSync(['http://localhost:3000'])
+      // startSync(['http://localhost:3000'])
     })
   }
 }
