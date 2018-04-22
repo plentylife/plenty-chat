@@ -5313,7 +5313,7 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar COST_OF_SENDING_MESSAGE = exports.COST_OF_SENDING_MESSAGE = 1;\n\nvar DEFAULT_CREDIT_LIMIT = exports.DEFAULT_CREDIT_LIMIT = 20;\n\nvar DEFAULT_COMMUNITY_SHARE_POINTS = exports.DEFAULT_COMMUNITY_SHARE_POINTS = 0;\n\nvar DEFAULT_DEMURRAGE_RATE = exports.DEFAULT_DEMURRAGE_RATE = 0.02;\n\n/** in milliseconds */\nvar LENGTH_OF_DAY = exports.LENGTH_OF_DAY = 1000 * 60 * 60 * 24;\n\n/** in milliseconds */\nvar DEFAULT_DEMURRAGE_PERIOD = exports.DEFAULT_DEMURRAGE_PERIOD = LENGTH_OF_DAY;\n\n//# sourceURL=webpack:///./src/accounting/AccountingGlobals.js?");
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar COST_OF_SENDING_MESSAGE = exports.COST_OF_SENDING_MESSAGE = 1;\n\nvar DEFAULT_CREDIT_LIMIT = exports.DEFAULT_CREDIT_LIMIT = 20;\n\nvar DEFAULT_COMMUNITY_SHARE_POINTS = exports.DEFAULT_COMMUNITY_SHARE_POINTS = 100;\n\nvar DEFAULT_DEMURRAGE_RATE = exports.DEFAULT_DEMURRAGE_RATE = 0.02;\n\n/** in milliseconds */\nvar LENGTH_OF_DAY = exports.LENGTH_OF_DAY = 1000 * 60 * 60 * 24;\n\n/** in milliseconds */\nvar DEFAULT_DEMURRAGE_PERIOD = exports.DEFAULT_DEMURRAGE_PERIOD = LENGTH_OF_DAY;\n\n//# sourceURL=webpack:///./src/accounting/AccountingGlobals.js?");
 
 /***/ }),
 

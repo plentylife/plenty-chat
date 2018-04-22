@@ -24,9 +24,7 @@ yarn-error.log*
 yarn.lock
 package-lock.json
 
-server/server-lib.js
-server/server-test-lib.js
-server/*.map
+server/**
 
 *.sqlite3
 .idea
