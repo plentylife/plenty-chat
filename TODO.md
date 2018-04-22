@@ -12,6 +12,7 @@
 - Demurrage
     * food for thought: only nodes that have been on in the past x amount of time can perform demurrage
 - Global event id to include timestamp
+- TEST: existing events aren't processed again
 
 ## System
 - start people off with 100 community share points

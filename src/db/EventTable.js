@@ -35,10 +35,11 @@ export async function pushEvent (event: Event, handledSuccessfully: boolean): Pr
   const updated = await updateEvent(event)
   // todo. test received from logging
   if (!updated) {
+    const now = new Date().getTime()
     let receivedFrom = []
     if (event.receivedFrom) receivedFrom = Array.from(event.receivedFrom)
     const withTime = Object.assign({}, event, {
-      timestamp: new Date().getTime(), handledSuccessfully, receivedFrom
+      timestamp: now, handledSuccessfully, receivedFrom
     })
     return nSQL(EVENT_TABLE).query('upsert', withTime).exec()
   }
@@ -87,17 +88,17 @@ const selfEventModel = baseEventModel.concat([
 const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode: DB_MODE || 'PERM'})
 
 /**
- * @return the id of the event
+ * @return the id of the event that includes the timestamp
  */
 export function pushSelfEvent (eventType: string, communtyId: string, payload: Object): Promise<number> {
   try {
-    console.log('trying to push into self events', eventType, communtyId, payload)
     const row = Object.assign({eventType: eventType, timestamp: new Date().getTime(), communityId: communtyId}, payload)
     return nSQL(SELF_EVENT_TABLE).query('upsert', row).exec().then(r => {
-      return r[0].affectedRows[0].eventId
+      const e = r[0].affectedRows[0]
+      return `${e.eventId}-${e.timestamp}`
     })
   } catch (e) {
-    console.log('pushSelfEvent failed', eventType, communtyId, payload, e)
+    console.error('pushSelfEvent failed', eventType, communtyId, payload, e)
     return Promise.resolve(false)
   }
 }

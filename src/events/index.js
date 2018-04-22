@@ -1,7 +1,7 @@
 // @flow
 
 import {handleMessageEvent, MESSAGE_EVENT_TYPE} from './MessageEvents'
-import {pushEvent, pushSelfEvent} from '../db/EventTable'
+import {getEvent, pushEvent, pushSelfEvent} from '../db/EventTable'
 import {handleRatingEvent, RATING_EVENT_TYPE} from './RatingEvents'
 import type {MessageEventPayload} from './MessageEvents'
 import type {RatingEventPayload} from './RatingEvents'
@@ -47,7 +47,11 @@ export async function handleEvent (event: Event): Promise<boolean> {
     if (!event.globalEventId) throw new Error('Improperly formatted event. No global event id.')
     if (typeof event.payload !== 'object') throw new MissingPayload()
 
-    // fixme put a try catch here to log failed events
+    const existing = await getEvent(event.globalEventId)
+    if (existing != null) {
+      console.log(`Event with id ${event.globalEventId} already exists in db`)
+      return true // fixme, should be variable
+    }
 
     lastEvent = applyHandler(event).then(async r => {
       if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
@@ -78,11 +82,8 @@ function applyHandler (event: Event): Promise<boolean> {
 
 export async function sendEvent (eventType: EventType, senderId: string, communityId: string,
   payload: EventPayload): Promise<boolean> {
-  console.log('sending event into db', eventType, senderId, communityId, payload)
   try {
-    console.log('sending event right before push')
     const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
-    console.log('sending event pushed to self db')
     if (eventId !== false) {
       return handleEvent({
         globalEventId: senderId + eventId,
