@@ -10,7 +10,6 @@ export const COMMUNITY_TABLE = 'Community'
 const communityTable = nSQL(COMMUNITY_TABLE).model([
   {key: 'communityId', type: 'uuid', props: ['pk']},
   {key: 'balance', type: 'int'}
-  // {key: 'channels', type: CHANNEL_TABLE + '[]', props: ['ref=>communityId']}
 ]).config({
   mode: DB_MODE || 'PERM',
   cache: false

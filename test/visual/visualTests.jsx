@@ -13,10 +13,16 @@ import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
 
 nSQL().onConnected(async () => {
-  window.commb = () => {
+  window.getBalance = () => {
     return getCommunityBalance(getCurrentCommunityId()).then(communityBalance => {
       console.log('balance', communityBalance)
       return communityBalance
+    })
+  }
+
+  window.setBalance = () => {
+    nSQL(COMMUNITY_TABLE).query('upsert', {communityId: 'commid', balance: 500}).exec().then(r => {
+      console.log(r)
     })
   }
 

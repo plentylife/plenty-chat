@@ -14,7 +14,7 @@ export const DB_MODE = (() => {
     case 'production':
       return 'LS'
     default:
-      return 'TEMP'
+      return process.env.DB_MODE || 'TEMP'
   }
 })()
 

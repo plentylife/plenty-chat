@@ -103,7 +103,8 @@ const visualTests = Object.assign({}, common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+        DB_MODE: JSON.stringify(process.env.DB_MODE || null)
       }
     })
   ],
@@ -147,11 +148,9 @@ const serverTest = Object.assign({}, server, {
   mode: 'development'
 })
 
-console.log('LIBRARY CONFIG', library)
-
 module.exports = [
-  serverTest,
+  // serverTest,
   // server,
-  library,
-  // visualTests
+  // library,
+  visualTests
 ]
