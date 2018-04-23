@@ -29,25 +29,27 @@ function plentyInit () {
   window.nsql = nSQL
 }
 
-function plentyInitSync (agentId, communityId, cb) {
+function plentyInitSync (agentId, communityId, cb, singlePeer) {
   if (agentId && communityId) {
-    console.log('PLETY INTI SYNC')
+    console.log('PLENTY INIT SYNC with singlePeer', singlePeer)
     setCurrentAgentId(agentId)
     setCurrentCommunityId(communityId)
     cb()
 
     nSQL().onConnected(() => {
-      console.log('DB connected (sync init)')
-      startSync(['http://localhost:3000'])
+      const peers = singlePeer.length > 0 ? singlePeer : ['http://localhost:3000']
+      console.log('DB connected (sync init)', peers)
+      startSync(peers)
     })
   }
 }
 
-export function onChannelView (agentId: string, channelId: string, communityId: string) {
+export async function onChannelView (agentId: string, channelId: string, communityId: string) {
   setCurrentAgentId(agentId)
   setCurrentCommunityId(communityId)
 
-  return nSQL().onConnected(async () => {
+  console.log('onChannelView')
+  await nSQL().onConnected(async () => {
     console.log('DB connected (onConnected)')
     await createChannel(agentId, channelId, communityId)
     await addAgentToCommunity(agentId, communityId)
