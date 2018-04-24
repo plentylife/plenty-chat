@@ -89,6 +89,10 @@ nSQL().onConnected(async () => {
       <div>
         <div className={'tutorial-screens'}>
           <Tutorial.ScreenOne/>
+          <Tutorial.ScreenTwo/>
+          <Tutorial.ScreenThree/>
+          <Tutorial.ScreenFour/>
+          <Tutorial.ScreenFive/>
         </div>
       </div>
     </div>

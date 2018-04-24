@@ -18,6 +18,7 @@
 
 ## System
     D - start people off with 100 community share points
+Splitting pot should not issue events if there is nothing to split
 
 ## Tests
 - Demurrage calc. tests need update

@@ -10,4 +10,12 @@
     font-family: Comfortaa, 'sans-serif';
   }
   font-family: Raleway, 'serif';
+  text-align: justify;
+
+  .balance-img-container {
+    text-align: center;
+    img {
+      max-width: 100%;
+    }
+  }
 }
