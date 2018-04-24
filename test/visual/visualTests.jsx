@@ -11,6 +11,7 @@ import communityTable, {COMMUNITY_TABLE, getCommunityBalance, setCommunityBalanc
 import {sendMessage} from '../../src'
 import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
+import * as Tutorial from 'Tutorial'
 
 nSQL().onConnected(async () => {
   window.getBalance = () => {
@@ -85,6 +86,11 @@ nSQL().onConnected(async () => {
       <div>
         <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
       </div>
+      <div>
+        <div className={'tutorial-screens'}>
+          <Tutorial.ScreenOne/>
+        </div>
+      </div>
     </div>
   }
 
@@ -94,9 +100,5 @@ nSQL().onConnected(async () => {
   )
 })
 
-// const c = nSQL().config({
-//   mode: DB_MODE,
-//   cache: false
-// }).connect()
 const c = nSQL().connect()
 console.log('DB con promise', c)

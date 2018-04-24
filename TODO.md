@@ -4,6 +4,7 @@
 - Notify user if server is down
 - Hide account status if requested or small screen
 - Tutorial
+- Mattermost, no js text, on facebook looks bad
 
 ## SYNC
     D - Global event id to include timestamp

@@ -23,6 +23,10 @@ const common = {
         use: [ 'style-loader', 'css-loader' ]
       },
       {
+        test: /\.scss/,
+        use: [ 'style-loader', 'css-loader', 'sass-loader' ]
+      },
+      {
         test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, 'src'),
@@ -44,7 +48,7 @@ const common = {
       React: 'react'
     },
     modules: [
-      // path.resolve('./src/components'),
+      path.resolve('./src/components'),
       // path.resolve('./src/db'),
       // path.resolve('./src/state'),
       path.resolve('./node_modules')
