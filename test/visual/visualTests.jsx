@@ -21,6 +21,14 @@ nSQL().onConnected(async () => {
     })
   }
 
+  window.getWallet = () => {
+    return getWallet(getCurrentAgentId(), getCurrentCommunityId()).then(w => console.log(w))
+  }
+
+  window.getWalletTable = () => {
+    nSQL(AGENT_WALLET_TABLE).query('select').exec().then(t => console.log(t))
+  }
+
   window.setBalance = () => {
     nSQL(COMMUNITY_TABLE).query('upsert', {communityId: 'commid', balance: 500}).exec().then(r => {
       console.log(r)
@@ -42,9 +50,9 @@ nSQL().onConnected(async () => {
   console.log('Initialized community', success)
 
   await createChannel(getCurrentAgentId(), CH_ID, getCurrentCommunityId())
-  await setCommunityBalance(getCurrentCommunityId(), 10)
+  await setCommunityBalance(getCurrentCommunityId(), 21)
   // await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 20)
-  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), -1)
+  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), -4)
   await addCommunitySharePoints(getCurrentAgentId(), getCurrentCommunityId(), 1)
   await addCommunitySharePoints(OTHER_AGENT_ID, getCurrentCommunityId(), 2)
 
@@ -93,6 +101,8 @@ nSQL().onConnected(async () => {
           <Tutorial.ScreenThree/>
           <Tutorial.ScreenFour/>
           <Tutorial.ScreenFive/>
+          <Tutorial.ScreenTasks/>
+          <Tutorial.ScreenCaveat/>
         </div>
       </div>
     </div>
@@ -104,5 +114,5 @@ nSQL().onConnected(async () => {
   )
 })
 
-const c = nSQL().connect()
+const c = nSQL().config({mode: DB_MODE, cache: false}).connect()
 console.log('DB con promise', c)

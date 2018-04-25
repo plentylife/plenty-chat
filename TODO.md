@@ -18,7 +18,8 @@
 
 ## System
     D - start people off with 100 community share points
-Splitting pot should not issue events if there is nothing to split
+- Splitting pot should not issue events if there is nothing to split
+- User should be able to rate a message even if it is not in their DB
 
 ## Tests
 - Demurrage calc. tests need update

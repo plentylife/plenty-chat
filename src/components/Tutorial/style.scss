@@ -8,6 +8,7 @@
 .tutorial-screen {
   @include headings {
     font-family: Comfortaa, 'sans-serif';
+    text-align: left;
   }
   font-family: Raleway, 'serif';
   text-align: justify;
@@ -18,4 +19,21 @@
       max-width: 100%;
     }
   }
+
+  .highlight {
+    font-style: italic;
+  }
+}
+
+.plenty-word, .thanks-word {
+  font-family: Comfortaa, 'sans-serif';
+  font-weight: bold;
+}
+
+.plenty-word {
+  color: #255ec3;
+}
+
+.thanks-word {
+  color: forestgreen;
 }

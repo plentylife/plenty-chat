@@ -1,6 +1,7 @@
 const webpack = require('webpack') // to access built-in plugins
 var path = require('path')
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const common = {
   module: {
@@ -45,7 +46,7 @@ const common = {
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 10000, // Convert images < 8kb to base64 strings
+            limit: 15000, // Convert images < 8kb to base64 strings
             name: 'images/[hash]-[name].[ext]'
           }
         }]
@@ -85,11 +86,16 @@ const library = Object.assign({}, common, {
     libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
   plugins: [
+    new DuplicatePackageCheckerPlugin({
+      verbose: true,
+      emitError: true
+    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
       }
-    })
+    }),
+    // new BundleAnalyzerPlugin()
   ],
   target: 'web',
   // devtool: 'cheap-module-eval-source-map',
@@ -165,6 +171,6 @@ const serverTest = Object.assign({}, server, {
 module.exports = [
   // serverTest,
   // server,
-  // library,
+  library,
   visualTests
 ]

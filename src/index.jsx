@@ -16,6 +16,7 @@ import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughF
 import {startSync} from './sync/SyncClient'
 import {createChannel} from './actions/ChannelActions'
 import {addAgentToCommunity} from './actions/AgentActions'
+import * as Tutorial from 'Tutorial'
 
 import './db/index'
 
@@ -59,5 +60,6 @@ export async function onChannelView (agentId: string, channelId: string, communi
 export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
   sendMessage, hasEnoughFundsToSendMessage,
   plentyInit, plentyInitSync,
-  nSQL
+  nSQL,
+  Tutorial
 }

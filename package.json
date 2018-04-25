@@ -83,6 +83,7 @@
     "sqlite3": "^4.0.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.5.0",
+    "webpack-bundle-analyzer": "^2.11.1",
     "webpack-cli": "^2.0.14"
   }
 }
