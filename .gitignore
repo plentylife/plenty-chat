@@ -27,5 +27,6 @@ package-lock.json
 server/**
 
 *.sqlite3
+*.rawdump
 .idea
 .directory

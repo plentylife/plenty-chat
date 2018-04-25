@@ -1,3 +1,5 @@
+// @flow
+
 import {nSQLiteAdapter} from 'nano-sqlite'
 
 let _currentAgentId = 'anton'
@@ -6,7 +8,7 @@ let _currentCommunityId = 'commid'
 /** time between demurrage and community pot splits; in minutes */
 export const CRON_TIME = 10
 
-export const DB_MODE = (() => {
+export var DB_MODE = (() => {
   // eslint-disable-next-line new-cap
   if (process.env.DB_NAME) return new nSQLiteAdapter(process.env.DB_NAME)
 
@@ -17,6 +19,10 @@ export const DB_MODE = (() => {
       return process.env.DB_MODE || 'TEMP'
   }
 })()
+
+export function setDbMode (mode: any) {
+  DB_MODE = mode
+}
 
 export function getCurrentAgentId (): string {
   return _currentAgentId

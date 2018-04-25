@@ -29,3 +29,15 @@ function dropAll () {
     })
   })
 }
+
+export function applyToAllDbs (f: (any) => Promise<void>) {
+  return new Promise(resolve => {
+    let left = ALL_TABLES.length
+    ALL_TABLES.forEach(async t => {
+      const table = nSQL(t)
+      await f(table)
+      left -= 1
+      if (left === 0) resolve()
+    })
+  })
+}
