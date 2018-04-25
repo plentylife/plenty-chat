@@ -31,9 +31,10 @@ export type Event = {
 }
 
 // todo. make sure that events are handled one after the next
-export let lastEvent = Promise.resolve(true)
+// export let lastEvent = new Promise(resolve => {})
+export let lastEvent = Promise.resolve(false)
 
-export async function handleEvent (event: Event): Promise<boolean> {
+export async function handleEvent (event: Event): Promise<boolean | Object> {
   try {
     console.log('handleEvent', event)
     await timeout(lastEvent, 1000 * 60).catch(e => {
@@ -50,7 +51,7 @@ export async function handleEvent (event: Event): Promise<boolean> {
     const existing = await getEvent(event.globalEventId)
     if (existing != null) {
       console.log(`Event with id ${event.globalEventId} already exists in db`)
-      return true // fixme, should be variable
+      return {code: 'EXISTS'} // fixme, should be variable
     }
 
     lastEvent = applyHandler(event).then(async r => {

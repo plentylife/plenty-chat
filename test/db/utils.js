@@ -26,7 +26,7 @@ function dumpTable (dir, name) {
   })
 }
 
-function importTable (dir, name) {
+export function importTable (dir, name) {
   return nSQL().connect().then(async db => {
     const data = await new Promise(resolve => {
       fs.readFile(dir + name + '.rawdump', 'utf8', (e, d) => {
@@ -46,8 +46,8 @@ const name = 'events-not-maching-state-in-agent'
 //   t.true(rows.length > 0)
 // })
 
-test.serial('importing table', async t => {
-  await importTable(dir, name)
-  const rows = await nSQL(EVENT_TABLE).query('select').exec()
-  t.true(rows.length > 0)
-})
+// test.serial('importing table', async t => {
+//   await importTable(dir, name)
+//   const rows = await nSQL(EVENT_TABLE).query('select').exec()
+//   t.true(rows.length > 0)
+// })

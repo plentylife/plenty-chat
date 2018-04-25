@@ -18,14 +18,15 @@ function dropDb (name: string) {
   return nSQL(name).query('drop').exec()
 }
 
-function dropAll () {
+export function dropAll (skipTables: Array<string> = []) {
   return new Promise(resolve => {
     let left = ALL_TABLES.length
-    ALL_TABLES.forEach(t => {
-      dropDb(t).then(() => {
-        left -= 1
-        if (left === 0) resolve()
-      })
+    ALL_TABLES.forEach(async t => {
+      if (!skipTables.includes(t)) {
+        await dropDb(t)
+      }
+      left -= 1
+      if (left === 0) resolve()
     })
   })
 }
