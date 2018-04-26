@@ -78,19 +78,19 @@ export function calculateCommunitySharePointsForMessageRating (rating: number) {
   return Math.round(Math.pow(rating, 2) * COST_OF_SENDING_MESSAGE * 100)
 }
 
-export async function accountingForMessageRating (message: MessageRow, ratingAgentId, rating: number,
+export async function accountingForMessageRating (messageId: string, msgSenderId: string, ratingAgentId, rating: number,
   _communityId: string = null): Promise<void> {
   assertBetweenZeroOne(rating) // not quite necessary
 
-  let communityId = await getCommunityOfMsg(message.id)
-  if (!communityId) communityId = _communityId
+  let communityId = _communityId
+  if (!communityId) communityId = await getCommunityOfMsg(messageId)
   if (!communityId) throw new CommunityIdNotInferrable()
 
   const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)
-  const existingRating = await getRating(message.id, ratingAgentId) // fixme it's the rater that we need, not the the sender
+  const existingRating = await getRating(messageId, ratingAgentId) // fixme it's the rater that we need, not the the sender
   const existingPoints = existingRating !== null ? calculateCommunitySharePointsForMessageRating(existingRating) : 0
   let points = pointsTotal
   if (existingPoints !== null) points -= existingPoints
 
-  return addCommunitySharePoints(message.senderId, communityId, points)
+  return addCommunitySharePoints(msgSenderId, communityId, points)
 }

@@ -9,17 +9,22 @@ export const RATING_EVENT_TYPE: 'rating' = 'rating'
 
 export type RatingEventPayload = {
   messageId: string,
-  rating: number
+  rating: number,
+  messageSenderId: ?string
 }
 
 export async function handleRatingEvent (event: Event): Promise<boolean> {
   const payload = validatePayload(event.payload)
 
-  const msg = await getMessage(payload.messageId)
-  if (msg === null) throw new MissingDatabaseEntry('There is not such message with id ' + payload.messageId)
-  if (msg.senderId === event.senderId) throw new CannotRateOwnMessage()
+  let msgSenderId = payload.messageSenderId
+  if (!msgSenderId) {
+    const msg = await getMessage(payload.messageId)
+    if (msg === null) throw new MissingDatabaseEntry('There is not such message with id ' + payload.messageId)
+    msgSenderId = msg.senderId
+  }
+  if (msgSenderId === event.senderId) throw new CannotRateOwnMessage()
 
-  await accountingForMessageRating(msg, event.senderId, payload.rating, event.communityId)
+  await accountingForMessageRating(payload.messageId, msgSenderId, event.senderId, payload.rating, event.communityId)
   return setRating(payload.messageId, event.senderId, payload.rating).then(r => (r.length > 0))
 }
 

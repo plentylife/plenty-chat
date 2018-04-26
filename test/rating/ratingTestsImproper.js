@@ -22,7 +22,7 @@ test.before(async t => {
   await nSQL().connect().then(async () => {
     await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
     await addAgentToCommunity(AGENT_RATER_ID, COMMUNITY_ID)
-    return pushMessage(MSG_ID, AGENT_ID, CHANNEL_ID)
+    await pushMessage(MSG_ID, AGENT_ID, CHANNEL_ID)
   })
 })
 
@@ -49,11 +49,11 @@ test.serial('cannot rate own message', async t => {
   t.true(error instanceof CannotRateOwnMessage)
 })
 
-test.skip('rating witout the message in db', async t => {
+test.serial('rating witout the message in db', async t => {
   await nSQL(MESSAGE_TABLE).query('drop').exec()
   t.is(await getMessage(MSG_ID), null)
 
-  await rateMessage('non-existent-msg', AGENT_RATER_ID, 2, 2)
+  await rateMessage('non-existent-msg', AGENT_RATER_ID, 2, 2, AGENT_ID)
 
   const raterPoints = await getCommunitySharePoints(AGENT_RATER_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)

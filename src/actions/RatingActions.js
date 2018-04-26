@@ -15,7 +15,8 @@ import {getCurrentCommunityId} from '../state/GlobalState'
  * @param {int} ratingMax
  * @return {Promise} resolves when db finishes setting the rating
  */
-export async function rateMessage (msgId: string, agentId: string, rating: number, ratingMax: number) {
+export async function rateMessage (msgId: string, agentId: string, rating: number, ratingMax: number,
+  msgSenderId: string = null) {
   if (rating <= 0) throw new Error('rating has to be positive and above zero')
   if (rating > ratingMax) throw new Error('rating cannot be higher than maximum')
   if (ratingMax <= 1) throw new Error('Maximum rating has to be positive and above one')
@@ -30,5 +31,6 @@ export async function rateMessage (msgId: string, agentId: string, rating: numbe
     messageId: msgId,
     rating: r
   }
+  if (msgSenderId) p.messageSenderId = msgSenderId
   return sendEvent(RATING_EVENT_TYPE, agentId, communityId, p)
 }
