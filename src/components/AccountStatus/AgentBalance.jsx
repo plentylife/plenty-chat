@@ -49,7 +49,7 @@ class AgentBalance extends Component<Props> {
         return <span className={'agent-block'}>
           <span className={'balance-block'}>
             <span className={'agent-balance accounting-info'}><label>Balance</label><Balance amount={data.balance}/></span>
-            <span className={'demurrage info'}>Spoiling at ${Math.trunc(DEFAULT_DEMURRAGE_RATE * 100)}% per day</span>
+            <span className={'demurrage info'}>Spoiling at {Math.trunc(DEFAULT_DEMURRAGE_RATE * 100)}% per day</span>
           </span>
           <span className={'accounting-info'}><label>Credit Limit</label><Balance amount={data.creditLimit}/></span>
         </span>
