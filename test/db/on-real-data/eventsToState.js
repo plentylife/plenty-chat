@@ -1,47 +1,46 @@
 import {test} from 'ava'
-import {EVENT_TABLE} from '../../../src/db/EventTable'
+import {EVENT_TABLE, getEvents} from '../../../src/db/EventTable'
 import {nSQL} from 'nano-sql/lib/index'
 import {importTable} from '../utils'
 import {DB_MODE} from '../../../src/state/GlobalState'
 import {dropAll, waitAndCheck} from '../../utils'
 import {AGENT_WALLET_TABLE, getAllWallets} from '../../../src/db/AgentWalletTable'
-import {handleEvent, lastEvent} from '../../../src/events'
 import {_backlogEvent, _isConsuming} from '../../../src/sync'
 import {COMMUNITY_TABLE} from '../../../src/db/CommunityTable'
 import {COMMUNITY_POT_SPLIT} from '../../../src/events/AccountingEvents'
+import {calculateCommunityPotSplit} from '../../../src/accounting/CommunityPot'
+import {splitAllCommunityPots} from '../../../src/actions/AccountingActions'
 
 const dir = '/home/anton/code/plenty-chat/test/db/test-data/'
 const name = 'events-not-maching-state-in-agent'
 
-function getEvents () {
+function _getAllEvents () {
   return nSQL(EVENT_TABLE).query('select').exec()
 }
 
 let events = null
 
+const COMMUNITY_ID = 'dimtyoqcb7dutj5kxxxh9s8y9y'
+
 test.before(async t => {
   t.is(DB_MODE, 'TEMP')
 
   await importTable(dir, name)
-  events = await getEvents()
+  events = await _getAllEvents()
   t.true(events.length > 0)
 
   await dropAll()
-  const rows = await getEvents()
+  const rows = await _getAllEvents()
   t.true(rows.length === 0)
   t.true((await nSQL(AGENT_WALLET_TABLE).query('select').exec()).length === 0)
 })
 
-test.skip('passing events into sync', async t => {
+test.serial('passing events into sync', async t => {
   const peer = {
     agentId: 'fakeid'
   }
-  let existing = []
-  let failed = 0
   let passedIn = 0
 
-  // events = events.slice(0, 4)
-  // t.is(events.length, 4)
   events.forEach(e => {
     _backlogEvent(e, peer)
     passedIn += 1
@@ -53,11 +52,9 @@ test.skip('passing events into sync', async t => {
 
   const ws = await getAllWallets()
 
-  console.log('\n\n\n=======================\n\n\n')
+  console.log('\n\n\nSync\n=======================\n')
   console.log('All events', events.length)
   console.log('Processed', passedIn)
-  // console.log('Existing', existing.length)
-  // console.log('Failed', failed)
   ws.forEach(w => {
     console.log(w)
   })
@@ -68,12 +65,31 @@ test.skip('passing events into sync', async t => {
   t.is(ws.length, 9)
 })
 
-test.serial('looking at pot splits', async t => {
+test.serial('testing the accounting split function', async t => {
+  const split = await calculateCommunityPotSplit(COMMUNITY_ID, 0)
+  console.log('Split function gave')
+  console.log(split)
+  t.true(split.length === 7)
+})
+
+test.serial('do the split', async t => {
+  const now = new Date().getTime()
+  await splitAllCommunityPots()
+  const afterSplit = await getEvents(now)
+  console.log('Split events')
+  afterSplit.forEach(se => {
+    console.log(se.communityId)
+    console.log(se.payload)
+    console.log('')
+  })
+})
+
+test.skip('looking at pot splits', async t => {
   console.log('\nSplits\n=======================\n')
 
   let payloadSizes = {}
   let splits = events.filter(e => (e.eventType === COMMUNITY_POT_SPLIT))
-  splits = splits.filter(e => (e.communityId === 'dimtyoqcb7dutj5kxxxh9s8y9y'))
+  splits = splits.filter(e => (e.communityId === COMMUNITY_ID))
 
   splits.forEach(s => {
     console.log(s)
