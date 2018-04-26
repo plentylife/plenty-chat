@@ -4,7 +4,8 @@ import {sendEvent} from '../events'
 import {RATING_EVENT_TYPE} from '../events/RatingEvents'
 import type {RatingEventPayload} from '../events/RatingEvents'
 import {getCommunityOfMsg} from '../db'
-import {CommunityIdNotInferrable} from '../utils/Error'
+// import {CommunityIdNotInferrable} from '../utils/Error'
+import {getCurrentCommunityId} from '../state/GlobalState'
 
 /**
  * Calculates a rating (can never be 0) and puts it into the database
@@ -19,8 +20,9 @@ export async function rateMessage (msgId: string, agentId: string, rating: numbe
   if (rating > ratingMax) throw new Error('rating cannot be higher than maximum')
   if (ratingMax <= 1) throw new Error('Maximum rating has to be positive and above one')
 
-  const communityId = await getCommunityOfMsg(msgId)
-  if (!communityId) throw new CommunityIdNotInferrable()
+  let communityId = await getCommunityOfMsg(msgId)
+  // if (!communityId) throw new CommunityIdNotInferrable()
+  if (!communityId) communityId = getCurrentCommunityId()
 
   const r = (rating - 1) / (ratingMax - 1) // ratingMax has to be more than one
   const p: RatingEventPayload = {
