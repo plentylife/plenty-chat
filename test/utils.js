@@ -42,3 +42,24 @@ export function applyToAllDbs (f: (any) => Promise<void>) {
     })
   })
 }
+
+export function waitAndCheck (condition: () => boolean) {
+  const p = new Promise(resolve => {
+    let lastCheck = false
+    setInterval(() => {
+      console.log('waitAndCheck', condition())
+      if (lastCheck) {
+        if (condition()) {
+          resolve()
+        } else {
+          lastCheck = false
+        }
+      }
+
+      if (condition()) {
+        lastCheck = true
+      }
+    }, 500)
+  })
+  return p
+}

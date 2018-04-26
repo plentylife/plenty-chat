@@ -36,7 +36,7 @@ export let lastEvent = Promise.resolve(false)
 
 export async function handleEvent (event: Event): Promise<boolean | Object> {
   try {
-    console.log('handleEvent', event)
+    // console.log('Handling Event', event)
     await timeout(lastEvent, 1000 * 60).catch(e => {
       if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
     }) // todo. add timeout
@@ -57,7 +57,8 @@ export async function handleEvent (event: Event): Promise<boolean | Object> {
     lastEvent = applyHandler(event).then(async r => {
       if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
       await pushEvent(event, r)
-      console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
+      // console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
+      if (r === false) console.log('Did not handle event succcessfully', JSON.stringify(event))
       return r
     }).catch(e => {
       console.error(`Failed to handle event: ${e}`, event)

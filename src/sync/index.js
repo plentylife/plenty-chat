@@ -45,7 +45,7 @@ function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     console.log(`EVENT <-- ${peer.agentId}`, event)
     ackFn(EVENT_CHANNEL + '.ack')
-    backlogEvent(event, peer)
+    _backlogEvent(event, peer)
   })
 }
 
@@ -72,9 +72,11 @@ export function registerSendEventsObserver () {
 
 let eventBacklog: Array<Event> = []
 
-function backlogEvent (event: Event, peer: Peer) {
+export function _backlogEvent (_event: Event, peer: Peer) {
+  const event = {..._event}
   delete event.handledEventSuccessfully
-  console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
+
+  // console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
 
   if (!(event.receivedFrom instanceof Array)) {
     throw new TypeError('Could not backlog event. `receivedFrom` is not an array')
@@ -89,10 +91,10 @@ function backlogEvent (event: Event, peer: Peer) {
   consumeEvents()
 }
 
-let isConsuming = false
+export var _isConsuming = false
 async function consumeEvents () {
-  if (!isConsuming) {
-    isConsuming = true
+  if (!_isConsuming) {
+    _isConsuming = true
 
     let event = eventBacklog.shift()
     while (event) {
@@ -102,7 +104,7 @@ async function consumeEvents () {
       event = eventBacklog.shift()
     }
 
-    isConsuming = false
+    _isConsuming = false
   }
 }
 
