@@ -2,7 +2,7 @@ import {test} from 'ava'
 import {EVENT_TABLE, getEvents} from '../../../src/db/EventTable'
 import {nSQL} from 'nano-sql/lib/index'
 import {importTable} from '../utils'
-import {DB_MODE} from '../../../src/state/GlobalState'
+import {DB_MODE, setCurrentAgentId} from '../../../src/state/GlobalState'
 import {dropAll, waitAndCheck} from '../../utils'
 import {AGENT_WALLET_TABLE, getAllWallets} from '../../../src/db/AgentWalletTable'
 import {_backlogEvent, _isConsuming} from '../../../src/sync'
@@ -21,6 +21,7 @@ function _getAllEvents () {
 let events = null
 
 const COMMUNITY_ID = 'dimtyoqcb7dutj5kxxxh9s8y9y'
+setCurrentAgentId('server-default-id')
 
 test.before(async t => {
   t.is(DB_MODE, 'TEMP')
@@ -74,10 +75,16 @@ test.serial('testing the accounting split function', async t => {
 
 test.serial('do the split', async t => {
   const now = new Date().getTime()
-  await splitAllCommunityPots()
+  let i = 0
+  while (i < 6) {
+    i++
+    await splitAllCommunityPots()
+  }
   const afterSplit = await getEvents(now)
   console.log('Split events')
   afterSplit.forEach(se => {
+    console.log(se.agentEventId)
+    console.log(se.globalEventId)
     console.log(se.communityId)
     console.log(se.payload)
     console.log('')
