@@ -23,5 +23,13 @@ i {
 
 html {
     height: 100%;
-    overflow: scroll;
 }
+
+body {
+    height: 100%;
+}
+
+/*#root {*/
+    /*height: 100%;*/
+    /*overflow: scroll;*/
+/*}*/

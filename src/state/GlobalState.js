@@ -14,7 +14,7 @@ export var DB_MODE = (() => {
 
   switch (process.env.NODE_ENV) {
     case 'production':
-      return 'LS'
+      return 'PERM'
     default:
       return process.env.DB_MODE || 'TEMP'
   }

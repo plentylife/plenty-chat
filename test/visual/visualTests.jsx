@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
+// import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
+import {AccountStatus, MessageRating} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {getCurrentCommunityId, getCurrentAgentId, DB_MODE} from '../../src/state/GlobalState'
@@ -92,18 +93,15 @@ nSQL().onConnected(async () => {
         <MessageRating agentId={getCurrentAgentId()} messageId={MSG_ID}/>
       </div>
       <div>
-        <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
       </div>
-      <div>
-        <div className={'tutorial-screens'}>
-          <Tutorial.ScreenOne/>
-          <Tutorial.ScreenTwo/>
-          <Tutorial.ScreenThree/>
-          <Tutorial.ScreenFour/>
-          <Tutorial.ScreenFive/>
-          <Tutorial.ScreenTasks/>
-          <Tutorial.ScreenCaveat/>
-        </div>
+      <div className={'tutorial-screens'}>
+        <Tutorial.ScreenOne/>
+        <Tutorial.ScreenTwo/>
+        <Tutorial.ScreenThree/>
+        <Tutorial.ScreenFour/>
+        <Tutorial.ScreenFive/>
+        <Tutorial.ScreenTasks/>
+        <Tutorial.ScreenCaveat/>
       </div>
     </div>
   }
@@ -116,3 +114,5 @@ nSQL().onConnected(async () => {
 
 const c = nSQL().config({mode: DB_MODE, cache: false}).connect()
 console.log('DB con promise', c)
+
+// <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
