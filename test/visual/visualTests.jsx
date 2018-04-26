@@ -13,8 +13,11 @@ import {sendMessage} from '../../src'
 import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
 import * as Tutorial from 'Tutorial'
+import {dropAll} from '../utils'
 
 nSQL().onConnected(async () => {
+  await dropAll()
+
   window.getBalance = () => {
     return getCommunityBalance(getCurrentCommunityId()).then(communityBalance => {
       console.log('balance', communityBalance)

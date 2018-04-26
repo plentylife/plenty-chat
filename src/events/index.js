@@ -34,7 +34,7 @@ export type Event = {
 // export let lastEvent = new Promise(resolve => {})
 export let lastEvent = Promise.resolve(false)
 
-export async function handleEvent (event: Event): Promise<boolean | Object> {
+export async function handleEvent (event: Event): Promise<boolean | Object | Error> {
   try {
     // console.log('Handling Event', event)
     await timeout(lastEvent, 1000 * 60).catch(e => {
@@ -63,7 +63,7 @@ export async function handleEvent (event: Event): Promise<boolean | Object> {
     }).catch(async e => {
       console.error(`Failed to handle event: ${e}`, event)
       await pushEvent(event, false)
-      return false
+      return e
     })
   } catch (e) {
     console.log('handleEvent failed totally', e)
@@ -98,6 +98,7 @@ export async function sendEvent (eventType: EventType, senderId: string, communi
         receivedFrom: new Set()
       })
     }
+    throw new Error('Something is very wrong with the SelfEvent database. Could not push event in.')
   } catch (e) {
     console.error('sendEvent failed', e)
     return Promise.resolve(false)

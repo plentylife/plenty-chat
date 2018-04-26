@@ -11,6 +11,8 @@ const REQUEST_UPDATE_ALL = ':all:'
 export const EVENT_CHANNEL = 'event'
 const READY_CHANNEL = 'ready'
 
+export const NO_EVENTS_BEFORE = 1524749468216
+
 export type Peer = {
   agentId: string,
   socket: any,
@@ -45,7 +47,11 @@ function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     console.log(`EVENT <-- ${peer.agentId}`, event)
     ackFn(EVENT_CHANNEL + '.ack')
-    _backlogEvent(event, peer)
+    if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE) {
+      _backlogEvent(event, peer)
+    } else {
+      console.log('Skipping received event based on time')
+    }
   })
 }
 

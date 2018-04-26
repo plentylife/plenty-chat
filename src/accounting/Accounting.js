@@ -71,7 +71,6 @@ export async function spend (agentId: string, communityId: string, byAmount: num
   })
 
   const cb = await getCommunityBalance(communityId)
-  console.log('SPEND', cb, byAmount)
   return setCommunityBalance(communityId, cb + byAmount)
 }
 
@@ -79,10 +78,12 @@ export function calculateCommunitySharePointsForMessageRating (rating: number) {
   return Math.round(Math.pow(rating, 2) * COST_OF_SENDING_MESSAGE * 100)
 }
 
-export async function accountingForMessageRating (message: MessageRow, ratingAgentId, rating: number): Promise<void> {
+export async function accountingForMessageRating (message: MessageRow, ratingAgentId, rating: number,
+  _communityId: string = null): Promise<void> {
   assertBetweenZeroOne(rating) // not quite necessary
 
-  const communityId = await getCommunityOfMsg(message.id)
+  let communityId = await getCommunityOfMsg(message.id)
+  if (!communityId) communityId = _communityId
   if (!communityId) throw new CommunityIdNotInferrable()
 
   const pointsTotal = calculateCommunitySharePointsForMessageRating(rating)

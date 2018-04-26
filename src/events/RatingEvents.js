@@ -19,7 +19,7 @@ export async function handleRatingEvent (event: Event): Promise<boolean> {
   if (msg === null) throw new MissingDatabaseEntry('There is not such message with id ' + payload.messageId)
   if (msg.senderId === event.senderId) throw new CannotRateOwnMessage()
 
-  await accountingForMessageRating(msg, event.senderId, payload.rating)
+  await accountingForMessageRating(msg, event.senderId, payload.rating, event.communityId)
   return setRating(payload.messageId, event.senderId, payload.rating).then(r => (r.length > 0))
 }
 

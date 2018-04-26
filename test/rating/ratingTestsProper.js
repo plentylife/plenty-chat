@@ -7,6 +7,8 @@ import apEq from 'approximately-equal'
 import {setCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getCommunitySharePoints} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
+import {dropAll, setupDb} from '../utils'
+import {DEFAULT_COMMUNITY_SHARE_POINTS} from '../../src/accounting/AccountingGlobals'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
 
@@ -25,14 +27,15 @@ async function testMessage (t, rating, expected) {
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
   console.log('community share points', msgSenderPoints)
-  t.is(raterPoints, 0)
-  t.is(msgSenderPoints, Math.pow(expected, 2) * 100)
+  t.is(raterPoints, DEFAULT_COMMUNITY_SHARE_POINTS)
+  t.is(msgSenderPoints, Math.pow(expected, 2) * 100 + DEFAULT_COMMUNITY_SHARE_POINTS)
   t.true(apEq(ratingInDb, expected, 0.01))
 }
 testMessage.title = (providedTitle, input, expected) => `${providedTitle} ${input} = ${expected}`.trim()
 
 test.before(async t => {
   await nSQL().connect().then(async () => {
+    await setupDb(t)
     await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
     await addAgentToCommunity(AGENT_SENDER_ID, COMMUNITY_ID)
     await setCommunityOfChannel(CHANNEL_ID, COMMUNITY_ID)
@@ -53,8 +56,8 @@ test.serial('adding inappropriate message rating', async t => {
 
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
-  t.is(raterPoints, 0)
-  t.is(msgSenderPoints, 100)
+  t.is(raterPoints, DEFAULT_COMMUNITY_SHARE_POINTS)
+  t.is(msgSenderPoints, 100 + DEFAULT_COMMUNITY_SHARE_POINTS)
 })
 
 test.serial('wrong star setup', async t => {
@@ -69,6 +72,6 @@ test.serial('wrong star setup', async t => {
 
   const raterPoints = await getCommunitySharePoints(AGENT_ID, COMMUNITY_ID)
   const msgSenderPoints = await getCommunitySharePoints(AGENT_SENDER_ID, COMMUNITY_ID)
-  t.is(raterPoints, 0)
-  t.is(msgSenderPoints, 100)
+  t.is(raterPoints, DEFAULT_COMMUNITY_SHARE_POINTS)
+  t.is(msgSenderPoints, 100 + DEFAULT_COMMUNITY_SHARE_POINTS)
 })
