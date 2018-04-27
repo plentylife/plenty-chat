@@ -23,7 +23,7 @@ const taskTable = nSQL(TASK_TABLE).model([
   {key: 'markedCompletedBy', type: AGENT_TABLE}
 ]).config({mode: DB_MODE || 'PERM'})
 
-export async function pushNewTask (parentMessageId: string, creatorId: string): Promise<string | null> {
+export async function pushNewTask (parentMessageId: string, creatorId: string): Promise<TaskRow | null> {
   // console.log('pushing message with id', id)
   if (!parentMessageId) throw new Error('Task must have parent message id')
   if (!creatorId) throw new Error('Task must have creator id')
@@ -31,9 +31,7 @@ export async function pushNewTask (parentMessageId: string, creatorId: string): 
 
   return nSQL(TASK_TABLE).query('upsert', {
     creatorId, parentMessageId
-  }).exec().then(r => {
-    return r.affectedRows[0] ? r.affectedRows[0].taskId : null
-  })
+  }).exec().then(rowOrNull)
 }
 
 export async function changeStatus (taskId: string, status: string, actingAgent: string, timestamp: number): Promise<boolean> {
@@ -52,7 +50,7 @@ export async function changeStatus (taskId: string, status: string, actingAgent:
 }
 
 export function getTask (taskId: string): Promise<TaskRow | null> {
-  return nSQL(TASK_TABLE).query('select').where(['id', '=', taskId]).exec().then(rowOrNull)
+  return nSQL(TASK_TABLE).query('select').where(['taskId', '=', taskId]).exec().then(rowOrNull)
 }
 
 function getTaskByParent (parentMessageId: string): Promise<TaskRow | null> {

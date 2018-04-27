@@ -31,12 +31,13 @@ function cn (table: string, columnName): string {
   return table + '.' + columnName
 }
 
-export function rowOrNull (rows: any): (Object | null) {
-  if (rows instanceof Array) {
-    return rows.length > 0 ? rows[0] : null
-  }
-  if (rows instanceof Object && rows.affectedRows) {
-    return rows.affectedRows.length > 0 ? rows.affectedRows[0] : null
+export function rowOrNull <T> (rows: any): (T | null) {
+  if (rows instanceof Array && rows.length > 0) {
+    const fr = rows[0]
+    if (fr instanceof Object && fr.affectedRows) {
+      return fr.affectedRows.length > 0 ? fr.affectedRows[0] : null
+    }
+    return fr
   }
   return null
 }

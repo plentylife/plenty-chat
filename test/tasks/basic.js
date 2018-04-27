@@ -1,8 +1,7 @@
 import {test} from 'ava'
 import {setupDb} from '../utils'
-import {sendMessage} from '../../src'
-import {setCommunityOfChannel} from '../../src/db/ChannelTable'
 import {completeTask, convertMessageIntoTask, deconvertTask} from '../../src/actions/TaskActions'
+import {getTask} from '../../src/db/TaskTable'
 
 const AGENT_ID = 'aid'
 const MSG_ID = 'mid'
@@ -10,20 +9,23 @@ const CHANNEL_ID = 'chid'
 const COMMUNITY_ID = 'commid'
 
 test.before(async t => {
-  await setupDb()
+  await setupDb(t)
 })
 
 test.serial('convert a message that is not in db into to a task', async t => {
-  const taskId = await convertMessageIntoTask('not-in-db')
-  // get task
+  const taskRes = await convertMessageIntoTask('not-in-db')
+  const task = await getTask(taskRes.value)
+  t.true(taskRes.status)
+  t.truthy(task)
+  t.is(task.taskId, taskRes.value)
 })
 
-test.serial('convert a message to a task', async t => {
+test.skip('convert a message to a task', async t => {
   const taskId = await convertMessageIntoTask('in-db')
   // get task
 })
 
-test.serial('de-convert a task into a message', async t => {
+test.skip('de-convert a task into a message', async t => {
   const taskId = await convertMessageIntoTask('in-db')
   // get it
   await deconvertTask(taskId)

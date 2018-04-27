@@ -19,8 +19,8 @@ export async function handleConvertToTaskEvent (event: Event): Promise<EventResu
   const payload = validateConversionPayload(event.payload)
   const parentMsgId = payload.parentMessageId
 
-  const taskId = await pushNewTask(parentMsgId, agentId)
-  return {status: !!taskId, value: taskId}
+  const task = await pushNewTask(parentMsgId, agentId)
+  return {status: !!task, value: task.taskId}
 }
 
 // just a stub for now. should throw exception if invalid
