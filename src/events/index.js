@@ -31,7 +31,6 @@ export type Event = {
 }
 
 // todo. make sure that events are handled one after the next
-// export let lastEvent = new Promise(resolve => {})
 export let lastEvent = Promise.resolve(false)
 
 export async function handleEvent (event: Event): Promise<boolean | Object | Error> {
