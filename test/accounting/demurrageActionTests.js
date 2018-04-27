@@ -1,6 +1,6 @@
 import test from 'ava'
 import {_setDemurrageTimestamps, addCommunitySharePoints, getWallet, setBalance} from '../../src/db/AgentWalletTable'
-import {LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
+import {DEFAULT_COMMUNITY_SHARE_POINTS, LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
 import {setupDb} from '../utils'
 import apEq from 'approximately-equal'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
@@ -51,7 +51,7 @@ AGENTS.forEach(a => { firstTimestamps[a] = {} })
 test.serial('doing demurrage on a new agents', async t => {
   await applyDemurrageToAll()
   await macroCheckWallets(t, [
-    {b: 0, sp: 0}, {b: 0, sp: 0}
+    {b: 0, sp: DEFAULT_COMMUNITY_SHARE_POINTS}, {b: 0, sp: DEFAULT_COMMUNITY_SHARE_POINTS}
   ])
   // check that dates changed
   const now = new Date().getTime()
@@ -72,6 +72,8 @@ let lastTimestamps = {}
 test.serial('doing demurrage on a older agents that do not have community share points', async t => {
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 50)
   await setBalance(AGENT_ID_RICH, COMMUNITY_ID, 100)
+  await addCommunitySharePoints(AGENT_ID_POOR, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS)
+  await addCommunitySharePoints(AGENT_ID_RICH, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS)
 
   // increasing balance from zero should change timestamps
   let wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
