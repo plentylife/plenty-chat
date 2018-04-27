@@ -94,7 +94,7 @@ function applyHandler (event: Event): Promise<boolean> {
 }
 
 export async function sendEvent (eventType: EventType, senderId: string, communityId: string,
-  payload: EventPayload): Promise<boolean> {
+  payload: EventPayload): Promise<boolean | EventResult> {
   try {
     const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
     if (eventId !== false) {
