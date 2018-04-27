@@ -21,6 +21,7 @@
 - Splitting pot should not issue events if there is nothing to split
 - User should be able to rate a message even if it is not in their DB
 - How not to bleed com. pot by high earners
+- Set database id
 
 ## Tests
-- Demurrage calc. tests need update
+    D - Demurrage calc. tests need update
