@@ -1,11 +1,11 @@
 // @flow
 
 import {handleMessageEvent, MESSAGE_EVENT_TYPE} from './MessageEvents'
-import {getEvent, pushEvent, pushSelfEvent} from '../db/EventTable'
+import {EVENT_TABLE, getEvent, pushEvent, pushSelfEvent} from '../db/EventTable'
 import {handleRatingEvent, RATING_EVENT_TYPE} from './RatingEvents'
 import type {MessageEventPayload} from './MessageEvents'
 import type {RatingEventPayload} from './RatingEvents'
-import {MissingPayload} from '../utils/Error'
+import {ExistsInDB, MissingPayload} from '../utils/Error'
 import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
 import {CREATE_CHANNEL_EVENT_TYPE, handleCreateChannelEvent} from './ChannelEvents'
 import {
@@ -30,10 +30,16 @@ export type Event = {
   timestamp: number
 }
 
+export type EventResult = {
+  status: boolean,
+  error: ?Error,
+  value: ?any
+}
+
 // todo. make sure that events are handled one after the next
 export let lastEvent = Promise.resolve(false)
 
-export async function handleEvent (event: Event): Promise<boolean | Object | Error> {
+export async function handleEvent (event: Event): Promise<boolean | Error | EventResult> {
   try {
     // console.log('Handling Event', event)
     await timeout(lastEvent, 1000 * 60).catch(e => {
@@ -50,15 +56,18 @@ export async function handleEvent (event: Event): Promise<boolean | Object | Err
     const existing = await getEvent(event.globalEventId)
     if (existing != null) {
       console.log(`Event with id ${event.globalEventId} already exists in db`)
-      return {code: 'EXISTS'} // fixme, should be variable
+      return new ExistsInDB(event.globalEventId, EVENT_TABLE) // fixme, should be variable
     }
 
-    lastEvent = applyHandler(event).then(async r => {
-      if (typeof r !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean')
-      await pushEvent(event, r)
-      // console.log('Handled event ' + (r ? 'Successfully' : 'UNsucessfully'), event)
-      if (r === false) console.log('Did not handle event succcessfully', JSON.stringify(event))
-      return r
+    lastEvent = applyHandler(event).then(async result => {
+      let status = result
+      if (typeof result !== 'boolean') {
+        if (typeof result.status !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean or EventResult')
+        status = (result: EventResult).status
+      }
+      await pushEvent(event, status)
+      if (status === false) console.log('Did not handle event successfully', JSON.stringify(event))
+      return result
     }).catch(async e => {
       console.error(`Failed to handle event: ${e}`, event, e.stack)
       await pushEvent(event, false)

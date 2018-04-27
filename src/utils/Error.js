@@ -19,3 +19,9 @@ export class MissingDatabaseEntry extends Error {}
 export class InappropriateAction extends Error {}
 
 export class WrongValue extends Error {}
+
+export class ExistsInDB extends Error {
+  constructor (id: any, table: string) {
+    super(`Entry with id ${id} already exists in ${table}`)
+  }
+}
