@@ -30,3 +30,13 @@ export function getCommunityOfMsg (msgId: string): Promise<string | null> {
 function cn (table: string, columnName): string {
   return table + '.' + columnName
 }
+
+export function rowOrNull (rows: any): (Object | null) {
+  if (rows instanceof Array) {
+    return rows.length > 0 ? rows[0] : null
+  }
+  if (rows instanceof Object && rows.affectedRows) {
+    return rows.affectedRows.length > 0 ? rows.affectedRows[0] : null
+  }
+  return null
+}
