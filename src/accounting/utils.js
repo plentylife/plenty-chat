@@ -25,7 +25,7 @@ export function getBaseLog (base, x) {
   return Math.log(x) / Math.log(base)
 }
 
-export function floorWithPrecision (n, decimalPlaces = 3) {
+export function floorWithPrecision (n, decimalPlaces = 5) {
   const rf = Math.pow(10, decimalPlaces)
   return Math.floor(n * rf) / rf
 }

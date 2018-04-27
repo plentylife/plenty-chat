@@ -65,9 +65,9 @@ test.serial('pot should be fully split, always, event it if means fractions', as
   await splitAllCommunityPots()
 
   await macroCheckWallets(t, [
-    {b: 20.16, sp: 10}, {b: 40.33, sp: 20}, {b: 60.5, sp: 30}
+    {b: 20.16666, sp: 10}, {b: 40.33333, sp: 20}, {b: 60.5, sp: 30}
   ])
-  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0.01))
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0))
 })
 
 test.serial('pot split event should have an array as payload', async t => {
