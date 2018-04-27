@@ -2,14 +2,14 @@
 
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_MODE} from '../state/GlobalState'
-import {assertPositive, assertInt} from '../accounting/utils'
+import {assertPositive} from '../accounting/utils'
 // import {CHANNEL_TABLE} from './ChannelTable'
 
 export const COMMUNITY_TABLE = 'Community'
 
 const communityTable = nSQL(COMMUNITY_TABLE).model([
   {key: 'communityId', type: 'uuid', props: ['pk']},
-  {key: 'balance', type: 'int'}
+  {key: 'balance', type: 'number'}
 ]).config({
   mode: DB_MODE || 'PERM',
   cache: false
@@ -28,7 +28,7 @@ export function getCommunityBalance (communityId: string): Promise<number> {
 }
 
 export function setCommunityBalance (communityId: string, balance: number): Promise<void> {
-  assertInt(balance)
+  // assertInt(balance) removed to prevent community pot bleed
   assertPositive(balance, /* zero allowed */ true)
   return nSQL(COMMUNITY_TABLE).query('upsert', {
     communityId, balance

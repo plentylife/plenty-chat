@@ -61,7 +61,7 @@ export async function handleEvent (event: Event): Promise<boolean | Object | Err
       if (r === false) console.log('Did not handle event succcessfully', JSON.stringify(event))
       return r
     }).catch(async e => {
-      console.error(`Failed to handle event: ${e}`, event)
+      console.error(`Failed to handle event: ${e}`, event, e.stack)
       await pushEvent(event, false)
       return e
     })

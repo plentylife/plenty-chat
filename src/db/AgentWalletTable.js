@@ -14,8 +14,8 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'id', type: 'uuid', props: ['pk', 'ai']},
   {key: 'agentId', type: AGENT_TABLE, props: ['idx']},
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
-  {key: 'balance', type: 'int'},
-  {key: 'creditLimit', type: 'int'},
+  {key: 'balance', type: 'number'},
+  {key: 'creditLimit', type: 'number'},
   {key: 'communitySharePoints', type: 'number'},
   // {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
   {key: 'demurrageTimestamps', type: 'map'}
@@ -55,7 +55,6 @@ export function getWallet (agentId: string, communityId: string): Promise<(Walle
 export function setBalance (agentId: string, communityId: string, balance: number): Promise<any> {
   /** Setting new balance for  an agent */
   // fixme check that balance is not below credit limit
-  if (!Number.isInteger(balance)) throw new Error('Balance has to be an integer')
   let payload = {
     agentId: agentId, communityId: communityId, balance: balance
   }
@@ -71,7 +70,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
       payload.communitySharePoints = DEFAULT_COMMUNITY_SHARE_POINTS
     }
-    console.log('Setting new balance for [agent] in [community] to [amount]', agentId, communityId, balance)
+    console.log(`Setting new balance for ${agentId} in ${communityId} to ${balance}`)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
   })
 }

@@ -60,14 +60,14 @@ test.serial('pot is split properly', async t => {
   t.is(await getCommunityBalance(COMMUNITY_ID), 0)
 })
 
-test.serial('if pot cannot be split fully with whole numbers, some thanks are left over for next time', async t => {
+test.serial('pot should be fully split, always, event it if means fractions', async t => {
   await setCommunityBalance(COMMUNITY_ID, 61)
   await splitAllCommunityPots()
 
   await macroCheckWallets(t, [
-    {b: 20, sp: 10}, {b: 40, sp: 20}, {b: 60, sp: 30}
+    {b: 20.16, sp: 10}, {b: 40.33, sp: 20}, {b: 60.5, sp: 30}
   ])
-  t.is(await getCommunityBalance(COMMUNITY_ID), 1)
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0.01))
 })
 
 test.serial('pot split event should have an array as payload', async t => {
@@ -79,3 +79,5 @@ test.serial('pot split event should have an array as payload', async t => {
 })
 
 test.todo('when communty pot is nothing. division by zero')
+
+test.todo('with multile communities')

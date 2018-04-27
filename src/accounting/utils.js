@@ -7,7 +7,7 @@ export function assertInt (i: number) {
 
 export function assertPositive (i: number, zeroAllowed: boolean = false, message = '') {
   const isPositive = zeroAllowed ? i >= 0 : i > 0
-  const msg = message || 'Number is not positive'
+  const msg = message || `Number is not positive [${i}]`
   if (!(typeof i === 'number') || !isPositive) throw new RangeError(msg)
 }
 
@@ -23,4 +23,9 @@ export function assertBetweenZeroOne (i: number) {
 
 export function getBaseLog (base, x) {
   return Math.log(x) / Math.log(base)
+}
+
+export function floorWithPrecision (n, decimalPlaces = 3) {
+  const rf = Math.pow(10, decimalPlaces)
+  return Math.floor(n * rf) / rf
 }

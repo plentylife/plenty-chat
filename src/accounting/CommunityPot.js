@@ -12,12 +12,10 @@ export async function calculateCommunityPotSplit (communityId: string, community
 
   const sum = points.reduce((acc, next) => (acc + next.communitySharePoints), 0)
 
-  // fixme make sure that a single person does not bleed out the whole community pot
-
   return points.map(p => {
     const pn = Object.assign({}, p)
     if (sum !== 0) {
-      pn.amount = Math.floor((p.communitySharePoints / sum) * communityBalance)
+      pn.amount = Math.floor((p.communitySharePoints / sum) * communityBalance * 100) / 100
     } else {
       pn.amount = 0
     }
