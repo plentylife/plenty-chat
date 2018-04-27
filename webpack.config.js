@@ -170,7 +170,7 @@ const serverTest = Object.assign({}, server, {
 
 module.exports = [
   // serverTest,
-  // server,
+  server,
   library,
-  visualTests
+  // visualTests
 ]
