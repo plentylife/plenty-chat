@@ -7,7 +7,8 @@ import apEq from 'approximately-equal'
 const invertedRate = 1 - DEFAULT_DEMURRAGE_RATE
 
 function cdMacro (t, b, p, ex) {
-  t.is(ex, _calculateDemurrage(b, DEFAULT_DEMURRAGE_RATE, p))
+  const d = _calculateDemurrage(b, DEFAULT_DEMURRAGE_RATE, p)
+  t.is(ex, d)
 }
 cdMacro.title = (title, balance, period, expected) => `${title} - balance of ${balance} at period ${period} == ${expected}`
 
@@ -43,7 +44,12 @@ test('rate should be within [0,1]', async t => {
 /* Calculations on wallets */
 
 function cdaMacro (t, w, la, ex) {
-  const res = calculateDemurrageForAgent(w, la * LENGTH_OF_DAY)
+  let wallet = {...w}
+  let timestamp = (new Date().getTime()) - la * LENGTH_OF_DAY
+  wallet.demurrageTimestamps = {
+    balance: timestamp, communitySharePoints: timestamp
+  }
+  const res = calculateDemurrageForAgent(wallet, la * LENGTH_OF_DAY)
   t.true(apEq(ex.balance, res.balance))
   t.true(apEq(ex.communitySharePoints, res.communitySharePoints))
 }
