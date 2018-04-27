@@ -9,7 +9,6 @@ import {
 import {assertPositive, assertInt, assertBetweenZeroOne} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
-import type {MessageRow} from '../db/MessageTable'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 import {getRating} from '../db/RatingTable'
