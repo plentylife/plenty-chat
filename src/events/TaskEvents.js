@@ -2,7 +2,7 @@
 
 import {hasEnoughFunds, spend} from '../accounting/Accounting'
 import {pushMessage} from '../db/MessageTable'
-import type {Event} from './index'
+import type {Event, EventResult} from './index'
 import {COST_OF_SENDING_MESSAGE} from '../accounting/AccountingGlobals'
 import {pushNewTask} from '../db/TaskTable'
 
@@ -14,12 +14,13 @@ export type ConvertToTaskEventPayload = {
   parentMessageId: string
 }
 
-export async function handleConvertToTaskEvent (event: Event): Promise<string | null> {
+export async function handleConvertToTaskEvent (event: Event): Promise<EventResult> {
   const agentId = event.senderId
   const payload = validateConversionPayload(event.payload)
   const parentMsgId = payload.parentMessageId
 
-  pushNewTask(parentMsgId, agentId)
+  const taskId = await pushNewTask(parentMsgId, agentId)
+  return {status: !!taskId, value: taskId}
 }
 
 // just a stub for now. should throw exception if invalid

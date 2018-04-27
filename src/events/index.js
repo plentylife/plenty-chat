@@ -15,6 +15,7 @@ import {
   handleDemurrageEvent
 } from './AccountingEvents'
 import { timeout, TimeoutError } from 'promise-timeout'
+import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -87,7 +88,8 @@ function applyHandler (event: Event): Promise<boolean> {
     case CREATE_CHANNEL_EVENT_TYPE: return handleCreateChannelEvent(event)
     case DEMURRAGE_EVEN_TYPE: return handleDemurrageEvent(event)
     case COMMUNITY_POT_SPLIT: return handleCommunityPotSplit(event)
-    default: throw new Error('Could not recognize event type')
+    case CONVERT_TO_TASK_EVENT_TYPE: return handleConvertToTaskEvent(event)
+    default: throw new Error(`Could not recognize event type '${event.eventType}'`)
   }
 }
 
