@@ -18,10 +18,11 @@
 
 ## System
     D - start people off with 100 community share points
+    D - How not to bleed com. pot by high earners
+    D - User should be able to rate a message even if it is not in their DB
 - Splitting pot should not issue events if there is nothing to split
-- User should be able to rate a message even if it is not in their DB
-- How not to bleed com. pot by high earners
 - Set database id
+- Figure out why not all events were relayed by the server (could it be reconnect and disconnect?)
 
 ## Tests
     D - Demurrage calc. tests need update
