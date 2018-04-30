@@ -2,8 +2,8 @@
 
 import {nSQLiteAdapter} from 'nano-sqlite'
 
-let _currentAgentId = 'anton'
-let _currentCommunityId = 'commid'
+let _currentAgentId = null
+let _currentCommunityId = null
 
 /** time between demurrage and community pot splits; in minutes */
 export const CRON_TIME = 10
