@@ -20,6 +20,8 @@
     D - start people off with 100 community share points
     D - How not to bleed com. pot by high earners
     D - User should be able to rate a message even if it is not in their DB
+
+- Pushing self event does not wait for the last one to complete (maybe); resulting in repeated ids
 - Splitting pot should not issue events if there is nothing to split
 - Set database id
 - Figure out why not all events were relayed by the server (could it be reconnect and disconnect?)
