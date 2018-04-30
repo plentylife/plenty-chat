@@ -1,7 +1,7 @@
 // @flow
 
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {AGENT_TABLE} from './AgentTable'
 import {rowOrNull} from './index'
 // import {COMMUNITY_TABLE} from './CommunityTable'
@@ -21,7 +21,7 @@ const taskTable = nSQL(TASK_TABLE).model([
   {key: 'completionTime', type: 'number', default: -1},
   // might not necessarily be one of the bidders
   {key: 'markedCompletedBy', type: AGENT_TABLE}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 export async function pushNewTask (parentMessageId: string, creatorId: string): Promise<TaskRow | null> {
   // console.log('pushing message with id', id)

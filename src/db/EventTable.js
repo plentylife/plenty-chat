@@ -1,5 +1,5 @@
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {AGENT_TABLE} from './AgentTable'
 import type {Event} from '../events'
@@ -21,7 +21,7 @@ const eventModel = baseEventModel.concat([
   {key: 'receivedFrom', type: 'string[]'},
   {key: 'handledSuccessfully', type: 'bool'}
 ])
-const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM'})
+const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 export function getEvent (globalEventId: string): Promise<Object | null> {
   return nSQL(EVENT_TABLE).query('select').where(['globalEventId', '=', globalEventId])
@@ -85,7 +85,7 @@ export const SELF_EVENT_TABLE = 'SelfEvent'
 const selfEventModel = baseEventModel.concat([
   {key: 'eventId', type: 'int', props: ['pk', 'ai']}
 ])
-const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode: DB_MODE || 'PERM'})
+const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 /**
  * @return the id of the event that includes the timestamp

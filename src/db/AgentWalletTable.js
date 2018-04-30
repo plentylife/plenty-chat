@@ -1,7 +1,7 @@
 // @flow
 
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS, DEFAULT_CREDIT_LIMIT} from '../accounting/AccountingGlobals'
 import {AGENT_TABLE} from './AgentTable'
@@ -19,7 +19,7 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'communitySharePoints', type: 'number'},
   // {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
   {key: 'demurrageTimestamps', type: 'map'}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
   return nSQL(AGENT_WALLET_TABLE).query('select')
@@ -100,7 +100,11 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
 export function applyDemurrageToWallet (agentId: string, communityId: string, delta: Object): Promise<Array<any>> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
-      throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
+      return nSQL('Event').query('select').where([['eventType', '=', 'addAgentToCommunity'], 'AND', ['senderId', '=', 'up1g6iyezbdw9ptby8ts4hrs9w']]).exec().then(ch => {
+      // nSQL('Event').query('select').where([['eventType', '=', 'addAgentToCommunity'], 'AND', ['senderId', '=', 'jdjr9bpehtgs3pokkas8n7dr8e']]).exec().then(ch => {
+        console.log(ch)
+        throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
+      })
     }
     const now = new Date().getTime()
     let flagAny = false

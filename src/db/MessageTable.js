@@ -1,7 +1,7 @@
 // @flow
 
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {CHANNEL_TABLE} from './ChannelTable'
 // import {COMMUNITY_TABLE} from './CommunityTable'
 
@@ -13,7 +13,7 @@ const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
   {key: 'senderId', type: 'string'},
   {key: 'channelId', type: CHANNEL_TABLE}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 export function pushMessage (id: string, senderId: string, channelId: string): Promise<void> {
   // console.log('pushing message with id', id)

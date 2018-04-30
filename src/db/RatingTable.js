@@ -1,6 +1,6 @@
 // @flow
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 
 export const RATING_TABLE = 'Rating'
 
@@ -9,7 +9,7 @@ const ratingTable = nSQL(RATING_TABLE).model([
   {key: 'agentId', type: 'string', props: ['idx']},
   {key: 'messageId', type: 'string', props: ['idx']},
   {key: 'rating', type: 'float'}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 function getRatingQuery (agentId: string, messageId: string) {
   return nSQL(RATING_TABLE).query('select', ['id', 'rating'])

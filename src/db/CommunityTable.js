@@ -1,7 +1,7 @@
 // @flow
 
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {assertPositive} from '../accounting/utils'
 // import {CHANNEL_TABLE} from './ChannelTable'
 
@@ -12,7 +12,8 @@ const communityTable = nSQL(COMMUNITY_TABLE).model([
   {key: 'balance', type: 'number'}
 ]).config({
   mode: DB_MODE || 'PERM',
-  cache: false
+  cache: false,
+  id: DB_ID
 })
 
 /**

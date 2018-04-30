@@ -1,7 +1,7 @@
 // @flow
 
 import {nSQL} from 'nano-sql/lib/index'
-import {DB_MODE} from '../state/GlobalState'
+import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {MissingProperty} from '../utils/Error'
 
@@ -13,7 +13,7 @@ const peerSyncTable = nSQL(PEER_SYNC_TABLE).model([
   {key: 'communityId', type: COMMUNITY_TABLE},
   // the latest timestamp up to which entries have been synced up. The timestamp is from the peer's perspective
   {key: 'syncedUpTo', type: 'number'}
-]).config({mode: DB_MODE || 'PERM'})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 /**
  * Either gives the last know timestamp of synced event (from the perspective of sending agent, not us) or 0
