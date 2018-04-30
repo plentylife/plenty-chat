@@ -2,7 +2,7 @@
 
 import {Event, handleEvent as internalEventHandler} from '../events'
 import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
-import {getCurrentAgentId} from '../state/GlobalState'
+import {getCurrentAgentId, PLENTY_VERSION} from '../state/GlobalState'
 import {nSQL} from 'nano-sql'
 import {getSyncedUpToInAll, logSync} from '../db/PeerSyncTable'
 
@@ -60,12 +60,13 @@ export function registerSendEventsObserver () {
   nSQL(EVENT_TABLE).on('upsert', (queryEvent) => {
     peers.forEach(peer => {
       if (peer.socket.connected) {
-        queryEvent.affectedRows.forEach(event => {
+        queryEvent.affectedRows.forEach(_event => {
+          const event = Object.assign({}, _event, {plentyVersion: PLENTY_VERSION})
           // checking that this event didn't come from the peer
           if (!event.receivedFrom.includes(peer.agentId)) {
             console.log(`EVENT (n) --> ${peer.agentId}`)
             peer.socket.emit(EVENT_CHANNEL, event, ack => {
-              console.log(EVENT_CHANNEL + '.new.ack')
+              console.log(EVENT_CHANNEL + '.new.ack' + '  ' + event.globalEventId)
             })
           } else {
             console.log(`Skipping sending new event to ${peer.agentId}`)
@@ -124,10 +125,11 @@ async function handleUpdateRequest (socket, communityId: string, fromTimestamp: 
     relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
   }
 
-  relevantEntries.forEach(e => {
+  relevantEntries.forEach(_e => {
+    const e = Object.assign({}, _e, {plentyVersion: PLENTY_VERSION})
     console.log('EVENT -->', e)
     socket.emit(EVENT_CHANNEL, e, ack => {
-      console.log(EVENT_CHANNEL + '.ack')
+      console.log(EVENT_CHANNEL + '.ack' + '  ' + e.globalEventId)
     })
   })
 }
