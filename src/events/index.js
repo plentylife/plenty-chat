@@ -96,11 +96,12 @@ function applyHandler (event: Event): Promise<boolean> {
 export async function sendEvent (eventType: EventType, senderId: string, communityId: string,
   payload: EventPayload): Promise<boolean | EventResult> {
   try {
-    const eventId = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
-    if (eventId !== false) {
+    const eventIdBits = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
+    if (eventIdBits !== false) {
+      const agentEventId = `${eventIdBits.eventId}-${eventIdBits.timestamp}`
       return handleEvent({
-        globalEventId: senderId + eventId,
-        agentEventId: eventId,
+        globalEventId: senderId + '-' + agentEventId,
+        agentEventId,
         communityId,
         senderId,
         eventType,
