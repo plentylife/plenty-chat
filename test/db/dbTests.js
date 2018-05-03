@@ -3,7 +3,7 @@ import {getCommunityOfChannel, setCommunityOfChannel} from '../../src/db/Channel
 import test from 'ava/index'
 import {pushMessage} from '../../src/db/MessageTable'
 import {getCommunityOfMsg} from '../../src/db/index'
-import {pushEvent, getCommunityEvents, getEvent, getEvents} from '../../src/db/EventTable'
+import {pushEvent, getCommunityEvents, getEvent, getEvents, pushSelfEvent} from '../../src/db/EventTable'
 import {DB_MODE} from '../../src/state/GlobalState'
 import {dumpPeerSyncTable, getSyncedUpTo, getSyncedUpToInAll, logSync} from '../../src/db/PeerSyncTable'
 
@@ -141,5 +141,15 @@ nSQL().connect().then(async (r) => {
 
     events = await getCommunityEvents(COMID, 0)
     t.true(events[0].timestamp < events[1].timestamp)
+  })
+
+  test('Self-events get appropriate numbered ids', async t => {
+    const numRuns = 200
+    let i = 0
+    while (i < numRuns) {
+      i++
+      const idBits = await pushSelfEvent('no-type', 'no-id', {})
+      t.is(idBits[0], i)
+    }
   })
 })
