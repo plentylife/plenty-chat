@@ -39,9 +39,15 @@ export type EventResult = {
 
 // todo. make sure that events are handled one after the next
 export let lastEvent = Promise.resolve(false)
+export var handledCount = 0
+export var _handleEventErrors = []
 
 export async function handleEvent (event: Event): Promise<boolean | Error | EventResult> {
   try {
+    // if (global.testEvents[handledCount].globalEventId !== event.globalEventId) {
+    //   throw new Error('Wrong order')
+    // }
+    handledCount += 1
     // console.log('Handling Event', event)
     await timeout(lastEvent, 1000 * 60).catch(e => {
       if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
@@ -72,10 +78,12 @@ export async function handleEvent (event: Event): Promise<boolean | Error | Even
     }).catch(async e => {
       console.error(`Failed to handle event: ${e}`, event, e.stack)
       await pushEvent(event, false)
+      if (process.env.NODE_ENV === 'test') _handleEventErrors.push(e)
       return e
     })
   } catch (e) {
-    console.log('handleEvent failed totally', e)
+    if (process.env.NODE_ENV === 'test') _handleEventErrors.push(e)
+    console.error('handleEvent failed totally', e)
   }
   return lastEvent
 }
