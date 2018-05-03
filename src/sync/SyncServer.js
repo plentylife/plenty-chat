@@ -39,7 +39,7 @@ nSQL().connect().then(() => {
   })
 
   setInterval(async () => {
-    console.log('\nCRON\n')
+    console.log('\nCRON\n', new Date())
     await applyDemurrageToAll()
     await splitAllCommunityPots()
   }, CRON_TIME * 60 * 1000)
