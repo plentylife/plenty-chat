@@ -16,6 +16,7 @@ import {
 } from './AccountingEvents'
 import { timeout, TimeoutError } from 'promise-timeout'
 import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
+import {_backlogEvent} from './queue'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
@@ -37,21 +38,17 @@ export type EventResult = {
   value: ?any
 }
 
-// todo. make sure that events are handled one after the next
-export let lastEvent = Promise.resolve(false)
 export var handledCount = 0
 export var _handleEventErrors = []
 
-export async function handleEvent (event: Event): Promise<boolean | Error | EventResult> {
+export function handleEvent (event: Event): Promise<boolean | Error | EventResult> {
+  return _backlogEvent(event)
+}
+
+export async function _handleEvent (event: Event): Promise<boolean | Error | EventResult> {
   try {
-    // if (global.testEvents[handledCount].globalEventId !== event.globalEventId) {
-    //   throw new Error('Wrong order')
-    // }
     handledCount += 1
     // console.log('Handling Event', event)
-    await timeout(lastEvent, 1000 * 60).catch(e => {
-      if (e instanceof TimeoutError) console.error('Event timed out. Event body:', event)
-    }) // todo. add timeout
 
     if (!event || !event.eventType) throw new Error('Improperly formatted event. No eventType.')
     if (!event.communityId) throw new Error('Improperly formatted event. No community id.')
@@ -66,7 +63,7 @@ export async function handleEvent (event: Event): Promise<boolean | Error | Even
       return new ExistsInDB(event.globalEventId, EVENT_TABLE) // fixme, should be variable
     }
 
-    lastEvent = applyHandler(event).then(async result => {
+    return applyHandler(event).then(async result => {
       let status = result
       if (typeof result !== 'boolean') {
         if (typeof result.status !== 'boolean') throw new TypeError('PROGRAMMER ERROR. `r` is not a boolean or EventResult')
@@ -84,8 +81,8 @@ export async function handleEvent (event: Event): Promise<boolean | Error | Even
   } catch (e) {
     if (process.env.NODE_ENV === 'test') _handleEventErrors.push(e)
     console.error('handleEvent failed totally', e)
+    return e
   }
-  return lastEvent
 }
 
 function applyHandler (event: Event): Promise<boolean> {

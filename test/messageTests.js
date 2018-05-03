@@ -6,8 +6,10 @@ import {getWallet, setBalance} from '../src/db/AgentWalletTable'
 import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {getCommunityBalance} from '../src/db/CommunityTable'
 import {getCommunityOfChannel, setCommunityOfChannel} from '../src/db/ChannelTable'
+import {DB_MODE} from '../src/state/GlobalState'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
+console.log('DB_MODE is ', DB_MODE)
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
@@ -35,7 +37,8 @@ nSQL().connect().then(async () => {
   test.serial('sending message without existing wallet', async t => {
     const MSG_ID = 'tmid_fail_nw'
 
-    t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
+    const res = await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID)
+    t.false(res)
     const msg = await getMessage(MSG_ID)
     const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
@@ -50,7 +53,8 @@ nSQL().connect().then(async () => {
 
     const initBalance = -1 * DEFAULT_CREDIT_LIMIT
     await setBalance(AGENT_ID, COMMUNITY_ID, initBalance)
-    t.false(await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID))
+    const res = await sendMessage(AGENT_ID, CHANNEL_ID, MSG_ID)
+    t.false(res)
     const msg = await getMessage(MSG_ID)
     const balance = await getWallet(AGENT_ID, COMMUNITY_ID)
     const cb = await getCommunityBalance(COMMUNITY_ID)
