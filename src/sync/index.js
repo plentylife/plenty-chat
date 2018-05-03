@@ -77,7 +77,7 @@ export function registerSendEventsObserver () {
   })
 }
 
-let eventBacklog: Array<Event> = []
+export let _eventBacklog: Array<Event> = []
 
 export function _backlogEvent (_event: Event, peer: Peer) {
   const event = {..._event}
@@ -93,7 +93,7 @@ export function _backlogEvent (_event: Event, peer: Peer) {
   if (peer.agentId) {
     event.receivedFrom.add(peer.agentId.trim())
   }
-  eventBacklog.push(event)
+  _eventBacklog.push(event)
   logSync(peer.agentId, event.communityId, event.timestamp)
   consumeEvents()
 }
@@ -103,12 +103,12 @@ async function consumeEvents () {
   if (!_isConsuming) {
     _isConsuming = true
 
-    let event = eventBacklog.shift()
+    let event = _eventBacklog.shift()
     while (event) {
       await internalEventHandler(event).catch(e => {
         console.log('Sync event handler failed', e)
       })
-      event = eventBacklog.shift()
+      event = _eventBacklog.shift()
     }
 
     _isConsuming = false
@@ -124,6 +124,9 @@ async function handleUpdateRequest (socket, communityId: string, fromTimestamp: 
   } else {
     relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
   }
+
+  // fixme wait for callback to emit
+  // fixme create a global queue
 
   relevantEntries.forEach(_e => {
     const e = Object.assign({}, _e, {plentyVersion: PLENTY_VERSION})
@@ -149,6 +152,12 @@ export function onConnectToPeer (peer: Peer) {
       requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, timestamp) // todo. updateAll is a hack
     }
   }
+
+  peer.socket.on('reconnect', async () => {
+    const timestamp = await getSyncedUpToInAll(peer.agentId)
+    console.log('Reconnected to', peer.agentId, 'requesting updates upto', timestamp)
+    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, timestamp) // todo. updateAll is a hack
+  })
 
   const myPeerInfo = {agentId: getCurrentAgentId()}
   peer.socket.on(READY_CHANNEL, (peerInfo, ackFn) => {
