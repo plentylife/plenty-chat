@@ -21,6 +21,7 @@
     D - How not to bleed com. pot by high earners
     D - User should be able to rate a message even if it is not in their DB
 
+- Post a message that someone ran out of money
 - Pushing self event does not wait for the last one to complete (maybe); resulting in repeated ids
 - Splitting pot should not issue events if there is nothing to split
 - Set database id
