@@ -39,7 +39,7 @@ export function importTable (dir, name) {
 }
 
 const dir = '/home/anton/code/plenty-chat/test/db/test-data/'
-const name = 'events-not-maching-state-in-agent'
+const name = 'events-not-maching-state-in-server'
 
 // test.serial('dumping table', async t => {
 //   const rows = await dumpTable(dir, name)
