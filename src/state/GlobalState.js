@@ -4,6 +4,8 @@ import {nSQLiteAdapter} from 'nano-sqlite'
 
 let _currentAgentId = null
 let _currentCommunityId = null
+let _sendTableSync = false
+let _sendEventSync = false
 
 export const PLENTY_VERSION = 180504
 
@@ -44,4 +46,20 @@ export function setCurrentCommunityId (id: string) {
 
 export function getCurrentCommunityId (): string {
   return _currentCommunityId
+}
+
+export function setSendTableSync (v: boolean) {
+  _sendTableSync = v
+}
+
+export function getSendTableSync (v: boolean) {
+  return _sendTableSync
+}
+
+export function setSendEventSync (v: boolean) {
+  _sendEventSync = v
+}
+
+export function getSendEventSync (v: boolean) {
+  return _sendEventSync
 }

@@ -2,6 +2,10 @@
 import io from 'socket.io-client'
 import {listenForTableSync, onConnectToPeer, registerSendEventsObserver} from './index'
 import type {Peer} from './index'
+import {setSendEventSync, setSendTableSync} from '../state/GlobalState'
+
+setSendEventSync(true)
+setSendTableSync(false)
 
 export function connectToPeer (peer: string): Promise<Peer> {
   const socket = io(peer)

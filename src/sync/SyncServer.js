@@ -1,6 +1,6 @@
 // @flow
 
-import {CRON_TIME, setCurrentAgentId} from '../state/GlobalState'
+import {CRON_TIME, setCurrentAgentId, setSendEventSync, setSendTableSync} from '../state/GlobalState'
 import {onConnectToPeer, registerSendEventsObserver} from './index'
 import '../db/index'
 import {nSQL} from 'nano-sql'
@@ -10,6 +10,8 @@ import {applyDemurrageToAll, splitAllCommunityPots} from '../actions/AccountingA
 console.log('Starting server')
 
 setCurrentAgentId('server-default-id')
+setSendEventSync(false)
+setSendTableSync(true)
 
 const server = require('http').createServer()
 const io = require('socket.io')(server, {

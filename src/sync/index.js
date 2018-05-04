@@ -2,7 +2,7 @@
 
 import {Event, handleEvent as internalEventHandler} from '../events'
 import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
-import {getCurrentAgentId, PLENTY_VERSION} from '../state/GlobalState'
+import {getCurrentAgentId, getSendEventSync, getSendTableSync, PLENTY_VERSION} from '../state/GlobalState'
 import {nSQL} from 'nano-sql'
 import {getSyncedUpToInAll, logSync} from '../db/PeerSyncTable'
 import {generateAllTableSyncMessages, receiveTableSyncMessage} from './TableSync'
@@ -21,7 +21,7 @@ export type Peer = {
   socket: any,
   address: string,
   trackingCounter: number,
-  hadUpdate: boolean,
+  hadAndNotInUpdate: boolean,
   hadUpdatePromise: Promise<void>,
   hadUpdatePromiseResolver: () => void
 }
@@ -110,24 +110,24 @@ function emitEvent (peer: Peer, event: Event): Promise<void> {
 export function registerSendEventsObserver () {
   nSQL(EVENT_TABLE).on('upsert', (queryEvent) => {
     peers.forEach(async peer => {
-      await peer.hadUpdatePromise // waiting for the first update to happen before sending out the rest
-
-      if (peer.socket.connected) {
-        queryEvent.affectedRows.forEach(_event => {
-          const event = Object.assign({}, _event, {plentyVersion: PLENTY_VERSION})
-          // checking that this event didn't come from the peer
-          if (!event.receivedFrom.includes(peer.agentId)) {
-            addToOutgoingQueue(peer, event)
-          } else {
-            console.log(`Skipping sending new event to ${peer.agentId}`)
-          }
-        })
+      if (peer.hadAndNotInUpdate) {
+        await peer.hadUpdatePromise // waiting for the first update to happen before sending out the rest
+        if (peer.socket.connected) {
+          queryEvent.affectedRows.forEach(_event => {
+            const event = Object.assign({}, _event, {plentyVersion: PLENTY_VERSION})
+            // checking that this event didn't come from the peer
+            if (!event.receivedFrom.includes(peer.agentId)) {
+              addToOutgoingQueue(peer, event)
+            } else {
+              console.log(`Skipping sending new event to ${peer.agentId}`)
+            }
+          })
+        }
       }
     })
   })
 }
 
-// export let _eventBacklog: Array<Event> = []
 export async function _receiveEvent (_event: Event, peer: Peer) {
   const event = {..._event}
   delete event.handledEventSuccessfully
@@ -140,52 +140,50 @@ export async function _receiveEvent (_event: Event, peer: Peer) {
   if (peer.agentId) {
     event.receivedFrom.add(peer.agentId.trim())
   }
-  // _eventBacklog.push(event)
   await logSync(peer.agentId, event.communityId, event.timestamp)
   return internalEventHandler(event)
-  // consumeEvents()
 }
-//
-// export var _isConsuming = false
-// async function consumeEvents () {
-//   if (!_isConsuming) {
-//     _isConsuming = true
-//
-//     let event = _eventBacklog.shift()
-//     while (event) {
-//       await internalEventHandler(event).catch(e => {
-//         console.log('Sync event handler failed', e)
-//       })
-//       event = _eventBacklog.shift()
-//     }
-//
-//     _isConsuming = false
-//   }
-// }
 
-// let handlingUpdateRequest = Promise(resolve => )
-// let finishHandlingUpdateRequest =
-
+export var isHandlingTableSync
 async function handleUpdateRequest (peer: Peer, communityId: string, fromTimestamp: number) {
+  peer.hadAndNotInUpdate = false
   console.log('Handling UPDATE request', communityId, new Date(fromTimestamp))
 
   // fixme these updates should happen by community
-  // let relevantEntries
-  // if (communityId === REQUEST_UPDATE_ALL) {
-  //   relevantEntries = await getEvents(fromTimestamp)
-  // } else {
-  //   relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
-  // }
+  if (getSendEventSync()) {
+    let relevantEntries
+    if (communityId === REQUEST_UPDATE_ALL) {
+      relevantEntries = await getEvents(fromTimestamp)
+    } else {
+      relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
+    }
+    console.log('Sending event sync')
+    relevantEntries.forEach((_e: Event) => {
+      if (!_e.receivedFrom.has(peer.agentId)) {
+        addToOutgoingQueue(peer, _e)
+      }
+    })
+  }
 
-  await doTableSync(peer)
+  if (getSendTableSync()) {
+    console.log('Sending table sync')
+    await doTableSync(peer)
+  }
 
-  // console.log('Sending event sync')
-  // relevantEntries.forEach((_e: Event) => {
-  //   if (!_e.receivedFrom.has(peer.agentId)) {
-  //     addToOutgoingQueue(peer, _e)
-  //   }
-  // })
-  if (!peer.hadUpdate) peer.hadUpdatePromiseResolver()
+  peer.hadUpdatePromiseResolver()
+  peer.hadAndNotInUpdate = true
+}
+
+async function doTableSync (peer: Peer, fromTimestamp: number) {
+  let tableSyncMsgs = await generateAllTableSyncMessages(fromTimestamp)
+  let count = tableSyncMsgs.length
+  if (count === 0) return Promise.resolve()
+
+  tableSyncMsgs.forEach(msg => {
+    peer.socket.emit(TABLE_SYNC_CHANNEL, msg, ack => {
+      count--
+    })
+  })
 }
 
 export function listenForTableSync (peer: Peer) {
@@ -196,29 +194,12 @@ export function listenForTableSync (peer: Peer) {
   })
 }
 
-function doTableSync (peer: Peer): Promise<void> {
-  let tableSyncMsgs = generateAllTableSyncMessages()
-  let count = tableSyncMsgs.length
-  if (count === 0) return Promise.resolve()
-
-  return new Promise(resolve => {
-    tableSyncMsgs.forEach(msg => {
-      peer.socket.emit(TABLE_SYNC_CHANNEL, msg, ack => {
-        count--
-        if (count === 0) resolve()
-      })
-    })
-  })
-}
-
 export function onConnectToPeer (peer: Peer) {
   console.log('Connection established to peer', peer.address)
 
-  peer.hadUpdate = false
+  peer.hadAndNotInUpdate = false
   peer.hadUpdatePromise = new Promise(resolve => {
     peer.hadUpdatePromiseResolver = resolve
-  }).then(() => {
-    peer.hadUpdate = true
   })
 
   peers.push(peer)

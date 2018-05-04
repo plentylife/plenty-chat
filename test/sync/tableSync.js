@@ -7,6 +7,8 @@ import {generateAllTableSyncMessages, receiveTableSyncMessage} from '../../src/s
 import {getCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getAllWallets} from '../../src/db/AgentWalletTable'
 import {getCommunityBalance} from '../../src/db/CommunityTable'
+import {MESSAGE_TABLE} from '../../src/db/MessageTable'
+import {EVENT_TABLE} from '../../src/db/EventTable'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'
@@ -23,10 +25,22 @@ test.before(async t => {
 
 let messages = []
 
+test.serial('if selected by time, only some entries should be synced', async t => {
+  messages = await generateAllTableSyncMessages(new Date().getTime())
+  const mt = messages.find(m => m.table === MESSAGE_TABLE)
+  const et = messages.find(m => m.table === EVENT_TABLE)
+  t.falsy(mt)
+  t.falsy(et)
+})
+
 test.serial('all table entries should become sync messages', async t => {
-  messages = await generateAllTableSyncMessages()
+  messages = await generateAllTableSyncMessages(0)
   messages.forEach(m => console.log(m))
-  t.pass()
+  const mt = messages.find(m => m.table === MESSAGE_TABLE).entries
+  const et = messages.find(m => m.table === EVENT_TABLE).entries
+  t.true(mt.length > 0)
+  t.true(et.length > 0)
+  t.true(messages.length > 0)
 })
 
 test.serial('tables should be updated on the other end', async t => {
