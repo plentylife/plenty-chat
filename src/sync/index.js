@@ -51,13 +51,12 @@ function listenForUpdateRequests (peer): void {
 function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     console.log(`EVENT <-- ${peer.agentId}`, event)
-    ackFn(EVENT_CHANNEL + '.ack')
     if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE &&
       event.plentyVersion && event.plentyVersion >= MIN_PLENTY_VERSION) {
       _receiveEvent(event, peer)
-      // logSync(peer.agentId, event.communityId, event.timestamp)
-      // internalEventHandler(event)
+      ackFn(EVENT_CHANNEL + '.ack')
     } else {
+      ackFn(EVENT_CHANNEL + '.failed')
       console.log('Skipping received event based on time or version')
     }
   })
@@ -141,7 +140,7 @@ export async function _receiveEvent (_event: Event, peer: Peer) {
   }
   // _eventBacklog.push(event)
   await logSync(peer.agentId, event.communityId, event.timestamp)
-  internalEventHandler(event)
+  return internalEventHandler(event)
   // consumeEvents()
 }
 //
