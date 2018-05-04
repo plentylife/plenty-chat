@@ -167,7 +167,7 @@ async function handleUpdateRequest (peer: Peer, communityId: string, fromTimesta
 
   if (getSendTableSync()) {
     console.log('Sending table sync')
-    await doTableSync(peer)
+    await doTableSync(peer, fromTimestamp)
   }
 
   peer.hadUpdatePromiseResolver()
