@@ -39,14 +39,17 @@ export function getSyncedUpToInAll (peerAgentId: string): Promise<number | 0> {
     })
 }
 
-export function logSync (peerAgentId: string, communityId: string, timestamp: number): Promise<any> {
+export async function logSync (peerAgentId: string, communityId: string, timestamp: number): Promise<any> {
   if (!peerAgentId) throw new MissingProperty('peerAgentId')
   if (!communityId) throw new MissingProperty('communityId')
   if (!timestamp || timestamp < 0) throw new MissingProperty('timestamp')
 
-  return nSQL(PEER_SYNC_TABLE).query('upsert', {
-    id: getRowId(peerAgentId, communityId), peerAgentId, communityId, syncedUpTo: timestamp
-  }).exec()
+  const lastTime = await getSyncedUpTo(peerAgentId, communityId)
+  if (lastTime < timestamp) {
+    return nSQL(PEER_SYNC_TABLE).query('upsert', {
+      id: getRowId(peerAgentId, communityId), peerAgentId, communityId, syncedUpTo: timestamp
+    }).exec()
+  }
 }
 
 function getRowId (peerAgentId, communityId) {
