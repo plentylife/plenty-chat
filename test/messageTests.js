@@ -7,6 +7,7 @@ import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {getCommunityBalance} from '../src/db/CommunityTable'
 import {getCommunityOfChannel, setCommunityOfChannel} from '../src/db/ChannelTable'
 import {DB_MODE} from '../src/state/GlobalState'
+import {createChannel} from '../src/actions/ChannelActions'
 
 console.log('NODE_ENV is ', process.env.NODE_ENV)
 console.log('DB_MODE is ', DB_MODE)
@@ -17,9 +18,9 @@ const CHANNEL_ID = 'chid'
 
 nSQL().connect().then(async () => {
   test.before('setting up channel to community mapping', async t => {
-    await setCommunityOfChannel(CHANNEL_ID, COMMUNITY_ID)
+    // await setCommunityOfChannel(CHANNEL_ID, COMMUNITY_ID)
+    await createChannel(AGENT_ID, CHANNEL_ID, COMMUNITY_ID)
     const c = await getCommunityOfChannel(CHANNEL_ID)
-
     t.is(c, COMMUNITY_ID)
   })
 

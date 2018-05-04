@@ -31,9 +31,16 @@ test.serial('existing community should not be affected', async t => {
   let cb = await getCommunityBalance(COMMUNITY_ID)
   t.is(cb, 10)
 
-  const ares = await createChannel(AGENT_ID, CHANNEL_ID, COMMUNITY_ID)
+  const ares = await createChannel(AGENT_ID, CHANNEL_ID, COMMUNITY_ID, /* force */ true)
   t.true(ares)
 
   cb = await getCommunityBalance(COMMUNITY_ID)
   t.is(cb, 10)
+})
+
+test.serial('creating a channel a second time should not send an event', async t => {
+  // should not be sending a secondary event
+  const second = await createChannel(AGENT_ID, CHANNEL_ID, COMMUNITY_ID)
+
+  t.is(second, null)
 })
