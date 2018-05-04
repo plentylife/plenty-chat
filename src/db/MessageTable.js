@@ -23,9 +23,7 @@ export function pushMessage (id: string, senderId: string, channelId: string): P
 
   return nSQL(MESSAGE_TABLE).query('upsert', {
     id: id, senderId: senderId, channelId: channelId
-  }).exec().then(r => {
-    console.log(r)
-  })
+  }).exec()
 }
 
 export function getMessage (id: string): Promise<MessageRow | null> {

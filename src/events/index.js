@@ -28,7 +28,8 @@ export type Event = {
   eventType: EventType,
   payload: EventPayload,
   receivedFrom: Set<string>,
-  timestamp: number
+  timestamp: number,
+  isSync: ?boolean
 }
 
 export type EventResult = {
