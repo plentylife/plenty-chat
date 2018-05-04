@@ -174,8 +174,10 @@ async function handleUpdateRequest (peer: Peer, communityId: string, fromTimesta
     relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
   }
 
-  relevantEntries.forEach(_e => {
-    addToOutgoingQueue(peer, _e)
+  relevantEntries.forEach((_e: Event) => {
+    if (!_e.receivedFrom.has(peer.agentId)) {
+      addToOutgoingQueue(peer, _e)
+    }
   })
   if (!peer.hadUpdate) peer.hadUpdatePromiseResolver()
 }

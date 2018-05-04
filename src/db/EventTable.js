@@ -69,13 +69,17 @@ export async function updateEvent (event: Event): Promise<boolean> {
 export function getCommunityEvents (communityId: string, timestamp: number): Promise<Array<any>> {
   return nSQL(EVENT_TABLE).query('select')
     .where([['communityId', '=', communityId], 'AND', ['timestamp', '>', timestamp]])
-    .orderBy({timestamp: 'asc'}).exec()
+    .orderBy({timestamp: 'asc'}).exec().then(es => {
+      return es.map(e => (Object.assign({}, e, {receivedFrom: new Set(e.receivedFrom)})))
+    })
 }
 
 /** Returns all events after a given timestamp in a community */
 export function getEvents (timestamp: number): Promise<Array<any>> {
   return nSQL(EVENT_TABLE).query('select').where(['timestamp', '>', timestamp])
-    .orderBy({timestamp: 'asc'}).exec()
+    .orderBy({timestamp: 'asc'}).exec().then(es => {
+      return es.map(e => (Object.assign({}, e, {receivedFrom: new Set(e.receivedFrom)})))
+    })
 }
 
 /* Events coming from ourselves */
