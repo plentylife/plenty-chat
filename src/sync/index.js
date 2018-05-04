@@ -54,9 +54,9 @@ function listenForEvents (peer: Peer) {
     ackFn(EVENT_CHANNEL + '.ack')
     if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE &&
       event.plentyVersion && event.plentyVersion >= MIN_PLENTY_VERSION) {
-      // _backlogEvent(event, peer)
-      logSync(peer.agentId, event.communityId, event.timestamp)
-      internalEventHandler(event)
+      _receiveEvent(event, peer)
+      // logSync(peer.agentId, event.communityId, event.timestamp)
+      // internalEventHandler(event)
     } else {
       console.log('Skipping received event based on time or version')
     }
@@ -127,24 +127,23 @@ export function registerSendEventsObserver () {
 }
 
 // export let _eventBacklog: Array<Event> = []
-// export function _backlogEvent (_event: Event, peer: Peer) {
-//   const event = {..._event}
-//   delete event.handledEventSuccessfully
-//
-//   // console.log(`Backlogging event from ${peer.agentId} to be consumed later`, event)
-//
-//   if (!(event.receivedFrom instanceof Array)) {
-//     throw new TypeError('Could not backlog event. `receivedFrom` is not an array')
-//   }
-//   event.receivedFrom = new Set(event.receivedFrom)
-//
-//   if (peer.agentId) {
-//     event.receivedFrom.add(peer.agentId.trim())
-//   }
-//   _eventBacklog.push(event)
-//   logSync(peer.agentId, event.communityId, event.timestamp)
-//   consumeEvents()
-// }
+export async function _receiveEvent (_event: Event, peer: Peer) {
+  const event = {..._event}
+  delete event.handledEventSuccessfully
+
+  if (!(event.receivedFrom instanceof Array)) {
+    throw new TypeError('Could not receive event. `receivedFrom` is not an array')
+  }
+  event.receivedFrom = new Set(event.receivedFrom)
+
+  if (peer.agentId) {
+    event.receivedFrom.add(peer.agentId.trim())
+  }
+  // _eventBacklog.push(event)
+  await logSync(peer.agentId, event.communityId, event.timestamp)
+  internalEventHandler(event)
+  // consumeEvents()
+}
 //
 // export var _isConsuming = false
 // async function consumeEvents () {
