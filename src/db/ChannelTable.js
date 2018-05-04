@@ -7,7 +7,7 @@ import {COMMUNITY_TABLE} from './CommunityTable'
 export const CHANNEL_TABLE = 'Channel'
 
 const channelTable = nSQL(CHANNEL_TABLE).model([
-  {key: 'channelId', type: 'uuid', props: ['pk']},
+  {key: 'channelId', type: 'string', props: ['pk']},
   {key: 'communityId', type: COMMUNITY_TABLE}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 

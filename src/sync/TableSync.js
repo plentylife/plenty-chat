@@ -3,6 +3,8 @@ import {MissingProperty} from '../utils/Error'
 import {ALL_TABLES} from '../db'
 import {EVENT_TABLE, SELF_EVENT_TABLE} from '../db/EventTable'
 import {MESSAGE_TABLE} from '../db/MessageTable'
+import {logSync} from '../db/PeerSyncTable'
+import type {Peer} from './index'
 
 const TABLES_TO_SYNC = ALL_TABLES.filter(t => (t !== SELF_EVENT_TABLE))
 const WITH_TIMESTAMP = [MESSAGE_TABLE, EVENT_TABLE]
@@ -41,10 +43,23 @@ async function _generateTableSyncMessages (tableName: string, fromTimestamp: num
   })
 }
 
-export function receiveTableSyncMessage (msg: TableSyncMsg) {
+export function receiveTableSyncMessage (peer: Peer, msg: TableSyncMsg): Promise<void> {
   if (!msg.table) throw new MissingProperty('table name in table sync')
   if (!msg.entries) throw new MissingProperty('table entries in table sync')
   if (!(msg.entries instanceof Array)) throw new TypeError('table entries must be an array')
 
-  return nSQL().loadJS(msg.table, msg.entries)
+  return setSyncedUpToTime(peer, msg).then(() => {
+    return nSQL().loadJS(msg.table, msg.entries)
+  })
+}
+
+function setSyncedUpToTime (peer: Peer, msg: TableSyncMsg): Promise<void> {
+  if (msg.table === EVENT_TABLE) {
+    const times = msg.entries.map(e => (e.timestamp))
+    const latest = Math.max(...times)
+    // fixme hack. need to log for each individual community
+    return logSync(peer.agentId, 'table-sync-hack', latest)
+  } else {
+    return Promise.resolve()
+  }
 }
