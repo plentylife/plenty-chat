@@ -30,8 +30,8 @@ async function _generateTableSyncMessages (tableName: string): Promise<Array<Tab
 }
 
 export function receiveTableSyncMessage (msg: TableSyncMsg) {
-  if (msg.table) throw new MissingProperty('table name in table sync')
-  if (msg.entry) throw new MissingProperty('table entry in table sync')
+  if (!msg.table) throw new MissingProperty('table name in table sync')
+  if (!msg.entry) throw new MissingProperty('table entry in table sync')
 
-  nSQL().loadJS(msg.table, [msg.entry])
+  return nSQL().loadJS(msg.table, [msg.entry])
 }
