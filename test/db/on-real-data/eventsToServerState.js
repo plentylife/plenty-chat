@@ -5,7 +5,7 @@ import {importTable} from '../utils'
 import {DB_MODE, setCurrentAgentId} from '../../../src/state/GlobalState'
 import {dropAll, waitAndCheck} from '../../utils'
 import {AGENT_WALLET_TABLE, getAllWallets} from '../../../src/db/AgentWalletTable'
-import {_backlogEvent, _eventBacklog, _isConsuming} from '../../../src/sync'
+import {_backlogEvent, _eventBacklog, _isConsumingOutgoingQueue} from '../../../src/sync'
 import {COMMUNITY_TABLE} from '../../../src/db/CommunityTable'
 import {COMMUNITY_POT_SPLIT} from '../../../src/events/AccountingEvents'
 import {calculateCommunityPotSplit} from '../../../src/accounting/CommunityPot'
@@ -58,7 +58,7 @@ test.serial('passing events into sync', async t => {
   // t.deepEqual(events, _eventBacklog)
 
   await waitAndCheck(() => {
-    return !_isConsuming
+    return !_isConsumingOutgoingQueue
   })
 
   console.log('\n\n\nSync\n=======================\n')

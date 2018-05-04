@@ -12,11 +12,16 @@ export const EVENT_CHANNEL = 'event'
 const READY_CHANNEL = 'ready'
 
 export const NO_EVENTS_BEFORE = 1524749468216
+const MIN_PLENTY_VERSION = 180504
 
 export type Peer = {
   agentId: string,
   socket: any,
-  address: string
+  address: string,
+  trackingCounter: number,
+  hadUpdate: boolean,
+  hadUpdatePromise: Promise<void>,
+  hadUpdatePromiseResolver: () => void
 }
 
 export var peers: Array<Peer> = []
@@ -35,11 +40,11 @@ export function requestCommunityUpdate (socket, communityId: string, fromTimesta
   })
 }
 
-function listenForUpdateRequests (socket): void {
-  socket.on(REQUEST_UPDATE_CHANNEL, (request, ackFn) => {
+function listenForUpdateRequests (peer): void {
+  peer.socket.on(REQUEST_UPDATE_CHANNEL, (request, ackFn) => {
     console.log('UPDATE <-- (r)', request)
     ackFn(REQUEST_UPDATE_CHANNEL + '.ack')
-    handleUpdateRequest(socket, request.communityId, request.fromTimestamp)
+    handleUpdateRequest(peer, request.communityId, request.fromTimestamp)
   })
 }
 
@@ -47,27 +52,69 @@ function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     console.log(`EVENT <-- ${peer.agentId}`, event)
     ackFn(EVENT_CHANNEL + '.ack')
-    if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE) {
-      _backlogEvent(event, peer)
+    if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE && event.plentyVersion >= MIN_PLENTY_VERSION) {
+      // _backlogEvent(event, peer)
+      internalEventHandler(event)
     } else {
-      console.log('Skipping received event based on time')
+      console.log('Skipping received event based on time or version')
     }
+  })
+}
+
+let outgoingQueue: Array<[Peer, Event]> = []
+
+function addToOutgoingQueue (peer: Peer, event: Event) {
+  outgoingQueue.push([peer, event])
+  consumeOutgoingQueue()
+}
+
+let _isConsumingOutgoingQueue = false
+async function consumeOutgoingQueue () {
+  if (!_isConsumingOutgoingQueue) {
+    _isConsumingOutgoingQueue = true
+
+    let next = outgoingQueue.shift()
+    let peer = next[0]
+    let event = next[1]
+    while (event) {
+      await emitEvent(peer, event)
+      next = outgoingQueue.shift()
+      if (next) {
+        peer = next[0]
+        event = next[1]
+      } else {
+        event = null
+      }
+    }
+
+    _isConsumingOutgoingQueue = false
+  }
+}
+
+function emitEvent (peer: Peer, event: Event): Promise<void> {
+  return new Promise(resolve => {
+    console.log(`EVENT (n) --> ${peer.agentId}`)
+
+    const outgoingEvent = Object.assign({}, event, {plentyVersion: PLENTY_VERSION})
+    peer.socket.emit(EVENT_CHANNEL, outgoingEvent, ack => {
+      console.log(EVENT_CHANNEL + '.ack' + '  ' + event.globalEventId)
+      resolve()
+    })
   })
 }
 
 /** watch the database for new events, and send them out to all peers */
 export function registerSendEventsObserver () {
   nSQL(EVENT_TABLE).on('upsert', (queryEvent) => {
-    peers.forEach(peer => {
+    peers.forEach(async peer => {
+      await peer.hadUpdatePromise // waiting for the first update to happen before sending out the rest
+
       if (peer.socket.connected) {
         queryEvent.affectedRows.forEach(_event => {
           const event = Object.assign({}, _event, {plentyVersion: PLENTY_VERSION})
           // checking that this event didn't come from the peer
           if (!event.receivedFrom.includes(peer.agentId)) {
-            console.log(`EVENT (n) --> ${peer.agentId}`)
-            peer.socket.emit(EVENT_CHANNEL, event, ack => {
-              console.log(EVENT_CHANNEL + '.new.ack' + '  ' + event.globalEventId)
-            })
+            addToOutgoingQueue(peer, event)
           } else {
             console.log(`Skipping sending new event to ${peer.agentId}`)
           }
@@ -114,7 +161,10 @@ export function registerSendEventsObserver () {
 //   }
 // }
 
-async function handleUpdateRequest (socket, communityId: string, fromTimestamp: number) {
+// let handlingUpdateRequest = Promise(resolve => )
+// let finishHandlingUpdateRequest =
+
+async function handleUpdateRequest (peer: Peer, communityId: string, fromTimestamp: number) {
   console.log('Handling UPDATE request', communityId, new Date(fromTimestamp))
 
   let relevantEntries
@@ -124,24 +174,26 @@ async function handleUpdateRequest (socket, communityId: string, fromTimestamp: 
     relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
   }
 
-  // fixme wait for callback to emit
-  // fixme create a global queue
-
   relevantEntries.forEach(_e => {
-    const e = Object.assign({}, _e, {plentyVersion: PLENTY_VERSION})
-    console.log('EVENT -->', e)
-    socket.emit(EVENT_CHANNEL, e, ack => {
-      console.log(EVENT_CHANNEL + '.ack' + '  ' + e.globalEventId)
-    })
+    addToOutgoingQueue(peer, _e)
   })
+  if (!peer.hadUpdate) peer.hadUpdatePromiseResolver()
 }
 
 export function onConnectToPeer (peer: Peer) {
   console.log('Connection established to peer', peer.address)
+
+  peer.hadUpdate = false
+  peer.hadUpdatePromise = new Promise(resolve => {
+    peer.hadUpdatePromiseResolver = resolve
+  }).then(() => {
+    peer.hadUpdate = true
+  })
+
   peers.push(peer)
 
   listenForEvents(peer)
-  listenForUpdateRequests(peer.socket)
+  listenForUpdateRequests(peer)
 
   let hasRequestedFlag = false
   const reqUpd = async () => {
