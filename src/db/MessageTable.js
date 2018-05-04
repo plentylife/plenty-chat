@@ -12,7 +12,8 @@ export type MessageRow = {id: string, senderId: string, channelId: string}
 const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
   {key: 'senderId', type: 'string'},
-  {key: 'channelId', type: CHANNEL_TABLE}
+  {key: 'channelId', type: CHANNEL_TABLE},
+  {key: 'timestamp', type: 'number', props: ['idx']}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 export function pushMessage (id: string, senderId: string, channelId: string): Promise<void> {
@@ -22,7 +23,7 @@ export function pushMessage (id: string, senderId: string, channelId: string): P
   if (!channelId) throw new Error('Message must have a channel')
 
   return nSQL(MESSAGE_TABLE).query('upsert', {
-    id: id, senderId: senderId, channelId: channelId
+    id: id, senderId: senderId, channelId: channelId, timestamp: (new Date().getTime())
   }).exec()
 }
 
