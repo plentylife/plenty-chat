@@ -8,8 +8,8 @@ import {CHANNEL_TABLE, getCommunityOfChannel} from '../../src/db/ChannelTable'
 import {getAllWallets} from '../../src/db/AgentWalletTable'
 import {getCommunityBalance} from '../../src/db/CommunityTable'
 import {MESSAGE_TABLE} from '../../src/db/MessageTable'
-import {EVENT_TABLE, getEvents} from '../../src/db/EventTable'
-import {getSyncedUpToInAll} from '../../src/db/PeerSyncTable'
+import {EVENT_TABLE, getEvents, SELF_EVENT_TABLE} from '../../src/db/EventTable'
+import {getSyncedUpToInAll, PEER_SYNC_TABLE} from '../../src/db/PeerSyncTable'
 import {nSQL} from 'nano-sql'
 
 const AGENT_ID = 'uid'
@@ -75,4 +75,10 @@ test.serial('events should have a proper received from', async t => {
   events.forEach(e => {
     t.true(e.receivedFrom.has(PEER_ID))
   })
+})
+
+test.serial('some tables should not be synced across agents', async t => {
+  const msgs = await generateAllTableSyncMessages(0)
+  t.falsy(msgs.find(m => (m.table === PEER_SYNC_TABLE)))
+  t.falsy(msgs.find(m => (m.table === SELF_EVENT_TABLE)))
 })

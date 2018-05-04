@@ -92,7 +92,8 @@ const library = Object.assign({}, common, {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production'),
+        DB_MODE: JSON.stringify(process.env.DB_MODE)
       }
     }),
     // new BundleAnalyzerPlugin()
@@ -169,8 +170,8 @@ const serverTest = Object.assign({}, server, {
 })
 
 module.exports = [
-  // serverTest,
+  serverTest,
   // server,
-  // library,
-  visualTests
+  library,
+  // visualTests
 ]

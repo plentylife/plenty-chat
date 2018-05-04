@@ -3,10 +3,10 @@ import {MissingProperty} from '../utils/Error'
 import {ALL_TABLES} from '../db'
 import {EVENT_TABLE, SELF_EVENT_TABLE} from '../db/EventTable'
 import {MESSAGE_TABLE} from '../db/MessageTable'
-import {logSync} from '../db/PeerSyncTable'
+import {logSync, PEER_SYNC_TABLE} from '../db/PeerSyncTable'
 import type {Peer} from './index'
 
-const TABLES_TO_SYNC = ALL_TABLES.filter(t => (t !== SELF_EVENT_TABLE))
+const TABLES_TO_SYNC = ALL_TABLES.filter(t => (t !== SELF_EVENT_TABLE && t !== PEER_SYNC_TABLE))
 const WITH_TIMESTAMP = [MESSAGE_TABLE, EVENT_TABLE]
 
 const ENTRIES_PER_MESSAGE = 10
