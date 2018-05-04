@@ -13,11 +13,12 @@ import {getSyncedUpToInAll} from '../../src/db/PeerSyncTable'
 import {nSQL} from 'nano-sql'
 
 const AGENT_ID = 'uid'
+const PEER_ID = 'peer-id'
 const COMMUNITY_ID = 'comid'
 const CHANNEL_ID = 'chid'
 const MESSAGE_ID = 'mid'
 const PEER = {
-  agentId: AGENT_ID
+  agentId: PEER_ID
 }
 
 let lastEventTime = 0
@@ -60,11 +61,18 @@ test.serial('tables should be updated on the other end', async t => {
   const ch = await getCommunityOfChannel(CHANNEL_ID)
   const ws = await getAllWallets()
   const comBal = await getCommunityBalance(COMMUNITY_ID)
-  const syncTime = await getSyncedUpToInAll(AGENT_ID)
+  const syncTime = await getSyncedUpToInAll(PEER_ID)
 
   t.is(COMMUNITY_ID, ch)
   t.is(ws.length, 1)
   t.is(ws[0].balance, -1)
   t.is(comBal, 1)
   t.is(syncTime, lastEventTime)
+})
+
+test.serial('events should have a proper received from', async t => {
+  const events = await getEvents(0)
+  events.forEach(e => {
+    t.true(e.receivedFrom.has(PEER_ID))
+  })
 })

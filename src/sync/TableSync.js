@@ -43,14 +43,33 @@ async function _generateTableSyncMessages (tableName: string, fromTimestamp: num
   })
 }
 
-export function receiveTableSyncMessage (peer: Peer, msg: TableSyncMsg): Promise<void> {
+export function receiveTableSyncMessage (peer: Peer, _msg: TableSyncMsg): Promise<void> {
+  let msg = _msg
   if (!msg.table) throw new MissingProperty('table name in table sync')
   if (!msg.entries) throw new MissingProperty('table entries in table sync')
   if (!(msg.entries instanceof Array)) throw new TypeError('table entries must be an array')
 
+  msg = modifyEventMessages(peer, msg)
+
   return setSyncedUpToTime(peer, msg).then(() => {
     return nSQL().loadJS(msg.table, msg.entries)
   })
+}
+
+function modifyEventMessages (peer: Peer, msg: TableSyncMsg) {
+  if (msg.table === EVENT_TABLE) {
+    const newEntries = msg.entries.map(e => {
+      const receivedFrom = []
+      if (e.receivedFrom instanceof Array) receivedFrom.concat(e.receivedFrom)
+      if (peer.agentId) {
+        receivedFrom.push(peer.agentId.trim())
+      }
+      return Object.assign({}, e, {receivedFrom})
+    })
+    return Object.assign({}, msg, {entries: newEntries})
+  } else {
+    return msg
+  }
 }
 
 function setSyncedUpToTime (peer: Peer, msg: TableSyncMsg): Promise<void> {
