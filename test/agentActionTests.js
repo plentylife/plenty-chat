@@ -28,7 +28,7 @@ test.serial('adding agent should not affect existing account', async t => {
   t.is(wallet.balance, 10)
   t.is(wallet.creditLimit, DEFAULT_CREDIT_LIMIT)
 
-  const ares = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
+  const ares = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID, /* force */ true)
   t.true(ares)
 
   // there should be only one agent
@@ -39,4 +39,9 @@ test.serial('adding agent should not affect existing account', async t => {
   wallet = await getWallet(AGENT_ID, COMMUNITY_ID)
   t.is(wallet.balance, 10)
   t.is(wallet.creditLimit, DEFAULT_CREDIT_LIMIT)
+})
+
+test.serial('adding agent for the second time should not happen', async t => {
+  const second = await addAgentToCommunity(AGENT_ID, COMMUNITY_ID)
+  t.is(second, null)
 })
