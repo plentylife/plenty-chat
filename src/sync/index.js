@@ -52,8 +52,10 @@ function listenForEvents (peer: Peer) {
   peer.socket.on(EVENT_CHANNEL, (event, ackFn) => {
     console.log(`EVENT <-- ${peer.agentId}`, event)
     ackFn(EVENT_CHANNEL + '.ack')
-    if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE && event.plentyVersion >= MIN_PLENTY_VERSION) {
+    if (event.timestamp && event.timestamp > NO_EVENTS_BEFORE &&
+      event.plentyVersion && event.plentyVersion >= MIN_PLENTY_VERSION) {
       // _backlogEvent(event, peer)
+      logSync(peer.agentId, event.communityId, event.timestamp)
       internalEventHandler(event)
     } else {
       console.log('Skipping received event based on time or version')

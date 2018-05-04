@@ -1,9 +1,9 @@
 // @flow
 
-import {hasEnoughFunds, spend} from '../accounting/Accounting'
-import {pushMessage} from '../db/MessageTable'
+// import {hasEnoughFunds, spend} from '../accounting/Accounting'
+// import {pushMessage} from '../db/MessageTable'
 import type {Event, EventResult} from './index'
-import {COST_OF_SENDING_MESSAGE} from '../accounting/AccountingGlobals'
+// import {COST_OF_SENDING_MESSAGE} from '../accounting/AccountingGlobals'
 import {pushNewTask} from '../db/TaskTable'
 
 export const CONVERT_TO_TASK_EVENT_TYPE: 'convertToTask' = 'convertToTask'

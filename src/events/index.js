@@ -14,7 +14,6 @@ import {
   handleCommunityPotSplit,
   handleDemurrageEvent
 } from './AccountingEvents'
-import { timeout, TimeoutError } from 'promise-timeout'
 import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
 import {_backlogEvent} from './queue'
 
