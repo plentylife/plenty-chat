@@ -5,10 +5,12 @@ import {EVENT_TABLE, getCommunityEvents, getEvents} from '../db/EventTable'
 import {getCurrentAgentId, PLENTY_VERSION} from '../state/GlobalState'
 import {nSQL} from 'nano-sql'
 import {getSyncedUpToInAll, logSync} from '../db/PeerSyncTable'
+import {generateAllTableSyncMessages, receiveTableSyncMessage} from './TableSync'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
 export const EVENT_CHANNEL = 'event'
+const TABLE_SYNC_CHANNEL = 'table-sync'
 const READY_CHANNEL = 'ready'
 
 export const NO_EVENTS_BEFORE = 1524749468216
@@ -167,19 +169,46 @@ export async function _receiveEvent (_event: Event, peer: Peer) {
 async function handleUpdateRequest (peer: Peer, communityId: string, fromTimestamp: number) {
   console.log('Handling UPDATE request', communityId, new Date(fromTimestamp))
 
-  let relevantEntries
-  if (communityId === REQUEST_UPDATE_ALL) {
-    relevantEntries = await getEvents(fromTimestamp)
-  } else {
-    relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
-  }
+  // fixme these updates should happen by community
+  // let relevantEntries
+  // if (communityId === REQUEST_UPDATE_ALL) {
+  //   relevantEntries = await getEvents(fromTimestamp)
+  // } else {
+  //   relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
+  // }
 
-  relevantEntries.forEach((_e: Event) => {
-    if (!_e.receivedFrom.has(peer.agentId)) {
-      addToOutgoingQueue(peer, _e)
-    }
-  })
+  await doTableSync(peer)
+
+  // console.log('Sending event sync')
+  // relevantEntries.forEach((_e: Event) => {
+  //   if (!_e.receivedFrom.has(peer.agentId)) {
+  //     addToOutgoingQueue(peer, _e)
+  //   }
+  // })
   if (!peer.hadUpdate) peer.hadUpdatePromiseResolver()
+}
+
+export function listenForTableSync (peer: Peer) {
+  peer.socket.on(TABLE_SYNC_CHANNEL, (msg, ackFn) => {
+    console.log(`TABLE SYNC <-- ${peer.agentId}`, msg)
+    receiveTableSyncMessage(msg)
+    ackFn(TABLE_SYNC_CHANNEL + '.ack')
+  })
+}
+
+function doTableSync (peer: Peer): Promise<void> {
+  let tableSyncMsgs = generateAllTableSyncMessages()
+  let count = tableSyncMsgs.length
+  if (count === 0) return Promise.resolve()
+
+  return new Promise(resolve => {
+    tableSyncMsgs.forEach(msg => {
+      peer.socket.emit(TABLE_SYNC_CHANNEL, msg, ack => {
+        count--
+        if (count === 0) resolve()
+      })
+    })
+  })
 }
 
 export function onConnectToPeer (peer: Peer) {

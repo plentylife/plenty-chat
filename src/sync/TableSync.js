@@ -1,14 +1,14 @@
-import {AGENT_TABLE} from '../db/AgentTable'
-import {AGENT_WALLET_TABLE} from '../db/AgentWalletTable'
-import {COMMUNITY_TABLE} from '../db/CommunityTable'
 import {nSQL} from 'nano-sql'
 import {MissingProperty} from '../utils/Error'
-import {CHANNEL_TABLE} from '../db/ChannelTable'
+import {ALL_TABLES} from '../db'
+import {SELF_EVENT_TABLE} from '../db/EventTable'
 
-const TABLES_TO_SYNC = [AGENT_TABLE, CHANNEL_TABLE, AGENT_WALLET_TABLE, COMMUNITY_TABLE]
+const TABLES_TO_SYNC = ALL_TABLES.filter(t => (t !== SELF_EVENT_TABLE))
+
+const ENTRIES_PER_MESSAGE = 10
 
 type TableSyncMsg = {
-  entry: Object, table: string
+  entries: Object, table: string
 }
 
 export async function generateAllTableSyncMessages (): Promise<Array<TableSyncMsg>> {
@@ -21,9 +21,14 @@ export async function generateAllTableSyncMessages (): Promise<Array<TableSyncMs
 
 async function _generateTableSyncMessages (tableName: string): Promise<Array<TableSyncMsg>> {
   const entries = await nSQL(tableName).query('select').exec()
-  return entries.map(e => {
+  let batches = []
+  for (let s = 0; s < entries.length; s += ENTRIES_PER_MESSAGE) {
+    const out = entries.slice(s, s + ENTRIES_PER_MESSAGE)
+    batches.push(out)
+  }
+  return batches.map(b => {
     return {
-      entry: e,
+      entries: b,
       table: tableName
     }
   })
@@ -31,7 +36,8 @@ async function _generateTableSyncMessages (tableName: string): Promise<Array<Tab
 
 export function receiveTableSyncMessage (msg: TableSyncMsg) {
   if (!msg.table) throw new MissingProperty('table name in table sync')
-  if (!msg.entry) throw new MissingProperty('table entry in table sync')
+  if (!msg.entries) throw new MissingProperty('table entries in table sync')
+  if (!(msg.entries instanceof Array)) throw new TypeError('table entries must be an array')
 
-  return nSQL().loadJS(msg.table, [msg.entry])
+  return nSQL().loadJS(msg.table, msg.entries)
 }
