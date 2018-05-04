@@ -11,7 +11,7 @@ import {assertInt} from '../accounting/utils'
 export const AGENT_WALLET_TABLE = 'AgentWallet'
 
 const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
-  {key: 'id', type: 'uuid', props: ['pk', 'ai']},
+  {key: 'id', type: 'string', props: ['pk']},
   {key: 'agentId', type: AGENT_TABLE, props: ['idx']},
   {key: 'communityId', type: COMMUNITY_TABLE, props: ['idx']},
   {key: 'balance', type: 'number'},
@@ -52,6 +52,10 @@ export function getWallet (agentId: string, communityId: string): Promise<(Walle
   })
 }
 
+function generateRowId (agentId: string, communityId: string) {
+  return agentId + '-' + communityId
+}
+
 export function setBalance (agentId: string, communityId: string, balance: number): Promise<any> {
   /** Setting new balance for  an agent */
   // fixme check that balance is not below credit limit
@@ -66,6 +70,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
         payload.demurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps, {balance: (new Date().getTime())})
       }
     } else {
+      payload.id = generateRowId(agentId, communityId)
       // $FlowFixMe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
       payload.communitySharePoints = DEFAULT_COMMUNITY_SHARE_POINTS
@@ -79,7 +84,7 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
   assertInt(pointsToAdd)
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
-      throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
+      throw new MissingDatabaseEntry('Could not add community share points to non-existent account (or too many accounts)', agentId, communityId)
     }
     const newPoints = r[0].communitySharePoints + pointsToAdd
     if (newPoints < 0) throw new InappropriateAction('Community share points cannot be below 0')
