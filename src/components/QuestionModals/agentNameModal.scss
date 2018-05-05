@@ -1,0 +1,26 @@
+.agent-name-modal {
+  .inputs-container {
+    display: flex;
+    justify-content: space-around;
+
+    & > div {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    & > div:first-child {
+      margin-right: 1em;
+    }
+  }
+
+  .button-holder {
+    margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  input {
+    min-width: 200px;
+    width: 100%
+  }
+}

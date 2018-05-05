@@ -13,10 +13,10 @@ import {sendMessage} from './actions/MessageActions'
 import {hasEnoughFundsToSendMessage} from './accounting/Accounting'
 // import {DEFAULT_CREDIT_LIMIT} from './accounting/AccountingGlobals'
 import {NotEnoughFundsForMessageModal} from './components/ErrorModals/NotEnoughFunds'
+import AgentNameModal from 'QuestionModals/AgentNameModal'
 import {startSync} from './sync/SyncClient'
-import {createChannel} from './actions/ChannelActions'
-import {addAgentToCommunity} from './actions/AgentActions'
 import * as Tutorial from 'Tutorial'
+import {onChannelView, provideUserGetterSetter} from './mmintegration'
 
 import './db/index'
 
@@ -45,21 +45,9 @@ function plentyInitSync (agentId, communityId, cb, singlePeer) {
   }
 }
 
-export async function onChannelView (agentId: string, channelId: string, communityId: string) {
-  setCurrentAgentId(agentId)
-  setCurrentCommunityId(communityId)
-
-  console.log('onChannelView')
-  await nSQL().onConnected(async () => {
-    console.log('DB connected (onConnected)')
-    await createChannel(agentId, channelId, communityId)
-    await addAgentToCommunity(agentId, communityId)
-  })
-}
-
-export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal,
+export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal,
   sendMessage, hasEnoughFundsToSendMessage,
-  plentyInit, plentyInitSync,
+  plentyInit, plentyInitSync, onChannelView, provideUserGetterSetter,
   nSQL,
   Tutorial
 }
