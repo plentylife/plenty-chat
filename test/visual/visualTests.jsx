@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 // import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
-import {AccountStatus, MessageRating} from '../../src/index'
+import {MessageRating} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {
@@ -20,7 +20,7 @@ import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
 import * as Tutorial from 'Tutorial'
 import {dropAll} from '../utils'
-import FrontPage from '../../src/components/MiscPages/FrontPage'
+import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')
@@ -94,7 +94,7 @@ nSQL().onConnected(async () => {
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
-      <div><AccountStatus agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}/></div>
+      <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}/>
       <div onClick={() => {
         sendMessage(getCurrentAgentId(), CH_ID, new Date().getTime() + 'msg')
       }}>
@@ -104,7 +104,6 @@ nSQL().onConnected(async () => {
         Rating
         <MessageRating agentId={getCurrentAgentId()} messageId={MSG_ID}/>
       </div>
-      <FrontPage/>
       <div className={'tutorial-screens'}>
         <Tutorial.ScreenOne/>
         <Tutorial.ScreenTwo/>
@@ -128,4 +127,6 @@ nSQL().onConnected(async () => {
 const c = nSQL().config({mode: DB_MODE, cache: false}).connect()
 console.log('DB con promise', c)
 
+// <FrontPage/>
 // <NotEnoughFundsForMessageModal show={true} onClose={() => null}/>
+// <div><AccountStatus agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}/></div>

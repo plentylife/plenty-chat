@@ -173,5 +173,5 @@ module.exports = [
   serverTest,
   // server,
   library,
-  // visualTests
+  visualTests
 ]
