@@ -7,7 +7,7 @@ import {getCommunityFromMessageOrCurrent} from './utils'
 import type {EventResult} from '../events'
 
 export async function convertMessageIntoTask (msgId: string): Promise<EventResult> {
-  const communityId = getCommunityFromMessageOrCurrent(msgId)
+  const communityId = await getCommunityFromMessageOrCurrent(msgId)
 
   return sendEvent(CONVERT_TO_TASK_EVENT_TYPE, getCurrentAgentId(), communityId, {
     parentMessageId: msgId

@@ -95,6 +95,7 @@ const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode
  * @return the id of the event that includes the timestamp
  */
 export function pushSelfEvent (eventType: string, communtyId: string, payload: Object): Promise<Object> {
+  if (typeof communtyId !== 'string') throw new TypeError('communityId must be a string')
   try {
     const row = Object.assign({eventType: eventType, timestamp: new Date().getTime(), communityId: communtyId}, payload)
     return nSQL(SELF_EVENT_TABLE).query('upsert', row).exec().then(r => {

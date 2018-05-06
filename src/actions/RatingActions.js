@@ -19,7 +19,7 @@ export async function rateMessage (msgId: string, agentId: string, rating: numbe
   if (rating > ratingMax) throw new Error('rating cannot be higher than maximum')
   if (ratingMax <= 1) throw new Error('Maximum rating has to be positive and above one')
 
-  const communityId = getCommunityFromMessageOrCurrent(msgId)
+  const communityId = await getCommunityFromMessageOrCurrent(msgId)
 
   const r = (rating - 1) / (ratingMax - 1) // ratingMax has to be more than one
   const p: RatingEventPayload = {
