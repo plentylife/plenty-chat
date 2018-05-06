@@ -2,7 +2,7 @@
 import React from 'react'
 import AccountStatus from '../AccountStatus/AccountStatus'
 import './controlPanel.scss'
-import DonateWindow from '../DonateWindow/DonateWindow'
+import {DonationWindow} from '../DonateWindow'
 
 type Props = {
   agentId: string,
@@ -11,7 +11,7 @@ type Props = {
 
 export default function ControlPanel (props: Props) {
   return <div id={'plenty-control-panel'}>
-    <DonateWindow/>
+    <DonationWindow/>
     <AccountStatus agentId={props.agentId} communityId={props.communityId}/>
   </div>
 }

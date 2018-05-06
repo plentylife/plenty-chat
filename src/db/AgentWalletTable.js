@@ -7,6 +7,7 @@ import {DEFAULT_COMMUNITY_SHARE_POINTS, DEFAULT_CREDIT_LIMIT} from '../accountin
 import {AGENT_TABLE} from './AgentTable'
 import {InappropriateAction, MissingDatabaseEntry} from '../utils/Error'
 import {assertInt} from '../accounting/utils'
+import {hasEnoughFundsNum} from '../accounting/Accounting'
 
 export const AGENT_WALLET_TABLE = 'AgentWallet'
 
@@ -172,6 +173,14 @@ export function walletExists (agentId: string, communityId: string): Promise<boo
 
 export function getAllWallets (): Promise<Array<Wallet>> {
   return nSQL(AGENT_WALLET_TABLE).query('select').exec()
+}
+
+export function getWalletsNearLimit (communityId: string, closeBy: number): Promise<Array<Wallet>> {
+  return nSQL(AGENT_WALLET_TABLE).query('select').where(['communityId', '=', communityId]).exec().then(ws => {
+    return ws.filter(w => {
+      return !hasEnoughFundsNum(w.balance, w.creditLimit, closeBy)
+    })
+  })
 }
 
 export default agentWalletTable

@@ -29,6 +29,10 @@ export function initializeCommunity (communityId: string): Promise<void> {
   )
 }
 
+export function hasEnoughFundsNum (balance, creditLimit, amountRequested): boolean {
+  return (balance + creditLimit - amountRequested > 0)
+}
+
 /**
  * Checks if the agent has enough funds according to the point of view of this agent
  *
