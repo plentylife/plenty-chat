@@ -4,7 +4,13 @@ import ReactDOM from 'react-dom'
 import {AccountStatus, MessageRating} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
-import {getCurrentCommunityId, getCurrentAgentId, DB_MODE} from '../../src/state/GlobalState'
+import {
+  getCurrentCommunityId,
+  getCurrentAgentId,
+  DB_MODE,
+  setCurrentAgentId,
+  setCurrentCommunityId
+} from '../../src/state/GlobalState'
 import {addCommunitySharePoints, AGENT_WALLET_TABLE, getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
@@ -14,8 +20,11 @@ import {createChannel} from '../../src/actions/ChannelActions'
 import {rateMessage} from '../../src/actions/RatingActions'
 import * as Tutorial from 'Tutorial'
 import {dropAll} from '../utils'
+import FrontPage from '../../src/components/MiscPages/FrontPage'
 
 nSQL().onConnected(async () => {
+  setCurrentAgentId('aid')
+  setCurrentCommunityId('cid')
   await dropAll()
 
   window.getBalance = () => {
@@ -69,18 +78,18 @@ nSQL().onConnected(async () => {
   //   setCommunityBalance(getCurrentCommunityId(), b += 1)
   // }, 3000)
 
-  await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
-    console.log('connected all wallets', all)
-  })
-
-  await nSQL(AGENT_WALLET_TABLE).query('select')
-    .where([['agentId', '=', getCurrentAgentId()], 'AND', ['communityId', '=', getCurrentCommunityId()]]).exec().then(r => {
-      console.log('specific wallet (query)', r)
-    })
-
-  await getWallet(getCurrentAgentId(), getCurrentCommunityId()).then(w => {
-    console.log('specific wallet', w)
-  })
+  // await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
+  //   console.log('connected all wallets', all)
+  // })
+  //
+  // await nSQL(AGENT_WALLET_TABLE).query('select')
+  //   .where([['agentId', '=', getCurrentAgentId()], 'AND', ['communityId', '=', getCurrentCommunityId()]]).exec().then(r => {
+  //     console.log('specific wallet (query)', r)
+  //   })
+  //
+  // await getWallet(getCurrentAgentId(), getCurrentCommunityId()).then(w => {
+  //   console.log('specific wallet', w)
+  // })
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
@@ -95,8 +104,7 @@ nSQL().onConnected(async () => {
         Rating
         <MessageRating agentId={getCurrentAgentId()} messageId={MSG_ID}/>
       </div>
-      <div>
-      </div>
+      <FrontPage/>
       <div className={'tutorial-screens'}>
         <Tutorial.ScreenOne/>
         <Tutorial.ScreenTwo/>
@@ -108,6 +116,8 @@ nSQL().onConnected(async () => {
       </div>
     </div>
   }
+
+  console.log('render')
 
   ReactDOM.render(
     <ComponentDisplay/>,

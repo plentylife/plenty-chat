@@ -17,6 +17,8 @@ import AgentNameModal from 'QuestionModals/AgentNameModal'
 import {startSync} from './sync/SyncClient'
 import * as Tutorial from 'Tutorial'
 import {onChannelView, provideUserGetterSetter} from './mmintegration'
+import MMStyles from './utils/style-utils.scss'
+import FrontPage from 'MiscPages/FrontPage'
 
 import './db/index'
 
@@ -45,9 +47,9 @@ function plentyInitSync (agentId, communityId, cb, singlePeer) {
   }
 }
 
-export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal,
+export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal, FrontPage,
   sendMessage, hasEnoughFundsToSendMessage,
   plentyInit, plentyInitSync, onChannelView, provideUserGetterSetter,
   nSQL,
-  Tutorial
+  Tutorial, MMStyles
 }

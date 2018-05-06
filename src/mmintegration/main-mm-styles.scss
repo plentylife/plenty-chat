@@ -1,0 +1,7 @@
+@import '../utils/style-utils';
+
+.signup__content {
+  @include headings {
+    font-family: Comfortaa, 'sans-serif';
+  }
+}

@@ -1,0 +1,67 @@
+@import "../../utils/style-utils";
+
+.front-page {
+  display: flex;
+  position: fixed;
+  top: 0; bottom: 0; left: 0; right: 0;
+  justify-content: center;
+  background-color: white;
+
+  @include headings-font;
+
+  & > div {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 400px;
+    max-height: 100%;
+  }
+
+  .img-holder {
+    max-height: 300px;
+    flex-grow: 1;
+    background-image: url("http://about.plenty.life/etc/logo-lowres.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 1em;
+  }
+
+  .subtitle {
+    font-size: 1.5em;
+    color: #636363;
+    font-weight: bold;
+    text-align: right;
+
+    & > span {
+      animation-duration: 1.7s;
+      animation-name: fade-in;
+      animation-fill-mode: backwards;
+    }
+    .middle {
+      animation-delay: 0.8s;
+    }
+    .bottom {
+      animation-delay: 2.3s;
+    }
+  }
+
+  .login-action {
+    animation-duration: 0.7s;
+    animation-fill-mode: backwards;
+    animation-name: fade-in;
+    animation-delay: 4s;
+
+    align-self: center;
+    margin-top: 2em;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
