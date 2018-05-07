@@ -82,6 +82,18 @@ export function getEvents (timestamp: number): Promise<Array<any>> {
     })
 }
 
+export function getLastEventBy (agentId: string, communityId: string): Promise<Object | null> {
+  return nSQL(EVENT_TABLE).query('select')
+    .where([['communityId', '=', communityId], 'AND', ['senderId', '=', agentId]])
+    .orderBy({'timestamp': 'desc'}).exec().then(rows => {
+      if (rows.length > 0) {
+        return rows[0]
+      } else {
+        return null
+      }
+    })
+}
+
 /* Events coming from ourselves */
 
 export const SELF_EVENT_TABLE = 'SelfEvent'
