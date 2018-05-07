@@ -1,0 +1,59 @@
+@import '../../utils/style-utils';
+
+#donate-window {
+  display: flex;
+  width: 100%;
+  margin-bottom: 3px;
+  border: 1px solid cadetblue;
+  flex-direction: column;
+  @include body-font;
+
+  .agent-row:last-child {
+    border-bottom: none;
+  }
+}
+
+.donate-modal-list {
+  li {
+    list-style: none;
+  }
+  padding: 0;
+}
+
+#donate-window, .donate-modal-list {
+  .agent-row {
+    display: flex;
+    padding: 3px;
+    border-bottom: 1px solid lightgray;
+    align-items: center;
+    padding: 0.3em;
+
+    .avatar {
+      height: 30px;
+      //width: 10px;
+
+      img {
+        height: 100%;
+        //width: 100%;
+      }
+    }
+
+    .agent-name {
+      @include headings-font;
+    }
+
+    .plea-outer-box {
+      display: flex;
+      flex-grow: 1;
+      margin: 0em 1em;
+    }
+
+    .plea-container {
+      display: inline;
+    }
+
+    & > span {
+      display: flex;
+    }
+  }
+}

@@ -19,6 +19,7 @@ import * as Tutorial from 'Tutorial'
 import {onChannelView, provideUserGetterSetter} from './mmintegration'
 import MMStyles from './utils/style-utils.scss'
 import FrontPage from 'MiscPages/FrontPage'
+import ControlPanel from 'ControlPanel/ControlPanel'
 
 import './db/index'
 
@@ -47,7 +48,7 @@ function plentyInitSync (agentId, communityId, cb, singlePeer) {
   }
 }
 
-export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal, FrontPage,
+export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal, FrontPage, ControlPanel,
   sendMessage, hasEnoughFundsToSendMessage,
   plentyInit, plentyInitSync, onChannelView, provideUserGetterSetter,
   nSQL,

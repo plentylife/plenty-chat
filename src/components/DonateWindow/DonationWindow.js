@@ -1,22 +1,26 @@
 import React from 'react'
-import './donateWindow.scss'
+import './donateStyle.scss'
 import {AGENT_WALLET_TABLE, getWalletsNearLimit} from '../../db/AgentWalletTable'
 import {getCurrentCommunityId} from '../../state/GlobalState'
 import type {Wallet} from '../../db/AgentWalletTable'
 import {getLastEventBy} from '../../db/EventTable'
+import AgentRow from './AgentRow'
 
-type Props = {}
+type Props = {
+  getUserImage: (Object) => string,
+  getUserProfile: (string) => Object
+}
 
-export default class DonateWindow extends React.Component<Props> {
+export default class DonationWindow extends React.Component<Props> {
   static tables () {
     return [AGENT_WALLET_TABLE] // listen for changes on this table
   }
 
   static onChange (event, complete) {
     console.log('Donate vindow', event)
-    if (event.notes.includes('mount')) { // or a new wallet near exhaustion
+    if (event.notes.includes('mount')) { // todo or a new wallet near exhaustion
       getWalletsNearLimit(getCurrentCommunityId(), 300).then(async ws => {
-        const sorted = await DonateWindow.sortWallets(ws)
+        const sorted = await DonationWindow.sortWallets(ws)
         complete(sorted)
       }) // fixme not going to change when community changes. gotta get redux
     }
@@ -36,12 +40,20 @@ export default class DonateWindow extends React.Component<Props> {
   }
 
   render () {
-    return <div id={'donate-window'}>
-      {this.props.nSQLdata && this.props.nSQLdata.map((w: Wallet) => {
-        return <div key={w.agentId}>
-          {w.agentId}
-        </div>
-      })}
-    </div>
+    let entry = null
+    if (this.props.nSQLdata && this.props.nSQLdata.length > 0) {
+      const w = this.props.nSQLdata[0]
+      entry = <AgentRow key={w.agentId} agentId={w.agentId} getProfile = {this.props.getUserProfile} getImage={this.props.getUserImage}
+        plea={true}/>
+    }
+
+    return !entry ? null : (
+      <div id={'donate-window'} onClick={e => {
+        e.preventDefault()
+        this.props.onOpen()
+      }}>
+        {entry}
+      </div>
+    )
   }
 }
