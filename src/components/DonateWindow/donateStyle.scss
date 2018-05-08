@@ -1,4 +1,5 @@
 @import '../../utils/style-utils';
+@import '../common';
 
 #donate-window {
   display: flex;
@@ -27,20 +28,6 @@
     border-bottom: 1px solid lightgray;
     align-items: center;
     padding: 0.3em;
-
-    .avatar {
-      height: 30px;
-      //width: 10px;
-
-      img {
-        height: 100%;
-        //width: 100%;
-      }
-    }
-
-    .agent-name {
-      @include headings-font;
-    }
 
     .plea-outer-box {
       display: flex;

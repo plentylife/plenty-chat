@@ -1,0 +1,13 @@
+@import '../utils/style-utils';
+
+.avatar {
+  height: 30px;
+
+  img {
+    height: 100%;
+  }
+}
+
+.agent-name {
+  @include headings-font;
+}

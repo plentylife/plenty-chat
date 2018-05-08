@@ -1,0 +1,27 @@
+@import '../common';
+
+.transaction-amount {
+  .question {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .thanks-word, .avatar {
+      margin: 0 0.3em;
+    }
+  }
+
+  .input-holder {
+    display: flex;
+    justify-content: center;
+
+    input {
+      width: 70px;
+      margin-right: 1em;
+    }
+  }
+
+  .modal-footer {
+    text-align: left;
+  }
+}

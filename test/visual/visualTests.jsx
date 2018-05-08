@@ -21,6 +21,7 @@ import {rateMessage} from '../../src/actions/RatingActions'
 import * as Tutorial from 'Tutorial'
 import {dropAll} from '../utils'
 import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
+import TransactionAmountModal from '../../src/components/Transactions/TransactionAmountModal'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')
@@ -78,6 +79,8 @@ nSQL().onConnected(async () => {
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
+      <TransactionAmountModal isOpen={true} agentName={'name'} agentImageSrc={getP()}
+      />
       <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
         getUserProfile={getUP} getUserImage={getP}/>
       <div onClick={() => {
