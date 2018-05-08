@@ -6,9 +6,9 @@ import {
   setBalance,
   _setDemurrageTimestamps
 } from '../db/AgentWalletTable'
-import {assertPositive, assertInt, assertBetweenZeroOne} from './utils'
+import {assertPositive, assertInt, assertBetweenZeroOne, floorWithPrecision} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
-import {COST_OF_SENDING_MESSAGE} from './AccountingGlobals'
+import {COST_OF_SENDING_MESSAGE, MAX_PRECISION_IN_AGENT_AMOUNTS} from './AccountingGlobals'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 import {getRating} from '../db/RatingTable'
@@ -96,4 +96,17 @@ export async function accountingForMessageRating (messageId: string, msgSenderId
   if (existingPoints !== null) points -= existingPoints
 
   return addCommunitySharePoints(msgSenderId, communityId, points)
+}
+
+export function convertStringToValidAmount (str: string): {amount: ?number, error: ?string} {
+  const number = Number(str)
+  if (Number.isNaN(number)) {
+    return {error: 'this is not a number', amount: null}
+  } else {
+    const amount = floorWithPrecision(number, MAX_PRECISION_IN_AGENT_AMOUNTS)
+    if (amount <= 0) {
+      return {amount: number, error: 'amount has to be more than zero'}
+    }
+    return {amount, error: null}
+  }
 }
