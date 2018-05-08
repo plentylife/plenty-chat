@@ -10,7 +10,8 @@ type Props = {
   isOpen: boolean,
   onHide: () => void,
   getUserProfile: (string) => Object,
-  getUserImage: (Object) => string
+  getUserImage: (Object) => string,
+  onSelect: (string, Object) => void
 }
 
 export default class DonateModal extends React.Component<Props> {
@@ -44,7 +45,7 @@ export default class DonateModal extends React.Component<Props> {
           {!this.state.wallets ? null : this.state.wallets.map(w => {
             return <li key={w.agentId}>
               <AgentRow agentId={w.agentId} getProfile={this.props.getUserProfile} getImage={this.props.getUserImage}
-                plea={false}/>
+                plea={false} onSelect={this.props.onSelect}/>
             </li>
           })}
         </ul>

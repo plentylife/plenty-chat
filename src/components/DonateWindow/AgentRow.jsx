@@ -1,11 +1,13 @@
 import React from 'react'
 import {Button} from 'react-bootstrap'
+import {userNameFromProfile} from '../utils'
 
 type Props = {
   getProfile: (string) => Object,
   getImage: (Object) => string,
   agentId: string,
-  plea: boolean
+  plea: boolean,
+  onSelect: (string, Object) => void
 }
 
 export default function AgentRow (props: Props) {
@@ -23,11 +25,13 @@ export default function AgentRow (props: Props) {
     <span className={'plea-outer-box'}>
       <span className={'plea-container'}>
         <span className={'agent-name'}>
-          {userProfile.first_name + ' ' + userProfile.last_name}
+          {userNameFromProfile(userProfile)}
         </span>
         {plea}
       </span>
     </span>
-    <Button bsStyle={'primary'}>Donate</Button>
+    <Button bsStyle={'primary'} onClick={e => {
+      props.onSelect(props.agentId, e)
+    }}>Donate</Button>
   </div>
 }

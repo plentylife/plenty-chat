@@ -4,6 +4,8 @@ import AccountStatus from '../AccountStatus/AccountStatus'
 import './controlPanel.scss'
 import {DonationWindow} from '../DonateWindow'
 import DonateModal from '../DonateWindow/DonateModal'
+import TransactionAmountModal from '../Transactions/TransactionAmountModal'
+import {userNameFromProfile} from '../utils'
 
 type Props = {
   agentId: string,
@@ -16,10 +18,34 @@ export default class ControlPanel extends React.Component<Props> {
   constructor (props) {
     super(props)
     this.state = {
-      donateModalOpen: false
+      donateModalOpen: false,
+      transactionTargetAgent: null,
+      transactionErrorMessage: 'this is a test error',
+      transactionAmount: null
     }
+    this.openTransactionModal = this.openTransactionModal.bind(this)
+    this.hideTransactionModal = this.hideTransactionModal.bind(this)
+    this.onTransact = this.onTransact.bind(this)
+    this.onTransactionAmountChange = this.onTransactionAmountChange.bind(this)
     this.openDonateModal = this.openDonateModal.bind(this)
     this.hideDonateModal = this.hideDonateModal.bind(this)
+  }
+
+  openTransactionModal (agentId: string) {
+    this.hideDonateModal()
+    const userProfile = this.props.getUserProfile(agentId)
+    this.setState({transactionTargetAgent: agentId,
+      transactionTargetName: userNameFromProfile(userProfile),
+      transactionTargetImageSrc: this.props.getUserImage(userProfile)})
+  }
+
+  onTransact () {
+
+  }
+
+  onTransactionAmountChange (amount: string) {
+    let checkedAmount = amount
+    this.setState({transactionAmount: checkedAmount})
   }
 
   openDonateModal () {
@@ -30,14 +56,26 @@ export default class ControlPanel extends React.Component<Props> {
     this.setState({donateModalOpen: false})
   }
 
+  hideTransactionModal () {
+    this.setState({transactionTargetAgent: null, transactionAmount: null})
+  }
+
   render () {
-    const modal = this.state.donateModalOpen
+    const donateModal = this.state.donateModalOpen
       ? <DonateModal getUserProfile={this.props.getUserProfile}
         getUserImage={this.props.getUserImage}
         isOpen={this.state.donateModalOpen} onHide={this.hideDonateModal}
+        onSelect={this.openTransactionModal}
       /> : null
     return <div id={'plenty-control-panel'}>
-      {modal}
+      {donateModal}
+      <TransactionAmountModal isOpen={!!this.state.transactionTargetAgent}
+        agentName={this.state.transactionTargetName} agentImageSrc={this.state.transactionTargetImageSrc}
+        onHide={this.hideTransactionModal}
+        onAmountChange={this.onTransactionAmountChange}
+        onSubmit={this.onTransact}
+        errorMsg={this.state.transactionErrorMessage}
+      />
       <DonationWindow getUserProfile={this.props.getUserProfile}
         getUserImage={this.props.getUserImage}
         onOpen={this.openDonateModal}/>

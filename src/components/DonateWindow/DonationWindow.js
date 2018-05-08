@@ -46,7 +46,7 @@ export default class DonationWindow extends React.Component<Props> {
     if (this.props.nSQLdata && this.props.nSQLdata.length > 0) {
       const w = this.props.nSQLdata[0]
       entry = <AgentRow key={w.agentId} agentId={w.agentId} getProfile = {this.props.getUserProfile} getImage={this.props.getUserImage}
-        plea={true}/>
+        plea={true} onSelect={(agentId, e) => {}}/>
     }
 
     return !entry ? null : (

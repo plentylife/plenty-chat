@@ -18,6 +18,9 @@
   li {
     list-style: none;
   }
+  li:last-child .agent-row {
+    border-bottom: none;
+  }
   padding: 0;
 }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Modal} from 'react-bootstrap'
+import {Alert, Button, Modal} from 'react-bootstrap'
 import {TENGE, THANKS} from '../utils'
 import './transactionAmountModal.scss'
 
@@ -8,8 +8,9 @@ type Props = {
   agentImageSrc: string,
   isOpen: boolean,
   onHide: () => void,
-  validator: (any) => string,
-  onSubmit: (number) => void
+  onAmountChange: (any) => void,
+  errorMsg: string,
+  onSubmit: () => void
 }
 
 export default function TransactionAmountModal (props: Props) {
@@ -30,12 +31,16 @@ export default function TransactionAmountModal (props: Props) {
         ?
       </p>
       <p className={'input-holder'}>
-        <input type={'text'}/>
-        <Button bsStyle={'primary'}>Give {TENGE}</Button>
+        <input type={'text'} onChange={e => props.onAmountChange(e.target.value)}/>
+        <Button bsStyle={'primary'} onClick={props.onSubmit}>Give {TENGE}</Button>
       </p>
+      {!props.errorMsg ? null : <Alert bsStyle={'danger'}>
+        {props.errorMsg}
+      </Alert>
+      }
     </Modal.Body>
     <Modal.Footer>
-      <Button bsStyle={'danger'}>Cancel</Button>
+      <Button bsStyle={'danger'} onClick={props.onHide}>Cancel</Button>
     </Modal.Footer>
   </Modal>
 }
