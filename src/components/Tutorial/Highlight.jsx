@@ -1,5 +1,9 @@
 import React from 'react'
 
-export default function Highlight (props) {
+type Props = {
+  children: Array<any>
+}
+
+export default function Highlight (props: Props) {
   return <span className={'highlight'}>{props.children}</span>
 }

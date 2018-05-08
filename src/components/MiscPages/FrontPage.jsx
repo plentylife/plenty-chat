@@ -2,7 +2,12 @@ import React from 'react'
 import {Button} from 'react-bootstrap'
 import './frontPage.scss'
 
-export default function FrontPage (props) {
+type Props = {
+  location: {search: string},
+  history: {push: (string) => void}
+}
+
+export default function FrontPage (props: Props) {
   console.log('front page props', props)
   return <div className={'front-page'}>
     <div>

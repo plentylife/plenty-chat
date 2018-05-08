@@ -8,7 +8,9 @@ import AgentRow from './AgentRow'
 
 type Props = {
   getUserImage: (Object) => string,
-  getUserProfile: (string) => Object
+  getUserProfile: (string) => Object,
+  nSQLdata: Array<Wallet>,
+  onOpen: () => void
 }
 
 export default class DonationWindow extends React.Component<Props> {

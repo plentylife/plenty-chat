@@ -3,7 +3,15 @@ import {getRating, RATING_TABLE} from '../../db/RatingTable'
 import Star from './Star'
 import './rating.css'
 
-class Rating extends PureComponent {
+type Props = {
+  nSQLdata: (null | number),
+  numStars: number,
+  agentId: string,
+  messageId: string,
+  onRating: (number, string, string) => void
+}
+
+class Rating extends PureComponent<Props> {
   constructor (props) {
     super(props)
     this.state = {

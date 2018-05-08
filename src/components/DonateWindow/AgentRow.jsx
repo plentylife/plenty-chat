@@ -1,7 +1,14 @@
 import React from 'react'
 import {Button} from 'react-bootstrap'
 
-export default function AgentRow (props) {
+type Props = {
+  getProfile: (string) => Object,
+  getImage: (Object) => string,
+  agentId: string,
+  plea: boolean
+}
+
+export default function AgentRow (props: Props) {
   const userProfile = props.getProfile(props.agentId)
   let plea = null
   if (props.plea) {

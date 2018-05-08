@@ -12,9 +12,6 @@ type Props = {
   getUserImage: (Object) => string
 }
 
-// const getUP = (agentid) => ({first_name: agentid, last_name: 'kats'})
-// const getP = () => ('https://www.shareicon.net/data/128x128/2016/05/24/769971_man_512x512.png')
-
 export default class ControlPanel extends React.Component<Props> {
   constructor (props) {
     super(props)

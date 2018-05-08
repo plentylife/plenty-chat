@@ -6,7 +6,14 @@ import DonationWindow from './DonationWindow'
 import {getCurrentCommunityId} from '../../state/GlobalState'
 import './donateStyle.scss'
 
-export default class DonateModal extends React.Component {
+type Props = {
+  isOpen: boolean,
+  onHide: () => void,
+  getUserProfile: (string) => Object,
+  getUserImage: (Object) => string
+}
+
+export default class DonateModal extends React.Component<Props> {
   constructor (props) {
     super(props)
     this.state = {
