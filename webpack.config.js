@@ -1,3 +1,5 @@
+const webpackSelection = require('./webpack-build-selector')
+
 const webpack = require('webpack') // to access built-in plugins
 var path = require('path')
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
@@ -169,9 +171,6 @@ const serverTest = Object.assign({}, server, {
   mode: 'development'
 })
 
-module.exports = [
-  serverTest,
-  // server,
-  library,
-  visualTests
-]
+module.exports = webpackSelection(
+  serverTest, server, library, visualTests
+)
