@@ -103,10 +103,14 @@ export function convertStringToValidAmount (str: string): {amount: ?number, erro
   if (Number.isNaN(number)) {
     return {error: 'this is not a number', amount: null}
   } else {
-    const amount = floorWithPrecision(number, MAX_PRECISION_IN_AGENT_AMOUNTS)
-    if (amount <= 0) {
-      return {amount: number, error: 'amount has to be more than zero'}
-    }
-    return {amount, error: null}
+    return validateTransactionAmount(number)
   }
+}
+
+export function validateTransactionAmount (_amount: number): {amount: ?number, error: ?string} {
+  const amount = floorWithPrecision(_amount, MAX_PRECISION_IN_AGENT_AMOUNTS)
+  if (amount <= 0) {
+    return {amount: _amount, error: 'amount has to be more than zero'}
+  }
+  return {amount, error: null}
 }

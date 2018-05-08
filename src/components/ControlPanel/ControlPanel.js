@@ -6,6 +6,7 @@ import {DonationWindow} from '../DonateWindow'
 import DonateModal from '../DonateWindow/DonateModal'
 import TransactionAmountModal from '../Transactions/TransactionAmountModal'
 import {userNameFromProfile} from '../utils'
+import {convertStringToValidAmount} from '../../accounting/Accounting'
 
 type Props = {
   agentId: string,
@@ -20,8 +21,8 @@ export default class ControlPanel extends React.Component<Props> {
     this.state = {
       donateModalOpen: false,
       transactionTargetAgent: null,
-      transactionErrorMessage: 'this is a test error',
-      transactionAmount: null
+      transactionErrorMessage: null,
+      transactionAmount: 1
     }
     this.openTransactionModal = this.openTransactionModal.bind(this)
     this.hideTransactionModal = this.hideTransactionModal.bind(this)
@@ -44,8 +45,19 @@ export default class ControlPanel extends React.Component<Props> {
   }
 
   onTransactionAmountChange (amount: string) {
-    let checkedAmount = amount
-    this.setState({transactionAmount: checkedAmount})
+    if (!(typeof amount === 'string' && amount.length === 0)) {
+      if (amount[amount.length - 1] !== '.') {
+        let checkedAmount = convertStringToValidAmount(amount)
+        this.setState({
+          transactionAmount: checkedAmount.amount === null ? this.state.transactionAmount : checkedAmount.amount,
+          transactionErrorMessage: checkedAmount.error
+        })
+      } else {
+        this.setState({transactionAmount: amount})
+      }
+    } else {
+      this.setState({transactionAmount: null})
+    }
   }
 
   openDonateModal () {
@@ -72,7 +84,7 @@ export default class ControlPanel extends React.Component<Props> {
       <TransactionAmountModal isOpen={!!this.state.transactionTargetAgent}
         agentName={this.state.transactionTargetName} agentImageSrc={this.state.transactionTargetImageSrc}
         onHide={this.hideTransactionModal}
-        onAmountChange={this.onTransactionAmountChange}
+        onAmountChange={this.onTransactionAmountChange} amount={this.state.transactionAmount}
         onSubmit={this.onTransact}
         errorMsg={this.state.transactionErrorMessage}
       />

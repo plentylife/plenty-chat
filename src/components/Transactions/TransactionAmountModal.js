@@ -9,6 +9,7 @@ type Props = {
   isOpen: boolean,
   onHide: () => void,
   onAmountChange: (any) => void,
+  amount: number,
   errorMsg: string,
   onSubmit: () => void
 }
@@ -31,7 +32,7 @@ export default function TransactionAmountModal (props: Props) {
         ?
       </p>
       <p className={'input-holder'}>
-        <input type={'text'} onChange={e => props.onAmountChange(e.target.value)}/>
+        <input type={'text'} onChange={e => props.onAmountChange(e.target.value)} value={props.amount === null ? '' : props.amount}/>
         <Button bsStyle={'primary'} onClick={props.onSubmit}>Give {TENGE}</Button>
       </p>
       {!props.errorMsg ? null : <Alert bsStyle={'danger'}>
