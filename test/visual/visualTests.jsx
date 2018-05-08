@@ -72,29 +72,14 @@ nSQL().onConnected(async () => {
   await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
   await rateMessage(MSG_ID, getCurrentAgentId(), 1, 3)
 
-  // let b = 1
-  // setInterval(() => {
-  //   setBalance(getCurrentAgentId(), getCurrentCommunityId(), (b += 1))
-  //   setCommunityBalance(getCurrentCommunityId(), b += 1)
-  // }, 3000)
-
-  // await nSQL(AGENT_WALLET_TABLE).query('select').exec().then(all => {
-  //   console.log('connected all wallets', all)
-  // })
-  //
-  // await nSQL(AGENT_WALLET_TABLE).query('select')
-  //   .where([['agentId', '=', getCurrentAgentId()], 'AND', ['communityId', '=', getCurrentCommunityId()]]).exec().then(r => {
-  //     console.log('specific wallet (query)', r)
-  //   })
-  //
-  // await getWallet(getCurrentAgentId(), getCurrentCommunityId()).then(w => {
-  //   console.log('specific wallet', w)
-  // })
+  const getUP = (agentid) => ({first_name: agentid, last_name: 'kats'})
+  const getP = () => ('https://www.shareicon.net/data/128x128/2016/05/24/769971_man_512x512.png')
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
-      <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}/>
+      <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
+        getUserProfile={getUP} getUserImage={getP}/>
       <div onClick={() => {
         sendMessage(getCurrentAgentId(), CH_ID, new Date().getTime() + 'msg')
       }}>
