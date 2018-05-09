@@ -103,14 +103,20 @@ export function convertStringToValidAmount (str: string): {amount: ?number, erro
   if (Number.isNaN(number)) {
     return {error: 'this is not a number', amount: null}
   } else {
-    return validateTransactionAmount(number)
+    try {
+      const amount = validateAndFormatTransactionAmount(number)
+      return {amount, error: null}
+    } catch (e) {
+      if (e instanceof RangeError) {
+        return {amount: number, error: 'amount has to be more than zero'}
+      }
+      return {amount: null, error: 'unknown error. whoops...'}
+    }
   }
 }
 
-export function validateTransactionAmount (_amount: number): {amount: ?number, error: ?string} {
+export function validateAndFormatTransactionAmount (_amount: number): {amount: ?number, error: ?string} {
   const amount = floorWithPrecision(_amount, MAX_PRECISION_IN_AGENT_AMOUNTS)
-  if (amount <= 0) {
-    return {amount: _amount, error: 'amount has to be more than zero'}
-  }
-  return {amount, error: null}
+  assertPositive(amount)
+  return amount
 }
