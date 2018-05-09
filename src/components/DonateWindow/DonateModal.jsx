@@ -5,6 +5,7 @@ import {getWalletsNearLimit} from '../../db/AgentWalletTable'
 import DonationWindow from './DonationWindow'
 import {getCurrentCommunityId} from '../../state/GlobalState'
 import './donateStyle.scss'
+import equals from 'shallow-equals'
 
 type Props = {
   isOpen: boolean,
@@ -24,10 +25,28 @@ export default class DonateModal extends React.Component<Props> {
   }
 
   componentDidUpdate () {
-    DonateModal.getWallets().then(ws => this.setState({wallets: ws}))
+    if (this.props.isOpen) {
+      DonateModal.getWallets().then(ws => this.setState({wallets: ws}))
+    }
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    const p = !equals(nextProps, this.props)
+    let ws = !(this.state.wallets.length === nextState.wallets.length)
+    for (let i = 0; this.state.wallets.length > i; i++) {
+      if (this.state.wallets[i].agentId !== nextState.wallets[i].agentId) {
+        ws = true
+      }
+    }
+    return p || ws
+  }
+
+  // setWallets () {
+  //
+  // }
+
   static async getWallets () {
+    // fixme 300 is just for testing
     const wallets = await getWalletsNearLimit(getCurrentCommunityId(), 300).then(ws => {
       return DonationWindow.sortWallets(ws)
     })
