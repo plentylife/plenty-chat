@@ -12,6 +12,7 @@ import {COST_OF_SENDING_MESSAGE, MAX_PRECISION_IN_AGENT_AMOUNTS} from './Account
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 import {getRating} from '../db/RatingTable'
+import {AMOUNT_UNDER_ZERO} from '../utils/UserErrors'
 
 export async function initializeAccount (agentId: string, communityId: string): Promise<boolean> {
   // todo. share points are not intialized; currently they get stuck into db by default.
@@ -41,7 +42,7 @@ export function hasEnoughFundsNum (balance, creditLimit, amountRequested): boole
  * @param {int} amount has to be an integer
  */
 export function hasEnoughFunds (agentId: string, communityId: string, amount: number): Promise<boolean> {
-  if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
+  // if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
 
   return getWallet(agentId, communityId).then(b => {
     if (b !== null) {
@@ -108,7 +109,7 @@ export function convertStringToValidAmount (str: string): {amount: ?number, erro
       return {amount, error: null}
     } catch (e) {
       if (e instanceof RangeError) {
-        return {amount: number, error: 'amount has to be more than zero'}
+        return {amount: number, error: AMOUNT_UNDER_ZERO}
       }
       return {amount: null, error: 'unknown error. whoops...'}
     }

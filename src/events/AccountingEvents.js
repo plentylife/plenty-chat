@@ -5,14 +5,26 @@ import type {DemurrageByProperty} from '../accounting/Demurrage'
 import {applyDemurrageToWallet, getWallet, setBalance} from '../db/AgentWalletTable'
 import type {PotSplitEntry} from '../accounting/CommunityPot'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
-import {floorWithPrecision} from '../accounting/utils'
+import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/utils'
+import {MissingProperty} from '../utils/Error'
 
-export const DEMURRAGE_EVEN_TYPE: 'demurrage' = 'demurrage'
+export const DEMURRAGE_EVENT_TYPE: 'demurrage' = 'demurrage'
 
-export const COMMUNITY_POT_SPLIT: 'potSplit' = 'potSplit'
+export const COMMUNITY_POT_SPLIT_EVENT_TYPE: 'potSplit' = 'potSplit'
+
+export const TRANSACTION_EVENT_TYPE: 'transaction' = 'transaction'
 
 export type DemurragePayload = DemurrageByProperty & {
   agendId: string
+}
+
+const TRANSACTION_TYPES = ['message', 'peer', 'donation']
+
+export type TransactionPayload = {
+  transactionType: 'message' | 'peer' | 'donation',
+  amount: number,
+  recipientAgentId: string,
+  messageId: ?string
 }
 
 export async function handleDemurrageEvent (event: Event): Promise<boolean> {
@@ -39,4 +51,19 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
     entry = payload.shift()
   }
   return true
+}
+
+export function validateTransactionType (type: string): string {
+  if (!TRANSACTION_TYPES.includes(type)) throw new TypeError(`Invalid transaction type [${type}]`)
+  return type
+}
+
+export function validateTransactionPayload (payload: TransactionPayload): TransactionPayload {
+  assertNumber(payload.amount)
+  assertPositive(payload.amount)
+  if (!payload.transactionType) throw new MissingProperty('transaction type')
+  validateTransactionType(payload.transactionType)
+  if (!payload.recipientAgentId) throw new MissingProperty('recipient agent id of the transactoin')
+  if (payload.transactionType === 'message' && !payload.messageId) throw new MissingProperty('message id in transaction details')
+  return payload
 }

@@ -7,7 +7,7 @@ import {dropAll, waitAndCheck} from '../../utils'
 import {AGENT_WALLET_TABLE, getAllWallets} from '../../../src/db/AgentWalletTable'
 import {_backlogEvent, _isConsumingOutgoingQueue} from '../../../src/sync'
 import {COMMUNITY_TABLE} from '../../../src/db/CommunityTable'
-import {COMMUNITY_POT_SPLIT} from '../../../src/events/AccountingEvents'
+import {COMMUNITY_POT_SPLIT_EVENT_TYPE} from '../../../src/events/AccountingEvents'
 import {calculateCommunityPotSplit} from '../../../src/accounting/CommunityPot'
 import {splitAllCommunityPots} from '../../../src/actions/AccountingActions'
 
@@ -95,7 +95,7 @@ test.skip('looking at pot splits', async t => {
   console.log('\nSplits\n=======================\n')
 
   let payloadSizes = {}
-  let splits = events.filter(e => (e.eventType === COMMUNITY_POT_SPLIT))
+  let splits = events.filter(e => (e.eventType === COMMUNITY_POT_SPLIT_EVENT_TYPE))
   splits = splits.filter(e => (e.communityId === COMMUNITY_ID))
 
   splits.forEach(s => {

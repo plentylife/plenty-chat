@@ -9,16 +9,17 @@ import {ExistsInDB, MissingPayload} from '../utils/Error'
 import {ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, handleAddAgentToCommunity} from './AgentEvents'
 import {CREATE_CHANNEL_EVENT_TYPE, handleCreateChannelEvent} from './ChannelEvents'
 import {
-  COMMUNITY_POT_SPLIT,
-  DEMURRAGE_EVEN_TYPE,
+  COMMUNITY_POT_SPLIT_EVENT_TYPE,
+  DEMURRAGE_EVENT_TYPE,
   handleCommunityPotSplit,
-  handleDemurrageEvent
+  handleDemurrageEvent, TRANSACTION_EVENT_TYPE
 } from './AccountingEvents'
 import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
 import {_backlogEvent} from './queue'
+import type {TransactionPayload} from './AccountingEvents'
 
-export type EventPayload = MessageEventPayload | RatingEventPayload
-export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE)
+export type EventPayload = MessageEventPayload | RatingEventPayload | TransactionPayload
+export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE | typeof TRANSACTION_EVENT_TYPE)
 
 export type Event = {
   globalEventId: string,
@@ -91,8 +92,8 @@ function applyHandler (event: Event): Promise<boolean> {
     case RATING_EVENT_TYPE: return handleRatingEvent(event)
     case ADD_AGENT_TO_COMMUNITY_EVEN_TYPE: return handleAddAgentToCommunity(event)
     case CREATE_CHANNEL_EVENT_TYPE: return handleCreateChannelEvent(event)
-    case DEMURRAGE_EVEN_TYPE: return handleDemurrageEvent(event)
-    case COMMUNITY_POT_SPLIT: return handleCommunityPotSplit(event)
+    case DEMURRAGE_EVENT_TYPE: return handleDemurrageEvent(event)
+    case COMMUNITY_POT_SPLIT_EVENT_TYPE: return handleCommunityPotSplit(event)
     case CONVERT_TO_TASK_EVENT_TYPE: return handleConvertToTaskEvent(event)
     default: throw new Error(`Could not recognize event type '${event.eventType}'`)
   }

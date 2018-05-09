@@ -3,10 +3,19 @@
 import {getAllWallets} from '../db/AgentWalletTable'
 import {calculateDemurrageForAgent} from '../accounting/Demurrage'
 import {sendEvent} from '../events'
-import {COMMUNITY_POT_SPLIT, DEMURRAGE_EVEN_TYPE} from '../events/AccountingEvents'
+import {
+  COMMUNITY_POT_SPLIT_EVENT_TYPE,
+  DEMURRAGE_EVENT_TYPE,
+  TRANSACTION_EVENT_TYPE, validateTransactionPayload,
+  validateTransactionType
+} from '../events/AccountingEvents'
 import {getCurrentAgentId} from '../state/GlobalState'
 import {getAllCommunities} from '../db/CommunityTable'
 import {calculateCommunityPotSplit} from '../accounting/CommunityPot'
+import type {EventResult} from '../events'
+import {hasEnoughFunds, validateAndFormatTransactionAmount} from '../accounting/Accounting'
+import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, PROGRAMMER_ERROR} from '../utils/UserErrors'
+import type {TransactionPayload} from '../events/AccountingEvents'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
@@ -19,7 +28,7 @@ export async function applyDemurrageToAll (): Promise<boolean> {
     if (hasAnyNonZero > 0) {
       const payload = Object.assign({}, w, d) // fixme remove unnecessary properties from payload
       console.log(`Sending out demurrage for agent ${w.agentId} with payload ${payload}`)
-      return sendEvent(DEMURRAGE_EVEN_TYPE, getCurrentAgentId(), w.communityId, payload)
+      return sendEvent(DEMURRAGE_EVENT_TYPE, getCurrentAgentId(), w.communityId, payload)
     } else {
       return Promise.resolve(true)
     }
@@ -31,8 +40,34 @@ export async function splitAllCommunityPots (): Promise<boolean> {
   const communities = await getAllCommunities()
   const promises = communities.map(c => {
     return calculateCommunityPotSplit(c.communityId, c.balance).then(splits => {
-      return sendEvent(COMMUNITY_POT_SPLIT, getCurrentAgentId(), c.communityId, splits)
+      return sendEvent(COMMUNITY_POT_SPLIT_EVENT_TYPE, getCurrentAgentId(), c.communityId, splits)
     })
   })
   return Promise.all(promises)
+}
+
+export async function makeTransaction (agentId: string, communityId: string, _amount: number,
+  _type: string, recipientAgentId: string, additionalPayload: Object): Promise<EventResult> {
+  try {
+    const type = validateTransactionType(_type)
+    const amount = validateAndFormatTransactionAmount(_amount)
+    const hasFunds = await hasEnoughFunds(agentId, communityId, amount)
+    if (!hasFunds) {
+      return {status: false, error: NOT_ENOUGH_FUNDS}
+    }
+    const payload: TransactionPayload = Object.assign({}, additionalPayload, {
+      transactionType: type,
+      recipientAgentId,
+      amount
+    })
+    validateTransactionPayload(payload)
+    return sendEvent(TRANSACTION_EVENT_TYPE, agentId, communityId, payload)
+  } catch (e) {
+    let res: EventResult = {status: false}
+    if (e instanceof RangeError) {
+      res.error = AMOUNT_UNDER_ZERO
+    }
+    res.error = PROGRAMMER_ERROR
+    return res
+  }
 }

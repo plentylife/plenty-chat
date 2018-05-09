@@ -6,7 +6,7 @@ import {splitAllCommunityPots} from '../../src/actions/AccountingActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
 import {getCommunityBalance, setCommunityBalance} from '../../src/db/CommunityTable'
 import {EVENT_TABLE} from '../../src/db/EventTable'
-import {COMMUNITY_POT_SPLIT} from '../../src/events/AccountingEvents'
+import {COMMUNITY_POT_SPLIT_EVENT_TYPE} from '../../src/events/AccountingEvents'
 import {nSQL} from 'nano-sql'
 import {addCommunitySharePoints, getWallet} from '../../src/db/AgentWalletTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS} from '../../src/accounting/AccountingGlobals'
@@ -71,7 +71,7 @@ test.serial('pot should be fully split, always, event it if means fractions', as
 })
 
 test.serial('pot split event should have an array as payload', async t => {
-  const rows = await nSQL(EVENT_TABLE).query('select').where(['eventType', '=', COMMUNITY_POT_SPLIT]).exec()
+  const rows = await nSQL(EVENT_TABLE).query('select').where(['eventType', '=', COMMUNITY_POT_SPLIT_EVENT_TYPE]).exec()
   rows.forEach((r) => {
     t.true(r.payload instanceof Array)
     t.true(r.payload.length === NUM_AGENTS)
