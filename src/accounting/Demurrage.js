@@ -2,6 +2,7 @@
 import {assertPositive} from './utils'
 import type {Wallet} from '../db/AgentWalletTable'
 import {DEFAULT_DEMURRAGE_PERIOD, DEFAULT_DEMURRAGE_RATE} from './AccountingGlobals'
+import './required'
 
 /** @return whole numbers only */
 export function _calculateDemurrage (balance: number, ratePerPeriod: number, periods: number): number {

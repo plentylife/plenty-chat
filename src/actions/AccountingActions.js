@@ -1,6 +1,6 @@
 // @flow
 
-import {getAllWallets} from '../db/AgentWalletTable'
+import {getAllWallets, getWallet} from '../db/AgentWalletTable'
 import {calculateDemurrageForAgent} from '../accounting/Demurrage'
 import {sendEvent} from '../events'
 import {
@@ -14,7 +14,7 @@ import {getAllCommunities} from '../db/CommunityTable'
 import {calculateCommunityPotSplit} from '../accounting/CommunityPot'
 import type {EventResult} from '../events'
 import {hasEnoughFunds, validateAndFormatTransactionAmount} from '../accounting/Accounting'
-import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, PROGRAMMER_ERROR} from '../utils/UserErrors'
+import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, PROGRAMMER_ERROR, RECIPIENT_DOES_NOT_EXIST} from '../utils/UserErrors'
 import type {TransactionPayload} from '../events/AccountingEvents'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
@@ -47,27 +47,33 @@ export async function splitAllCommunityPots (): Promise<boolean> {
 }
 
 export async function makeTransaction (agentId: string, communityId: string, _amount: number,
-  _type: string, recipientAgentId: string, additionalPayload: Object): Promise<EventResult> {
+  recipientAgentId: string, _type: string, additionalPayload: Object): Promise<EventResult> {
   try {
     const type = validateTransactionType(_type)
     const amount = validateAndFormatTransactionAmount(_amount)
     const hasFunds = await hasEnoughFunds(agentId, communityId, amount)
     if (!hasFunds) {
-      return {status: false, error: NOT_ENOUGH_FUNDS}
+      return {status: false, value: NOT_ENOUGH_FUNDS}
     }
-    const payload: TransactionPayload = Object.assign({}, additionalPayload, {
+    const recipientExists = await getWallet(recipientAgentId, communityId)
+    if (!recipientExists) {
+      return {status: false, value: RECIPIENT_DOES_NOT_EXIST}
+    }
+    const payload: TransactionPayload = Object.assign({}, additionalPayload || {}, {
       transactionType: type,
       recipientAgentId,
       amount
     })
-    validateTransactionPayload(payload)
+    validateTransactionPayload(payload, agentId)
     return sendEvent(TRANSACTION_EVENT_TYPE, agentId, communityId, payload)
   } catch (e) {
-    let res: EventResult = {status: false}
+    let res: EventResult = {status: false, error: e}
     if (e instanceof RangeError) {
-      res.error = AMOUNT_UNDER_ZERO
+      res.value = AMOUNT_UNDER_ZERO
+    } else {
+      console.error('Making a transaction failed due to a programmer error', e)
+      res.value = PROGRAMMER_ERROR
     }
-    res.error = PROGRAMMER_ERROR
     return res
   }
 }

@@ -6,13 +6,22 @@ import {
   setBalance,
   _setDemurrageTimestamps
 } from '../db/AgentWalletTable'
-import {assertPositive, assertInt, assertBetweenZeroOne, floorWithPrecision} from './utils'
+import {
+  assertPositive,
+  assertInt,
+  assertBetweenZeroOne,
+  floorWithPrecisionPrimitive,
+  assertNumber,
+  floorWithPrecision
+} from './utils'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {COST_OF_SENDING_MESSAGE, MAX_PRECISION_IN_AGENT_AMOUNTS} from './AccountingGlobals'
 import {getCommunityOfMsg} from '../db'
 import {CommunityIdNotInferrable} from '../utils/Error'
 import {getRating} from '../db/RatingTable'
 import {AMOUNT_UNDER_ZERO} from '../utils/UserErrors'
+import './required'
+import {Decimal} from 'decimal.js'
 
 export async function initializeAccount (agentId: string, communityId: string): Promise<boolean> {
   // todo. share points are not intialized; currently they get stuck into db by default.
@@ -43,10 +52,11 @@ export function hasEnoughFundsNum (balance, creditLimit, amountRequested): boole
  */
 export function hasEnoughFunds (agentId: string, communityId: string, amount: number): Promise<boolean> {
   // if (!Number.isInteger(amount)) throw new Error('Amount has to be an integer')
+  assertNumber(amount)
 
   return getWallet(agentId, communityId).then(b => {
     if (b !== null) {
-      const check = b.balance + b.creditLimit >= amount
+      const check = Decimal(b.balance).plus(Decimal(b.creditLimit)).gte(amount)
       return check
     }
     return false
@@ -99,9 +109,9 @@ export async function accountingForMessageRating (messageId: string, msgSenderId
   return addCommunitySharePoints(msgSenderId, communityId, points)
 }
 
-export function convertStringToValidAmount (str: string): {amount: ?number, error: ?string} {
-  const number = Number(str)
-  if (Number.isNaN(number)) {
+export function convertStringToValidAmount (str: string): {amount: ?Decimal, error: ?string} {
+  const number = Decimal(str)
+  if (number.isNaN()) {
     return {error: 'this is not a number', amount: null}
   } else {
     try {
@@ -116,7 +126,7 @@ export function convertStringToValidAmount (str: string): {amount: ?number, erro
   }
 }
 
-export function validateAndFormatTransactionAmount (_amount: number): {amount: ?number, error: ?string} {
+export function validateAndFormatTransactionAmount (_amount: number): Decimal {
   const amount = floorWithPrecision(_amount, MAX_PRECISION_IN_AGENT_AMOUNTS)
   assertPositive(amount)
   return amount

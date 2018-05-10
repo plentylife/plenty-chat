@@ -8,6 +8,7 @@ import {AGENT_TABLE} from './AgentTable'
 import {InappropriateAction, MissingDatabaseEntry} from '../utils/Error'
 import {assertInt} from '../accounting/utils'
 import {hasEnoughFundsNum} from '../accounting/Accounting'
+import {Decimal} from 'decimal.js'
 
 export const AGENT_WALLET_TABLE = 'AgentWallet'
 
@@ -37,6 +38,7 @@ export type Wallet = {
   demurrageTimestamps: DemurrageTimestamps}
 
 export function getWallet (agentId: string, communityId: string): Promise<(Wallet | null)> {
+  if (!communityId) throw new TypeError(`Cannot retrieve wallet without community id for agent ${agentId}`)
   return getRecord(agentId, communityId).then(r => {
     if (r.length > 0) {
       let b: Wallet = {
@@ -57,13 +59,23 @@ function generateRowId (agentId: string, communityId: string) {
   return agentId + '-' + communityId
 }
 
-export function setBalance (agentId: string, communityId: string, balance: number): Promise<any> {
+/** @param isDelta signifies that the balance should be treated as a delta, thus a wallet needs to exist */
+export function setBalance (agentId: string, communityId: string, balance: number, isDelta = false): Promise<any> {
   /** Setting new balance for  an agent */
   // fixme check that balance is not below credit limit
   let payload = {
-    agentId: agentId, communityId: communityId, balance: balance
+    agentId: agentId, communityId: communityId
   }
   return getRecord(agentId, communityId).then(r => {
+    if (isDelta && r.length === 0) {
+      throw new MissingDatabaseEntry('to adjust a wallet balance by a delta, the wallet must exist. ' +
+        `agent id [${agentId}]; community id [${communityId}]`)
+    }
+    if (isDelta) {
+      payload.balance = Decimal(balance).plus(Decimal(r[0].balance)).toNumber()
+    } else {
+      payload.balance = balance
+    }
     if (r.length > 0) {
       // $FlowFixMe
       payload.id = r[0].id
@@ -76,7 +88,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
       payload.communitySharePoints = DEFAULT_COMMUNITY_SHARE_POINTS
     }
-    console.log(`Setting new balance for ${agentId} in ${communityId} to ${balance}`)
+    console.log(`Setting new balance for ${agentId} in ${communityId} to ${payload.balance}`)
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
   })
 }

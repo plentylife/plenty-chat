@@ -12,7 +12,7 @@ import {
   COMMUNITY_POT_SPLIT_EVENT_TYPE,
   DEMURRAGE_EVENT_TYPE,
   handleCommunityPotSplit,
-  handleDemurrageEvent, TRANSACTION_EVENT_TYPE
+  handleDemurrageEvent, handleTransaction, TRANSACTION_EVENT_TYPE
 } from './AccountingEvents'
 import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
 import {_backlogEvent} from './queue'
@@ -71,7 +71,10 @@ export async function _handleEvent (event: Event): Promise<boolean | Error | Eve
         status = (result: EventResult).status
       }
       await pushEvent(event, status)
-      if (status === false) console.log('Did not handle event successfully', JSON.stringify(event))
+      if (status === false) {
+        console.error('Did not handle event successfully', JSON.stringify(event))
+        if ((result instanceof Object) && result.error)console.error('Because of error', result.error)
+      }
       return result
     }).catch(async e => {
       console.error(`Failed to handle event: ${e}`, event, e.stack)
@@ -86,7 +89,7 @@ export async function _handleEvent (event: Event): Promise<boolean | Error | Eve
   }
 }
 
-function applyHandler (event: Event): Promise<boolean> {
+function applyHandler (event: Event): Promise<boolean | EventResult> {
   switch (event.eventType) {
     case MESSAGE_EVENT_TYPE: return handleMessageEvent(event)
     case RATING_EVENT_TYPE: return handleRatingEvent(event)
@@ -95,6 +98,7 @@ function applyHandler (event: Event): Promise<boolean> {
     case DEMURRAGE_EVENT_TYPE: return handleDemurrageEvent(event)
     case COMMUNITY_POT_SPLIT_EVENT_TYPE: return handleCommunityPotSplit(event)
     case CONVERT_TO_TASK_EVENT_TYPE: return handleConvertToTaskEvent(event)
+    case TRANSACTION_EVENT_TYPE: return handleTransaction(event)
     default: throw new Error(`Could not recognize event type '${event.eventType}'`)
   }
 }

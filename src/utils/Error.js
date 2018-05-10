@@ -25,3 +25,5 @@ export class ExistsInDB extends Error {
     super(`Entry with id ${id} already exists in ${table}`)
   }
 }
+
+export class NotEnoughFunds extends Error {}

@@ -1,7 +1,8 @@
 // @flow
 
 import {getAllCommunitySharePoints} from '../db/AgentWalletTable'
-import {floorWithPrecision} from './utils'
+import {floorWithPrecisionPrimitive} from './utils'
+import './required'
 
 export type PotSplitEntry = {
   agentId: string, amount: number
@@ -16,7 +17,7 @@ export async function calculateCommunityPotSplit (communityId: string, community
   return points.map(p => {
     const pn = Object.assign({}, p)
     if (sum !== 0) {
-      pn.amount = floorWithPrecision((p.communitySharePoints / sum) * communityBalance)
+      pn.amount = floorWithPrecisionPrimitive((p.communitySharePoints / sum) * communityBalance)
     } else {
       pn.amount = 0
     }

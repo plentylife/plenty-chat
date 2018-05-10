@@ -1,18 +1,24 @@
 // @flow
 import {WrongValue} from '../utils/Error'
+import './required'
+import {Decimal} from 'decimal.js'
 
 export function assertInt (i: number) {
   if (!Number.isInteger(i)) throw new TypeError('Number is not an integer')
 }
 
-export function assertPositive (i: number, zeroAllowed: boolean = false, message = '') {
-  const isPositive = zeroAllowed ? i >= 0 : i > 0
+export function assertPositive (_i: number, zeroAllowed: boolean = false, message = '') {
+  assertNumber(_i)
+  const i = Decimal(_i)
+  const isPositive = zeroAllowed ? i.gte(0) : i.gt(0)
   const msg = message || `Number is not positive [${i}]`
-  if (!(typeof i === 'number') || !isPositive) throw new RangeError(msg)
+  if (!isPositive) throw new RangeError(msg)
 }
 
 export function assertNumber (i: number) {
-  if (!(typeof i === 'number')) throw new TypeError(`Is not a number ${i}`)
+  if (!(typeof i === 'number' || i instanceof Decimal)) {
+    throw new TypeError(`Is not a number ${i}`)
+  }
 }
 
 export function assertBetweenZeroOne (i: number) {
@@ -25,7 +31,13 @@ export function getBaseLog (base, x) {
   return Math.log(x) / Math.log(base)
 }
 
-export function floorWithPrecision (n, decimalPlaces = 5) {
+/** @deprecated('use the Decimal version instead') */
+export function floorWithPrecisionPrimitive (n, decimalPlaces = 5) {
   const rf = Math.pow(10, decimalPlaces)
   return Math.floor(n * rf) / rf
+}
+
+export function floorWithPrecision (n, decimalPlaces = 5) {
+  const rf = Decimal(10).pow(decimalPlaces)
+  return Decimal(n).times(rf).floor().div(rf)
 }
