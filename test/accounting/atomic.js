@@ -1,9 +1,11 @@
 import test from 'ava'
 import {convertStringToValidAmount} from '../../src/accounting/Accounting'
+import {Decimal} from 'decimal.js'
 
 function strToAmount (t, input, exAm, exEr) {
   const res = convertStringToValidAmount(input)
-  t.is(res.amount, exAm)
+  const isDecimal = res.amount instanceof Decimal
+  t.is(isDecimal ? res.amount.toNumber() : res.amount, exAm)
   t.true((exEr && !!res.error) || (!exEr && !res.error))
 }
 strToAmount.title = (t, i, exAm, exEr) => `${t} [${i}] => [${exEr ? 'error' : exAm}]`

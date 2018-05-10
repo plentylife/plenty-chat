@@ -110,19 +110,23 @@ export async function accountingForMessageRating (messageId: string, msgSenderId
 }
 
 export function convertStringToValidAmount (str: string): {amount: ?Decimal, error: ?string} {
-  const number = Decimal(str)
-  if (number.isNaN()) {
-    return {error: 'this is not a number', amount: null}
-  } else {
-    try {
-      const amount = validateAndFormatTransactionAmount(number)
-      return {amount, error: null}
-    } catch (e) {
-      if (e instanceof RangeError) {
-        return {amount: number, error: AMOUNT_UNDER_ZERO}
+  try {
+    const number = Decimal(str)
+    if (number.isNaN()) {
+      return {error: 'this is not a number', amount: null}
+    } else {
+      try {
+        const amount = validateAndFormatTransactionAmount(number)
+        return {amount, error: null}
+      } catch (e) {
+        if (e instanceof RangeError) {
+          return {amount: number, error: AMOUNT_UNDER_ZERO}
+        }
+        return {amount: null, error: 'unknown error. whoops...'}
       }
-      return {amount: null, error: 'unknown error. whoops...'}
     }
+  } catch (e) {
+    return {amount: null, error: 'this is not a number'}
   }
 }
 
