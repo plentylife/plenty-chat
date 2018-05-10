@@ -4,13 +4,12 @@ import {
   addCommunitySharePoints,
   getWallet,
   setBalance,
-  _setDemurrageTimestamps
+  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit
 } from '../db/AgentWalletTable'
 import {
   assertPositive,
   assertInt,
   assertBetweenZeroOne,
-  floorWithPrecisionPrimitive,
   assertNumber,
   floorWithPrecision
 } from './utils'
@@ -22,6 +21,7 @@ import {getRating} from '../db/RatingTable'
 import {AMOUNT_UNDER_ZERO} from '../utils/UserErrors'
 import './required'
 import {Decimal} from 'decimal.js'
+import {calculateCreditLimitDelta} from './CreditLimit'
 
 export async function initializeAccount (agentId: string, communityId: string): Promise<boolean> {
   // todo. share points are not intialized; currently they get stuck into db by default.
@@ -134,4 +134,12 @@ export function validateAndFormatTransactionAmount (_amount: number): Decimal {
   const amount = floorWithPrecision(_amount, MAX_PRECISION_IN_AGENT_AMOUNTS)
   assertPositive(amount)
   return amount
+}
+
+export async function updateCreditLimit (agentId: string, communityId: string, incomingAmount: Decimal): Promise<boolean> {
+  const wallet = await getWallet(agentId, communityId)
+  let communityMembersCount = (await getWalletsInCommunity(communityId)).length
+  const delta = calculateCreditLimitDelta(Decimal(wallet.creditLimit), communityMembersCount, incomingAmount)
+  const updatedLimit = delta.plus(wallet.creditLimit)
+  return setCreditLimit(agentId, communityId, updatedLimit).then(r => !!r)
 }

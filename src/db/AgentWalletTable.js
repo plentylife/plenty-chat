@@ -9,6 +9,7 @@ import {InappropriateAction, MissingDatabaseEntry} from '../utils/Error'
 import {assertInt} from '../accounting/utils'
 import {hasEnoughFundsNum} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
+import {rowOrNull} from './index'
 
 export const AGENT_WALLET_TABLE = 'AgentWallet'
 
@@ -187,12 +188,23 @@ export function getAllWallets (): Promise<Array<Wallet>> {
   return nSQL(AGENT_WALLET_TABLE).query('select').exec()
 }
 
+export function getWalletsInCommunity (communityId: string): Promise<Array<Wallet>> {
+  return nSQL(AGENT_WALLET_TABLE).query('select').where(['communityId', '=', communityId]).exec()
+}
+
 export function getWalletsNearLimit (communityId: string, closeBy: number): Promise<Array<Wallet>> {
-  return nSQL(AGENT_WALLET_TABLE).query('select').where(['communityId', '=', communityId]).exec().then(ws => {
+  return getWalletsInCommunity(communityId).then(ws => {
     return ws.filter(w => {
       return !hasEnoughFundsNum(w.balance, w.creditLimit, closeBy)
     })
   })
+}
+
+export function setCreditLimit (agentId: string, communityId: string, creditLimit: Decimal): Promise<null | Object> {
+  const id = generateRowId(agentId, communityId)
+  return nSQL(AGENT_WALLET_TABLE).query('upsert', {
+    id, creditLimit: creditLimit.toNumber()
+  }).exec().then(rowOrNull)
 }
 
 export default agentWalletTable

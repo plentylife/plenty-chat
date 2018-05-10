@@ -7,7 +7,7 @@ import type {PotSplitEntry} from '../accounting/CommunityPot'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/utils'
 import {InappropriateAction, MissingProperty, NotEnoughFunds} from '../utils/Error'
-import {hasEnoughFunds} from '../accounting/Accounting'
+import {hasEnoughFunds, updateCreditLimit} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
 
 export const DEMURRAGE_EVENT_TYPE: 'demurrage' = 'demurrage'
@@ -47,8 +47,11 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
     const wallet = await getWallet(entry.agentId, event.communityId)
     const newCommBalance = floorWithPrecision(Decimal(communityBalance).minus(entry.amount))
     const newAgentBalance = floorWithPrecision(Decimal(wallet.balance).plus(entry.amount))
+
     await setBalance(entry.agentId, event.communityId, newAgentBalance)
+    await updateCreditLimit(entry.agentId, event.communityId, Decimal(entry.amount))
     await setCommunityBalance(event.communityId, newCommBalance)
+
     console.log(`Handling community split for agent ${entry.agentId} ${communityBalance} - ${entry.amount} = ${newCommBalance}`)
     entry = payload.shift()
   }
@@ -77,8 +80,10 @@ export async function handleTransaction (event: Event): Promise<EventResult> {
     const payload = validateTransactionPayload(event.payload, event.senderId)
     const hasFunds = await hasEnoughFunds(event.senderId, event.communityId, payload.amount)
     if (!hasFunds) throw new NotEnoughFunds()
-    await setBalance(event.senderId, event.communityId, Decimal(payload.amount).neg(), /* delta */ true)
-    await setBalance(payload.recipientAgentId, event.communityId, payload.amount, /* delta */ true)
+    const amount = Decimal(payload.amount)
+    await setBalance(event.senderId, event.communityId, amount.neg(), /* delta */ true)
+    await setBalance(payload.recipientAgentId, event.communityId, amount, /* delta */ true)
+    await updateCreditLimit(payload.recipientAgentId, event.communityId, amount)
     return {status: true}
   } catch (e) {
     return {status: false, error: e}
