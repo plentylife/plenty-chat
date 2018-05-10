@@ -11,6 +11,7 @@ import {nSQL} from 'nano-sql'
 import {addCommunitySharePoints, getWallet} from '../../src/db/AgentWalletTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS} from '../../src/accounting/AccountingGlobals'
 import {setCurrentAgentId} from '../../src/state/GlobalState'
+import MMath from 'mathjs'
 
 const NUM_AGENTS = 3
 const AGENTS = []
@@ -58,7 +59,7 @@ test.serial('pot is split properly', async t => {
   await splitAllCommunityPots()
 
   await macroCheckWallets(t, [
-    {b: 10, sp: 10}, {b: 20, sp: 20}, {b: 30, sp: 30}
+    {b: 9.99999, sp: 10}, {b: 19.99999, sp: 20}, {b: 30.00002, sp: 30}
   ])
   t.is(await getCommunityBalance(COMMUNITY_ID), 0)
 })
@@ -67,9 +68,10 @@ test.serial('pot should be fully split, always, event it if means fractions', as
   await setCommunityBalance(COMMUNITY_ID, 61)
   await splitAllCommunityPots()
 
-  await macroCheckWallets(t, [
-    {b: 20.16666, sp: 10}, {b: 40.33333, sp: 20}, {b: 60.5, sp: 30}
-  ])
+  const checkAgainst = [{b: 20.16665, sp: 10}, {b: 40.33332, sp: 20}, {b: 60.50003, sp: 30}]
+  const sumOfcheck = MMath.sum(...checkAgainst.map(c => (c.b)))
+  t.true(sumOfcheck === 121)
+  await macroCheckWallets(t, checkAgainst)
   t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0))
 })
 

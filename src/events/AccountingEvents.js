@@ -5,7 +5,7 @@ import type {DemurrageByProperty} from '../accounting/Demurrage'
 import {applyDemurrageToWallet, getWallet, setBalance} from '../db/AgentWalletTable'
 import type {PotSplitEntry} from '../accounting/CommunityPot'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
-import {assertNumber, assertPositive, floorWithPrecisionPrimitive} from '../accounting/utils'
+import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/utils'
 import {InappropriateAction, MissingProperty, NotEnoughFunds} from '../utils/Error'
 import {hasEnoughFunds} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
@@ -45,8 +45,8 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
   while (entry && entry.amount !== 0) {
     const communityBalance = await getCommunityBalance(event.communityId) // fixme move up
     const wallet = await getWallet(entry.agentId, event.communityId)
-    const newCommBalance = floorWithPrecisionPrimitive(communityBalance - entry.amount)
-    const newAgentBalance = floorWithPrecisionPrimitive(wallet.balance + entry.amount)
+    const newCommBalance = floorWithPrecision(Decimal(communityBalance).minus(entry.amount))
+    const newAgentBalance = floorWithPrecision(Decimal(wallet.balance).plus(entry.amount))
     await setBalance(entry.agentId, event.communityId, newAgentBalance)
     await setCommunityBalance(event.communityId, newCommBalance)
     console.log(`Handling community split for agent ${entry.agentId} ${communityBalance} - ${entry.amount} = ${newCommBalance}`)

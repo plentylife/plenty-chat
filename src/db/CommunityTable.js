@@ -3,6 +3,7 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {assertPositive} from '../accounting/utils'
+import {Decimal} from 'decimal.js'
 // import {CHANNEL_TABLE} from './ChannelTable'
 
 export const COMMUNITY_TABLE = 'Community'
@@ -28,7 +29,7 @@ export function getCommunityBalance (communityId: string): Promise<number> {
   })
 }
 
-export function setCommunityBalance (communityId: string, balance: number): Promise<void> {
+export function setCommunityBalance (communityId: string, balance: (number | Decimal)): Promise<void> {
   // assertInt(balance) removed to prevent community pot bleed
   assertPositive(balance, /* zero allowed */ true)
   return nSQL(COMMUNITY_TABLE).query('upsert', {

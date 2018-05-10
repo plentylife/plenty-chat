@@ -27,6 +27,7 @@
 - Splitting pot should not issue events if there is nothing to split
 - Splitting pot shouold send a message for each user
 - Figure out why not all events were relayed by the server (could it be reconnect and disconnect?)
+- Switch everything to decimal.js (such as community pot split chain)
 
 ## Tests
     D - Demurrage calc. tests need update
