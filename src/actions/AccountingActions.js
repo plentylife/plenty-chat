@@ -27,7 +27,7 @@ export async function applyDemurrageToAll (): Promise<boolean> {
     })
     if (hasAnyNonZero > 0) {
       const payload = Object.assign({}, w, d) // fixme remove unnecessary properties from payload
-      console.log(`Sending out demurrage for agent ${w.agentId} with payload ${payload}`)
+      console.log(`Sending out demurrage for agent ${w.agentId} with payload ${JSON.stringify(payload)}`)
       return sendEvent(DEMURRAGE_EVENT_TYPE, getCurrentAgentId(), w.communityId, payload)
     } else {
       return Promise.resolve(true)

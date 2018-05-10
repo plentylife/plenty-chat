@@ -5,11 +5,14 @@ import {setupDb} from '../utils'
 import apEq from 'approximately-equal'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {applyDemurrageToAll} from '../../src/actions/AccountingActions'
+import {setCurrentAgentId} from '../../src/state/GlobalState'
 
 const AGENT_ID_POOR = 'uid_poor'
 const AGENT_ID_RICH = 'uid_rich'
 const AGENTS = [AGENT_ID_POOR, AGENT_ID_RICH]
 const COMMUNITY_ID = 'cid'
+
+setCurrentAgentId('server')
 
 const TIMESTAMP = new Date().getTime()
 
