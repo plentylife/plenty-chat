@@ -8,6 +8,7 @@ import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {assertNumber, assertPositive, floorWithPrecisionPrimitive} from '../accounting/utils'
 import {InappropriateAction, MissingProperty, NotEnoughFunds} from '../utils/Error'
 import {hasEnoughFunds} from '../accounting/Accounting'
+import {Decimal} from 'decimal.js'
 
 export const DEMURRAGE_EVENT_TYPE: 'demurrage' = 'demurrage'
 
@@ -60,7 +61,7 @@ export function validateTransactionType (type: string): string {
 }
 
 export function validateTransactionPayload (payload: TransactionPayload, senderId: string): TransactionPayload {
-  assertNumber(payload.amount)
+  assertNumber(payload.amount) // todo potentially decimal is not going to fly with the db
   assertPositive(payload.amount)
   if (!senderId) throw new TypeError('sender id is mandatory for checking transaction payload validity')
   if (payload.recipientAgentId === senderId) throw new InappropriateAction('cannot send a transaction to self')
@@ -76,7 +77,7 @@ export async function handleTransaction (event: Event): Promise<EventResult> {
     const payload = validateTransactionPayload(event.payload, event.senderId)
     const hasFunds = await hasEnoughFunds(event.senderId, event.communityId, payload.amount)
     if (!hasFunds) throw new NotEnoughFunds()
-    await setBalance(event.senderId, event.communityId, -1 * payload.amount, /* delta */ true)
+    await setBalance(event.senderId, event.communityId, Decimal(payload.amount).neg(), /* delta */ true)
     await setBalance(payload.recipientAgentId, event.communityId, payload.amount, /* delta */ true)
     return {status: true}
   } catch (e) {
