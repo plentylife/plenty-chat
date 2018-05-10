@@ -10,6 +10,7 @@ import {COMMUNITY_POT_SPLIT_EVENT_TYPE} from '../../src/events/AccountingEvents'
 import {nSQL} from 'nano-sql'
 import {addCommunitySharePoints, getWallet} from '../../src/db/AgentWalletTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS} from '../../src/accounting/AccountingGlobals'
+import {setCurrentAgentId} from '../../src/state/GlobalState'
 
 const NUM_AGENTS = 3
 const AGENTS = []
@@ -18,6 +19,8 @@ for (let i = 0; i < NUM_AGENTS; i++) {
   AGENTS.push(`agent-id-${i}`)
 }
 const COMMUNITY_ID = 'cid'
+
+setCurrentAgentId('server')
 
 test.before(t => {
   return setupDb(t).then(async () => {
