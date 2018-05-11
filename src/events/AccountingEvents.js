@@ -29,8 +29,7 @@ export type TransactionPayload = {
   amount: number,
   recipientAgentId: string,
   messageId: ?string,
-  channelId: ?string,
-  messageSenderId: ?string
+  channelId: ?string
 }
 
 export async function handleDemurrageEvent (event: Event): Promise<boolean> {
@@ -77,7 +76,6 @@ export function validateTransactionPayload (payload: TransactionPayload, senderI
   if (payload.transactionType === 'message') {
     if (!payload.messageId) throw new MissingProperty('message id in transaction details')
     if (!payload.channelId) throw new MissingProperty('message channel id in transaction details')
-    if (!payload.messageSenderId) throw new MissingProperty('message sender id in transaction details')
   }
   return payload
 }
@@ -86,24 +84,25 @@ export async function handleTransaction (event: Event): Promise<EventResult> {
   try {
     const payload = validateTransactionPayload(event.payload, event.senderId)
     const hasFunds = await hasEnoughFunds(event.senderId, event.communityId, payload.amount)
-    if (!hasFunds) throw new NotEnoughFunds()
+    if (!hasFunds) return {status: false, error: new NotEnoughFunds()}
+
     const amount = Decimal(payload.amount)
     await adjustBalance(event.senderId, event.communityId, amount.neg())
     await adjustBalance(payload.recipientAgentId, event.communityId, amount)
     await updateCreditLimit(payload.recipientAgentId, event.communityId, amount)
-    if (event === MESSAGE_TRANSACTION_TYPE) await updateMessageCollectedFunds(payload)
+    if (payload.transactionType === MESSAGE_TRANSACTION_TYPE) await updateMessageCollectedFunds(amount, payload)
     return {status: true}
   } catch (e) {
     return {status: false, error: e}
   }
 }
 
-async function updateMessageCollectedFunds (payload: TransactionPayload): Promise<void> {
+async function updateMessageCollectedFunds (amount: Decimal, payload: TransactionPayload): Promise<void> {
   let msg = await getMessage(payload.messageId)
   if (msg === null) {
     // todo. see if this will include funds collected
-    msg = await pushMessage(payload.messageId, payload.messageSenderId, payload.channelId)
+    msg = await pushMessage(payload.messageId, payload.recipientAgentId, payload.channelId)
   }
-  const updated = Decimal(msg.fundsCollected).plus(payload.amount)
+  const updated = Decimal(msg.fundsCollected).plus(amount)
   return setMessageFunds(payload.messageId, updated)
 }

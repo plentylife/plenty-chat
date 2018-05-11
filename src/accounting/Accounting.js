@@ -4,7 +4,7 @@ import {
   addCommunitySharePoints,
   getWallet,
   setBalance,
-  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit, adjustBalance
+  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit, adjustBalance, WALLET_DEMURRAGE_PROPERTIES
 } from '../db/AgentWalletTable'
 import {
   assertPositive,
@@ -27,10 +27,16 @@ export async function initializeAccount (agentId: string, communityId: string): 
   // todo. share points are not intialized; currently they get stuck into db by default.
   const now = new Date().getTime()
   const bs = await setBalance(agentId, communityId, 0)
-  const dr = await _setDemurrageTimestamps(agentId, communityId, {
-    balance: now, communitySharePoints: now
-  })
+  const dr = await _setDemurrageTimestamps(agentId, communityId, generateDemurrgeTimestamps(now))
   return (bs.length > 0 && dr.length > 0)
+}
+
+function generateDemurrgeTimestamps (timestamp: number) {
+  let ts = {}
+  WALLET_DEMURRAGE_PROPERTIES.forEach(p => {
+    ts.p = timestamp
+  })
+  return ts
 }
 
 export function initializeCommunity (communityId: string): Promise<void> {

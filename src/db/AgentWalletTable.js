@@ -22,8 +22,8 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'communitySharePoints', type: 'number'},
   // {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
   {key: 'demurrageTimestamps', type: 'map'},
-  {key: 'incomingStat', type: 'number'},
-  {key: 'outgoingStat', type: 'number'}
+  {key: 'incomingStat', type: 'number', default: 0},
+  {key: 'outgoingStat', type: 'number', default: 0}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
@@ -103,7 +103,7 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
       payload.creditLimit = DEFAULT_CREDIT_LIMIT // fixme should not be here
       payload.communitySharePoints = DEFAULT_COMMUNITY_SHARE_POINTS
     }
-    console.log(`Setting new balance for ${agentId} in ${communityId} to ${payload.balance}`)
+    console.log(`Setting new balance for ${agentId} in ${communityId} to ${payload.balance}` + (isDelta ? ` ${balance}` : ''))
     return nSQL(AGENT_WALLET_TABLE).query('upsert', payload).exec()
   })
 }

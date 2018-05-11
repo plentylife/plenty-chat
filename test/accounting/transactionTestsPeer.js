@@ -3,7 +3,7 @@ import {setupDb} from '../utils'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {makeTransaction} from '../../src/actions/AccountingActions'
 import {AGENT_WALLET_TABLE, getWallet, setBalance, setCreditLimit} from '../../src/db/AgentWalletTable'
-import {NOT_ENOUGH_FUNDS, RECIPIENT_DOES_NOT_EXIST} from '../../src/utils/UserErrors'
+import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, RECIPIENT_DOES_NOT_EXIST} from '../../src/utils/UserErrors'
 import {DEFAULT_CREDIT_LIMIT} from '../../src/accounting/AccountingGlobals'
 import {Decimal} from 'decimal.js'
 import {nSQL} from 'nano-sql'
@@ -61,6 +61,20 @@ test.serial('transaction without sender having enough funds', async t => {
   t.is(wr.creditLimit, DEFAULT_CREDIT_LIMIT)
   t.false(res.status)
   t.is(res.value, NOT_ENOUGH_FUNDS)
+})
+
+test.serial('negative amounts are not allowed', async t => {
+  const amount = Decimal(-1)
+  const res = await makeTransaction(AGENT_SENDER, COMMUNITY_ID, amount, AGENT_RECIPIENT, TRANSACTION_TYPE)
+
+  const ws = await getWallet(AGENT_SENDER, COMMUNITY_ID)
+  const wr = await getWallet(AGENT_RECIPIENT, COMMUNITY_ID)
+  t.is(ws.balance, 10)
+  t.is(wr.balance, 0)
+  t.is(ws.creditLimit, DEFAULT_CREDIT_LIMIT)
+  t.is(wr.creditLimit, DEFAULT_CREDIT_LIMIT)
+  t.false(res.status)
+  t.is(res.value, AMOUNT_UNDER_ZERO)
 })
 
 test.serial('first proper transaction', async t => {

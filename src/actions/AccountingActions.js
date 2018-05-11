@@ -54,9 +54,9 @@ export async function splitAllCommunityPots (): Promise<boolean> {
 }
 
 export function makeTransactionOnMessage (messageId: string, channelId: string, messageSenderId: string, agentId: string,
-  communityId: string, amount: number, recipientAgentId: string): Promise<EventResult> {
-  return makeTransaction(agentId, communityId, amount, recipientAgentId, MESSAGE_TRANSACTION_TYPE, {
-    messageId, channelId, messageSenderId
+  communityId: string, amount: number): Promise<EventResult> {
+  return makeTransaction(agentId, communityId, amount, messageSenderId, MESSAGE_TRANSACTION_TYPE, {
+    messageId, channelId
   })
 }
 
