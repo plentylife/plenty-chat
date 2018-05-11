@@ -1,0 +1,69 @@
+<mjml>
+  <mj-head>
+    <mj-font name="Raleway" href="https://fonts.googleapis.com/css?family=Raleway" />
+    <mj-font name="Comfortaa" href="https://fonts.googleapis.com/css?family=Comfortaa" />
+    <mj-style inline="inline">
+      .link-nostyle { color: inherit}
+      .table-heading {font-family: 'Comfortaa';
+      font-weight: 700}
+      .amount {color: #228b22; font-family: 'Raleway'}
+      .muted {color:#7c7c7c; font-family: 'Comfortaa';}
+      .messages {color:#5aaebb; font-weight: 700; font-size: 14px}
+    </mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image width='150' src="http://about.plenty.life/etc/plenty_logo_3b_header_low_res.png"></mj-image>
+      </mj-column>
+    </mj-section>
+
+
+    <mj-section padding-top='0'>
+      <mj-column>
+        <mj-text align='center' font-family='raleway'>
+          There are <span class='messages'>[MESSAGE_NUM]</span> new messages in the communities that you are part of
+        </mj-text>
+        <mj-text align='center' font-family='comfortaa' font-size='20px' color='#5aaebb'>
+          <a href='https://plenty.life' class="link-nostyle">see what's up</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding-bottom='0'>
+            <mj-text align='center' font-size='17px' font-family='Comfortaa' color='#7c7c7c'>Your account status</mj-text>
+    </mj-section>
+
+    <mj-section full-width="full-width" padding-top='0'>
+      <mj-column>
+        <mj-table>
+          <tr>
+            <td class='table-heading'>Balance</td>
+            <td class='amount' align='right'>[BALANCE]</td>
+          </tr>
+          <tr>
+            <td class='muted' >Spoiling at [DEMURRAGE_RATE] per day</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class='table-heading'>Credit Limit</td>
+            <td class='amount' align='right'>[CREDIT_LIMIT]</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+      <mj-column>
+        <mj-table>
+          <tr>
+            <td class='table-heading'>Community Balance</td>
+            <td class='amount' align='right'>[COMMUNITY_BALANCE]</td>
+          </tr>
+          <tr>
+            <td class='table-heading'>Your Share</td>
+            <td class='amount' align='right'>[SHARE]</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+  </mj-body>
+</mjml>
