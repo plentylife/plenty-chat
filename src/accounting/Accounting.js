@@ -22,21 +22,14 @@ import {AMOUNT_UNDER_ZERO} from '../utils/UserErrors'
 import './required'
 import {Decimal} from 'decimal.js'
 import {calculateCreditLimitDelta} from './CreditLimit'
+import {generateDemurrageTimestamps} from './Demurrage'
 
 export async function initializeAccount (agentId: string, communityId: string): Promise<boolean> {
   // todo. share points are not intialized; currently they get stuck into db by default.
   const now = new Date().getTime()
   const bs = await setBalance(agentId, communityId, 0)
-  const dr = await _setDemurrageTimestamps(agentId, communityId, generateDemurrgeTimestamps(now))
+  const dr = await _setDemurrageTimestamps(agentId, communityId, generateDemurrageTimestamps(now))
   return (bs.length > 0 && dr.length > 0)
-}
-
-function generateDemurrgeTimestamps (timestamp: number) {
-  let ts = {}
-  WALLET_DEMURRAGE_PROPERTIES.forEach(p => {
-    ts.p = timestamp
-  })
-  return ts
 }
 
 export function initializeCommunity (communityId: string): Promise<void> {

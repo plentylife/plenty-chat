@@ -6,7 +6,9 @@ export const DEFAULT_CREDIT_LIMIT = MINIMUM_CREDIT_LIMIT
 
 export const DEFAULT_COMMUNITY_SHARE_POINTS = 100
 
-export const MAXIMUM_DEMURRAGE_RATE = 0.1
+/* demurrage rate are given as the fraction that will be left at the end of one period */
+
+export const MAXIMUM_DEMURRAGE_RATE = 0.9
 
 // fixme should be maximum
 export const DEFAULT_DEMURRAGE_RATE = 0.02

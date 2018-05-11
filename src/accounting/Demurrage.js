@@ -8,6 +8,7 @@ import {
 } from './AccountingGlobals'
 import './required'
 import {Decimal} from 'decimal.js'
+import {WALLET_DEMURRAGE_PROPERTIES} from '../db/AgentWalletTable'
 
 /** @return whole numbers only */
 export function _calculateDemurrage (balance: number, _ratePerPeriod: number, periods: number): number {
@@ -17,7 +18,7 @@ export function _calculateDemurrage (balance: number, _ratePerPeriod: number, pe
   if (balance < 0) throw new RangeError('Balance cannot be negative')
   assertPositive(periods, /* zero allowed */ true, `Period count cannot be negative -- ${periods}`)
 
-  const rate = Decimal(1).minus(ratePerPeriod)
+  const rate = ratePerPeriod
   const lossFactor = Decimal(1).minus(Decimal(rate).pow(periods))
   return floorWithPrecision(lossFactor.times(balance))
 }
@@ -36,9 +37,10 @@ export type DemurrageByProperty = {
 
 function _calculateDemurrageRate (incomingStat: Decimal, outgoingStat: Decimal): Decimal {
   const max = Decimal(MAXIMUM_DEMURRAGE_RATE)
+  if (outgoingStat.gte(incomingStat)) return Decimal(1)
   if (outgoingStat.lte(0)) return max
-  const rate = Decimal(incomingStat).div(outgoingStat)
-  return rate.gt(max) ? max : rate
+  const rate = Decimal(1).minus(Decimal(incomingStat).div(outgoingStat).minus(1).div(100))
+  return rate.lt(max) ? max : rate
 }
 
 function _cda (w: Wallet, p: string, rate: Decimal): Decimal {
@@ -51,12 +53,20 @@ function _cda (w: Wallet, p: string, rate: Decimal): Decimal {
 
 export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByProperty {
   const w = agentWallet
-  const balanceRate = _calculateDemurrageRate(w.incomingStat, w.outgoingStat)
+  const balanceRate = _calculateDemurrageRate(Decimal(w.incomingStat), Decimal(w.outgoingStat))
   return {
     balance: _cda(agentWallet, 'balance', balanceRate),
     communitySharePoints: _cda(agentWallet, 'communitySharePoints', balanceRate),
     incomingStat: _cda(w, 'incomingStat', STATISTICS_DEMURRAGE_RATE),
     outgoingStat: _cda(w, 'outgoingStat', STATISTICS_DEMURRAGE_RATE),
-    creditLimit: _cda(w, 'outgoingStat', CREDIT_LIMIT_DEMURRAGE_RATE)
+    creditLimit: _cda(w, 'creditLimit', CREDIT_LIMIT_DEMURRAGE_RATE)
   }
+}
+
+export function generateDemurrageTimestamps (timestamp: number) {
+  let ts = {}
+  WALLET_DEMURRAGE_PROPERTIES.forEach(p => {
+    ts[p] = timestamp
+  })
+  return ts
 }
