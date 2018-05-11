@@ -21,7 +21,9 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'creditLimit', type: 'number'},
   {key: 'communitySharePoints', type: 'number'},
   // {key: 'communitySharePoints', type: 'number', default: DEFAULT_COMMUNITY_SHARE_POINTS},
-  {key: 'demurrageTimestamps', type: 'map'}
+  {key: 'demurrageTimestamps', type: 'map'},
+  {key: 'incomingStat', type: 'number'},
+  {key: 'outgoingStat', type: 'number'}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
@@ -36,7 +38,7 @@ export type DemurrageTimestamps = {
 export type Wallet = {
   agentId: string, communityId: string,
   balance: number, creditLimit: number, communitySharePoints: number,
-  demurrageTimestamps: DemurrageTimestamps}
+  demurrageTimestamps: DemurrageTimestamps, incomingStat: number, outgoingStat: number}
 
 export function getWallet (agentId: string, communityId: string): Promise<(Wallet | null)> {
   if (!communityId) throw new TypeError(`Cannot retrieve wallet without community id for agent ${agentId}`)
@@ -48,7 +50,9 @@ export function getWallet (agentId: string, communityId: string): Promise<(Walle
         balance: r[0].balance,
         creditLimit: r[0].creditLimit,
         communitySharePoints: r[0].communitySharePoints,
-        demurrageTimestamps: r[0].demurrageTimestamps
+        demurrageTimestamps: r[0].demurrageTimestamps,
+        incomingStat: r[0].incomingStat,
+        outgoingStat: r[0].outgoingStat
       }
       return b
     }
@@ -60,10 +64,15 @@ function generateRowId (agentId: string, communityId: string) {
   return agentId + '-' + communityId
 }
 
-/** @param isDelta signifies that the balance should be treated as a delta, thus a wallet needs to exist */
+export function adjustBalance (agentId: string, communityId: string, balance: number): Promise<any> {
+  return setBalance(agentId, communityId, balance, /* isDelta */true)
+}
+
+/** @param isDelta signifies that the balance should be treated as a delta, thus a wallet needs to exist
+ * if it is a delta, the outgoing and incoming stats are updated */
 export function setBalance (agentId: string, communityId: string, balance: number, isDelta = false): Promise<any> {
   /** Setting new balance for  an agent */
-  // fixme check that balance is not below credit limit
+  const dBalance = Decimal(balance)
   let payload = {
     agentId: agentId, communityId: communityId
   }
@@ -73,14 +82,19 @@ export function setBalance (agentId: string, communityId: string, balance: numbe
         `agent id [${agentId}]; community id [${communityId}]`)
     }
     if (isDelta) {
-      payload.balance = Decimal(balance).plus(Decimal(r[0].balance)).toNumber()
+      payload.balance = dBalance.plus(Decimal(r[0].balance)).toNumber()
+      if (dBalance.lt(0)) {
+        payload.outgoingStat = Decimal(r[0].outgoingStat).plus(dBalance.abs())
+      } else if (dBalance.gt(0)) {
+        payload.incomingStat = Decimal(r[0].incomingStat).plus(dBalance.abs())
+      }
     } else {
-      payload.balance = balance
+      payload.balance = dBalance.toNumber()
     }
     if (r.length > 0) {
       // $FlowFixMe
       payload.id = r[0].id
-      if (r[0].balance <= 0 && balance > 0) {
+      if (r[0].balance <= 0 && dBalance.gt(0)) {
         payload.demurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps, {balance: (new Date().getTime())})
       }
     } else {

@@ -2,7 +2,7 @@
 
 import type {Event, EventResult} from './index'
 import type {DemurrageByProperty} from '../accounting/Demurrage'
-import {applyDemurrageToWallet, getWallet, setBalance} from '../db/AgentWalletTable'
+import {adjustBalance, applyDemurrageToWallet, getWallet, setBalance} from '../db/AgentWalletTable'
 import type {PotSplitEntry} from '../accounting/CommunityPot'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/utils'
@@ -43,12 +43,11 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
   console.log(`Splitting Community (${event.communityId}) ${payload.length} ways`, payload)
   let entry = payload.shift()
   while (entry && entry.amount !== 0) {
+    const amount = floorWithPrecision(entry.amount)
     const communityBalance = await getCommunityBalance(event.communityId) // fixme move up
-    const wallet = await getWallet(entry.agentId, event.communityId)
-    const newCommBalance = floorWithPrecision(Decimal(communityBalance).minus(entry.amount))
-    const newAgentBalance = floorWithPrecision(Decimal(wallet.balance).plus(entry.amount))
+    const newCommBalance = Decimal(communityBalance).minus(amount)
 
-    await setBalance(entry.agentId, event.communityId, newAgentBalance)
+    await adjustBalance(entry.agentId, event.communityId, amount)
     await updateCreditLimit(entry.agentId, event.communityId, Decimal(entry.amount))
     await setCommunityBalance(event.communityId, newCommBalance)
 
@@ -81,8 +80,8 @@ export async function handleTransaction (event: Event): Promise<EventResult> {
     const hasFunds = await hasEnoughFunds(event.senderId, event.communityId, payload.amount)
     if (!hasFunds) throw new NotEnoughFunds()
     const amount = Decimal(payload.amount)
-    await setBalance(event.senderId, event.communityId, amount.neg(), /* delta */ true)
-    await setBalance(payload.recipientAgentId, event.communityId, amount, /* delta */ true)
+    await adjustBalance(event.senderId, event.communityId, amount.neg())
+    await adjustBalance(payload.recipientAgentId, event.communityId, amount)
     await updateCreditLimit(payload.recipientAgentId, event.communityId, amount)
     return {status: true}
   } catch (e) {

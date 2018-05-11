@@ -4,7 +4,7 @@ import {
   addCommunitySharePoints,
   getWallet,
   setBalance,
-  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit
+  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit, adjustBalance
 } from '../db/AgentWalletTable'
 import {
   assertPositive,
@@ -80,8 +80,8 @@ export async function spend (agentId: string, communityId: string, byAmount: num
 
   await getWallet(agentId, communityId).then(b => {
     if (b === null) throw new Error('No record of balance for agent ' + agentId)
-    const nb = Decimal(b.balance).minus(byAmount)
-    return setBalance(agentId, communityId, nb.toNumber())
+    const amount = Decimal(byAmount).neg()
+    return adjustBalance(agentId, communityId, amount.toNumber())
   })
 
   const cb = await getCommunityBalance(communityId)
