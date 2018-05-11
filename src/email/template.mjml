@@ -7,6 +7,8 @@
       .table-heading {font-family: 'Comfortaa';
       font-weight: 700}
       .amount {color: #228b22; font-family: 'Raleway'}
+      .amount-warning {color: #b9872a; font-family: 'Raleway'}
+      .amount-danger {color: #a94442; font-family: 'Raleway'}
       .muted {color:#7c7c7c; font-family: 'Comfortaa';}
       .messages {color:#5aaebb; font-weight: 700; font-size: 14px}
     </mj-style>
@@ -39,15 +41,15 @@
         <mj-table>
           <tr>
             <td class='table-heading'>Balance</td>
-            <td class='amount' align='right'>[BALANCE]</td>
+            <td class='[BALANCE_CLASS]' align='right'>[BALANCE]₸</td>
           </tr>
           <tr>
-            <td class='muted' >Spoiling at [DEMURRAGE_RATE] per day</td>
+            <td class='muted' >Spoiling at [DEMURRAGE_RATE]% per day</td>
             <td></td>
           </tr>
           <tr>
             <td class='table-heading'>Credit Limit</td>
-            <td class='amount' align='right'>[CREDIT_LIMIT]</td>
+            <td class='amount' align='right'>[CREDIT_LIMIT]₸</td>
           </tr>
         </mj-table>
       </mj-column>
@@ -55,11 +57,11 @@
         <mj-table>
           <tr>
             <td class='table-heading'>Community Balance</td>
-            <td class='amount' align='right'>[COMMUNITY_BALANCE]</td>
+            <td class='amount' align='right'>[COMMUNITY_BALANCE]₸</td>
           </tr>
           <tr>
             <td class='table-heading'>Your Share</td>
-            <td class='amount' align='right'>[SHARE]</td>
+            <td class='amount' align='right'>[SHARE]₸</td>
           </tr>
         </mj-table>
       </mj-column>

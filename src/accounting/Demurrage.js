@@ -35,7 +35,9 @@ export type DemurrageByProperty = {
   creditLimit: Decimal
 }
 
-function _calculateDemurrageRate (incomingStat: Decimal, outgoingStat: Decimal): Decimal {
+export function calculateDemurrageRate (_incomingStat: Decimal, _outgoingStat: Decimal): Decimal {
+  const outgoingStat = Decimal(_outgoingStat)
+  const incomingStat = Decimal(_incomingStat)
   const max = Decimal(MAXIMUM_DEMURRAGE_RATE)
   if (outgoingStat.gte(incomingStat)) return Decimal(1)
   if (outgoingStat.lte(0)) return max

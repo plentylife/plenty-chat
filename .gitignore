@@ -30,3 +30,5 @@ package-lock.json
 *.rawdump
 .idea
 .directory
+
+TIMELOG.md
