@@ -1,7 +1,11 @@
 // @flow
-import {assertPositive} from './utils'
+import {assertPositive, floorWithPrecision} from './utils'
 import type {Wallet} from '../db/AgentWalletTable'
-import {DEFAULT_DEMURRAGE_PERIOD, DEFAULT_DEMURRAGE_RATE, MAXIMUM_DEMURRAGE_RATE} from './AccountingGlobals'
+import {
+  DEMURRAGE_PERIOD,
+  MAXIMUM_DEMURRAGE_RATE,
+  STATISTICS_DEMURRAGE_RATE, CREDIT_LIMIT_DEMURRAGE_RATE
+} from './AccountingGlobals'
 import './required'
 import {Decimal} from 'decimal.js'
 
@@ -15,16 +19,19 @@ export function _calculateDemurrage (balance: number, _ratePerPeriod: number, pe
 
   const rate = Decimal(1).minus(ratePerPeriod)
   const lossFactor = Decimal(1).minus(Decimal(rate).pow(periods))
-  return Math.round(lossFactor.times(balance))
+  return floorWithPrecision(lossFactor.times(balance))
 }
 
-function _calculatePeriods (timeSpan: number, periodLength: number): number {
-  return (timeSpan / periodLength)
+function _calculatePeriods (timeSpan: number, periodLength: number): Decimal {
+  return Decimal(timeSpan).div(periodLength)
 }
 
 export type DemurrageByProperty = {
-  balance: number,
-  communitySharePoints: number
+  balance: Decimal,
+  communitySharePoints: Decimal,
+  incomingStat: Decimal,
+  outgoingStat: Decimal,
+  creditLimit: Decimal
 }
 
 function _calculateDemurrageRate (incomingStat: Decimal, outgoingStat: Decimal): Decimal {
@@ -34,18 +41,22 @@ function _calculateDemurrageRate (incomingStat: Decimal, outgoingStat: Decimal):
   return rate.gt(max) ? max : rate
 }
 
-function _cda (w: Wallet, p: string) {
+function _cda (w: Wallet, p: string, rate: Decimal): Decimal {
   const now = new Date().getTime()
-  const periods = _calculatePeriods(now - w.demurrageTimestamps[p], DEFAULT_DEMURRAGE_PERIOD)
+  const periods = _calculatePeriods(now - w.demurrageTimestamps[p], DEMURRAGE_PERIOD)
   const balance = w[p]
   if (balance <= 0) return 0
-  const rate = _calculateDemurrageRate(w.incomingStat, w.outgoingStat)
   return _calculateDemurrage(balance, rate, periods)
 }
 
 export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByProperty {
+  const w = agentWallet
+  const balanceRate = _calculateDemurrageRate(w.incomingStat, w.outgoingStat)
   return {
-    balance: _cda(agentWallet, 'balance'),
-    communitySharePoints: _cda(agentWallet, 'communitySharePoints')
+    balance: _cda(agentWallet, 'balance', balanceRate),
+    communitySharePoints: _cda(agentWallet, 'communitySharePoints', balanceRate),
+    incomingStat: _cda(w, 'incomingStat', STATISTICS_DEMURRAGE_RATE),
+    outgoingStat: _cda(w, 'outgoingStat', STATISTICS_DEMURRAGE_RATE),
+    creditLimit: _cda(w, 'outgoingStat', CREDIT_LIMIT_DEMURRAGE_RATE)
   }
 }

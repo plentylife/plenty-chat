@@ -31,7 +31,7 @@ function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
     .where([['agentId', '=', agentId], 'AND', ['communityId', '=', communityId]]).exec()
 }
 
-export const WALLET_DELTA_PROPERTIES = ['balance', 'communitySharePoints']
+export const WALLET_DEMURRAGE_PROPERTIES = ['balance', 'communitySharePoints', 'creditLimit', 'incomingStat', 'outgoingStat']
 export type DemurrageTimestamps = {
   balance: number, communitySharePoints: number
 }
@@ -144,16 +144,17 @@ export function applyDemurrageToWallet (agentId: string, communityId: string, de
     const newBalances = {}
     const timestamps: DemurrageTimestamps = Object.assign({}, r[0].demurrageTimestamps)
 
-    WALLET_DELTA_PROPERTIES.forEach(prop => {
+    WALLET_DEMURRAGE_PROPERTIES.forEach(prop => {
       if (delta[prop]) {
-        const cb = r[0][prop]
-        newBalances[prop] = cb - delta[prop]
+        const cb = Decimal(r[0][prop])
+        newBalances[prop] = cb.minus(delta[prop])
         timestamps[prop] = now
         flagAny = true
       }
     })
 
     if (flagAny) {
+      newBalances.outgoingStat = (newBalances.outgoingStat || Decimal(r[0].outgoingStat)).plus(delta.balance)
       const upsert = Object.assign({id: r[0].id}, newBalances, {demurrageTimestamps: timestamps})
       return nSQL(AGENT_WALLET_TABLE).query('upsert', upsert).exec()
     } else {

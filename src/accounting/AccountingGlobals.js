@@ -11,14 +11,14 @@ export const MAXIMUM_DEMURRAGE_RATE = 0.1
 // fixme should be maximum
 export const DEFAULT_DEMURRAGE_RATE = 0.02
 
+export const STATISTICS_DEMURRAGE_RATE = 0.85
+
+export const CREDIT_LIMIT_DEMURRAGE_RATE = 0.85
+
 /** in milliseconds */
 export const LENGTH_OF_DAY = 1000 * 60 * 60 * 24
 
-/** in milliseconds */
-export const DEFAULT_DEMURRAGE_PERIOD = LENGTH_OF_DAY
+/** applies to stats and credit limit demurrage as well; in milliseconds */
+export const DEMURRAGE_PERIOD = LENGTH_OF_DAY
 
 export const MAX_PRECISION_IN_AGENT_AMOUNTS = 3
-
-export const STATISTICS_FORGET_FACTOR = 0.85
-
-export const STATISTICS_FORGET_FACTOR_PERIOD = LENGTH_OF_DAY
