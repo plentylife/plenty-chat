@@ -80,12 +80,12 @@ export async function spend (agentId: string, communityId: string, byAmount: num
 
   await getWallet(agentId, communityId).then(b => {
     if (b === null) throw new Error('No record of balance for agent ' + agentId)
-    const nb = b.balance - byAmount
-    return setBalance(agentId, communityId, nb)
+    const nb = Decimal(b.balance).minus(byAmount)
+    return setBalance(agentId, communityId, nb.toNumber())
   })
 
   const cb = await getCommunityBalance(communityId)
-  return setCommunityBalance(communityId, cb + byAmount)
+  return setCommunityBalance(communityId, Decimal(cb).plus(byAmount).toNumber())
 }
 
 export function calculateCommunitySharePointsForMessageRating (rating: number) {
