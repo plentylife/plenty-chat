@@ -5,7 +5,7 @@ import {calculateDemurrageForAgent} from '../accounting/Demurrage'
 import {sendEvent} from '../events'
 import {
   COMMUNITY_POT_SPLIT_EVENT_TYPE,
-  DEMURRAGE_EVENT_TYPE,
+  DEMURRAGE_EVENT_TYPE, MESSAGE_TRANSACTION_TYPE,
   TRANSACTION_EVENT_TYPE, validateTransactionPayload,
   validateTransactionType
 } from '../events/AccountingEvents'
@@ -14,8 +14,15 @@ import {getAllCommunities} from '../db/CommunityTable'
 import {calculateCommunityPotSplit} from '../accounting/CommunityPot'
 import type {EventResult} from '../events'
 import {hasEnoughFunds, validateAndFormatTransactionAmount} from '../accounting/Accounting'
-import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, PROGRAMMER_ERROR, RECIPIENT_DOES_NOT_EXIST} from '../utils/UserErrors'
+import {
+  AMOUNT_UNDER_ZERO,
+  MESSAGE_DOES_NOT_EXIST,
+  NOT_ENOUGH_FUNDS,
+  PROGRAMMER_ERROR,
+  RECIPIENT_DOES_NOT_EXIST
+} from '../utils/UserErrors'
 import type {TransactionPayload} from '../events/AccountingEvents'
+import {getMessage} from '../db/MessageTable'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
@@ -46,6 +53,13 @@ export async function splitAllCommunityPots (): Promise<boolean> {
   return Promise.all(promises)
 }
 
+export function makeTransactionOnMessage (messageId: string, channelId: string, messageSenderId: string, agentId: string,
+  communityId: string, amount: number, recipientAgentId: string): Promise<EventResult> {
+  return makeTransaction(agentId, communityId, amount, recipientAgentId, MESSAGE_TRANSACTION_TYPE, {
+    messageId, channelId, messageSenderId
+  })
+}
+
 export async function makeTransaction (agentId: string, communityId: string, _amount: number,
   recipientAgentId: string, _type: string, additionalPayload: Object): Promise<EventResult> {
   try {
@@ -59,6 +73,7 @@ export async function makeTransaction (agentId: string, communityId: string, _am
     if (!recipientExists) {
       return {status: false, value: RECIPIENT_DOES_NOT_EXIST}
     }
+
     const payload: TransactionPayload = Object.assign({}, additionalPayload || {}, {
       transactionType: type,
       recipientAgentId,
