@@ -35,6 +35,41 @@
       </mj-column>
     </mj-section>
 
+    <mj-section padding-bottom='0'>
+            <mj-text align='center' font-size='17px' font-family='Comfortaa' color='#7c7c7c'>Your account status</mj-text>
+    </mj-section>
+
+    <mj-section full-width="full-width" padding-top='0'>
+      <mj-column>
+        <mj-table>
+          <tr>
+            <td class='table-heading'>Balance</td>
+            <td style='[BALANCE_STYLE]' align='right'>[BALANCE]₸</td>
+          </tr>
+          <tr>
+            <td class='muted' >Spoiling at [DEMURRAGE_RATE]% per day</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class='table-heading'>Credit Limit</td>
+            <td class='amount' align='right'>[CREDIT_LIMIT]₸</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+      <mj-column>
+        <mj-table>
+          <tr>
+            <td class='table-heading'>Community Balance</td>
+            <td class='amount' align='right'>[COMMUNITY_BALANCE]₸</td>
+          </tr>
+          <tr>
+            <td class='table-heading'>Your Share</td>
+            <td class='amount' align='right'>[SHARE]₸</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
     <mj-section>
       <mj-column>
         <mj-text align='center' color='#424242' font-family='Raleway'>
