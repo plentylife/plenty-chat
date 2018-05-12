@@ -7,3 +7,8 @@ export function eqSet (as, bs) {
   for (let a of as) if (!bs.has(a)) return false
   return true
 }
+
+let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+export function getDayOfWeek (date) {
+  return days[date.getDay()]
+}

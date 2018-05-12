@@ -31,4 +31,7 @@ package-lock.json
 .idea
 .directory
 
+test/email/output.html
+
 TIMELOG.md
+config.js

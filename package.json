@@ -14,6 +14,7 @@
     "nano-sql": "^1.5.2",
     "nano-sql-react": "^1.3.3",
     "nano-sqlite": "^1.2.0",
+    "nodemailer": "^4.6.4",
     "promise-timeout": "^1.3.0",
     "react": "^16.3.1",
     "react-animate-on-change": "^1.0.1",

@@ -16,6 +16,9 @@
   <mj-body>
     <mj-section>
       <mj-column>
+        <mj-text color='#ffffff' font-size='0px' line-height='0px' padding='0px'>
+          [DATE]
+        </mj-text>
         <mj-image width='150' src="http://about.plenty.life/etc/plenty_logo_3b_header_low_res.png"></mj-image>
       </mj-column>
     </mj-section>
@@ -41,7 +44,7 @@
         <mj-table>
           <tr>
             <td class='table-heading'>Balance</td>
-            <td class='[BALANCE_CLASS]' align='right'>[BALANCE]₸</td>
+            <td style='[BALANCE_STYLE]' align='right'>[BALANCE]₸</td>
           </tr>
           <tr>
             <td class='muted' >Spoiling at [DEMURRAGE_RATE]% per day</td>
@@ -64,6 +67,17 @@
             <td class='amount' align='right'>[SHARE]₸</td>
           </tr>
         </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text align='center' color='#424242' font-family='Raleway'>
+          Ask us anything at <a href='mailto:thanks@plenty.life'>thanks@plenty.life</a>
+        </mj-text>
+        <mj-text color='#ffffff' font-size='0px' line-height='0px' padding='0px'>
+          [DATE]
+        </mj-text>
       </mj-column>
     </mj-section>
 
