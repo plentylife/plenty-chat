@@ -1,9 +1,10 @@
 import test from 'ava'
 import {nSQL} from 'nano-sql'
-import {AGENT_WALLET_TABLE, getWallet, setBalance} from '../src/db/AgentWalletTable'
+import {getWallet, setBalance} from '../src/db/AgentWalletTable'
 import {DEFAULT_CREDIT_LIMIT} from '../src/accounting/AccountingGlobals'
 import {addAgentToCommunity} from '../src/actions/AgentActions'
 import {DB_MODE} from '../src/state/GlobalState'
+import {AGENT_WALLET_TABLE} from '../src/db/tableNames'
 
 const AGENT_ID = 'uid'
 const COMMUNITY_ID = 'comid'

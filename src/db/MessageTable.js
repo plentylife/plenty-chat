@@ -13,7 +13,7 @@ export type MessageRow = {id: string, senderId: string, channelId: string, times
 const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
   {key: 'senderId', type: 'string'},
-  {key: 'channelId', type: CHANNEL_TABLE},
+  {key: 'channelId', type: CHANNEL_TABLE, props: ['ref=>messages[]']},
   {key: 'timestamp', type: 'number', props: ['idx']},
   {key: 'fundsCollected', type: 'number', default: 0}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
@@ -38,6 +38,10 @@ export function getMessage (id: string): Promise<MessageRow | null> {
 
 export function setMessageFunds (id: string, amount: Decimal): Promise<MessageRow | null> {
   return nSQL(MESSAGE_TABLE).query('upsert', {id, fundsCollected: amount.toNumber()}).exec().then(rowOrNull)
+}
+
+export function getMessagesForNotifications (after: number): Promise<Array<MessageRow & {communityId: string}>> {
+  return nSQL(MESSAGE_TABLE).query('select').orm(['channelId']).where(['timestamp', '>', after]).exec()
 }
 
 export default messageTable

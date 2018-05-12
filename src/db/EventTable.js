@@ -1,7 +1,7 @@
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
-import {AGENT_TABLE} from './AgentTable'
+import {AGENT_TABLE} from './tableNames'
 import type {Event} from '../events'
 
 export const EVENT_TABLE = 'Event'

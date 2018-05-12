@@ -4,7 +4,7 @@ import '../../src/db/index'
 import {EVENT_TABLE} from '../../src/db/EventTable'
 import {test} from 'ava'
 import {applyToAllDbs} from '../utils'
-import {AGENT_TABLE} from '../../src/db/AgentTable'
+import {AGENT_TABLE} from '../../src/db/tableNames'
 import fs from 'fs'
 
 let adapter = null
