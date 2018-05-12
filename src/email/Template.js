@@ -11,8 +11,8 @@ export function generateEmailHtml (newCount: number, wallet: Wallet, communityBa
     fs.readFile('src/email/template.html', (err, data) => {
       if (err) reject(err)
       let html = fillMsgCount(newCount, data.toString())
-      html = fillWallet(wallet, html)
-      html = fillCommunity(communityBalance, share, html)
+      // html = fillWallet(wallet, html)
+      // html = fillCommunity(communityBalance, share, html)
       html = fillDate(html)
       resolve(html)
     })

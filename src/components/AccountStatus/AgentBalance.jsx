@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
-import {AGENT_WALLET_TABLE, getWallet} from '../../db/AgentWalletTable'
+import {getWallet} from '../../db/AgentWalletTable'
 import type {Wallet} from '../../db/AgentWalletTable'
 import './style.css'
 import {DEFAULT_DEMURRAGE_RATE} from '../../accounting/AccountingGlobals'
 import {bindNSQL} from 'nano-sql-react/index'
 import Balance from './Balance'
+import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 
 type Props = {
   agentId: string,

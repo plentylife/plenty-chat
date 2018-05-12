@@ -2,11 +2,12 @@ import test from 'ava'
 import {setupDb} from '../utils'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {makeTransaction} from '../../src/actions/AccountingActions'
-import {AGENT_WALLET_TABLE, getWallet, setBalance, setCreditLimit} from '../../src/db/AgentWalletTable'
+import {getWallet, setBalance, setCreditLimit} from '../../src/db/AgentWalletTable'
 import {AMOUNT_UNDER_ZERO, NOT_ENOUGH_FUNDS, RECIPIENT_DOES_NOT_EXIST} from '../../src/utils/UserErrors'
 import {DEFAULT_CREDIT_LIMIT} from '../../src/accounting/AccountingGlobals'
 import {Decimal} from 'decimal.js'
 import {nSQL} from 'nano-sql'
+import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
 
 const TRANSACTION_TYPE = 'peer'
 

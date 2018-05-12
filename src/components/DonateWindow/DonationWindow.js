@@ -1,10 +1,11 @@
 import React from 'react'
 import './donateStyle.scss'
-import {AGENT_WALLET_TABLE, getWalletsNearLimit} from '../../db/AgentWalletTable'
+import {getWalletsNearLimit} from '../../db/AgentWalletTable'
 import {getCurrentCommunityId} from '../../state/GlobalState'
 import type {Wallet} from '../../db/AgentWalletTable'
 import {getLastEventBy} from '../../db/EventTable'
 import AgentRow from './AgentRow'
+import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 
 type Props = {
   getUserImage: (Object) => string,

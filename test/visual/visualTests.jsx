@@ -11,7 +11,7 @@ import {
   setCurrentAgentId,
   setCurrentCommunityId
 } from '../../src/state/GlobalState'
-import {addCommunitySharePoints, AGENT_WALLET_TABLE, getWallet, setBalance} from '../../src/db/AgentWalletTable'
+import {addCommunitySharePoints, getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
 import communityTable, {COMMUNITY_TABLE, getCommunityBalance, setCommunityBalance} from '../../src/db/CommunityTable'
@@ -21,6 +21,7 @@ import {rateMessage} from '../../src/actions/RatingActions'
 import * as Tutorial from 'Tutorial'
 import {dropAll} from '../utils'
 import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
+import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')

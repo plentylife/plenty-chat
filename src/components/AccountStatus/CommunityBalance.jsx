@@ -4,7 +4,7 @@ import './style.css'
 import {COMMUNITY_TABLE, getCommunityBalance} from '../../db/CommunityTable'
 import {calculateCommunityPotSplit} from '../../accounting/CommunityPot'
 import {bindNSQL} from 'nano-sql-react/index'
-import {AGENT_WALLET_TABLE} from '../../db/AgentWalletTable'
+import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import Balance from './Balance'
 import {CRON_TIME} from '../../state/GlobalState'
 

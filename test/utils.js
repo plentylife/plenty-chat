@@ -13,7 +13,7 @@ export function setupDb (t) {
   })
 }
 
-function dropDb (name: string) {
+export function _dropDb (name: string) {
   console.log('Dropping', name)
   return nSQL(name).query('drop').exec()
 }
@@ -23,7 +23,7 @@ export function dropAll (skipTables: Array<string> = []) {
     let left = ALL_TABLES.length
     ALL_TABLES.forEach(async t => {
       if (!skipTables.includes(t)) {
-        await dropDb(t)
+        await _dropDb(t)
       }
       left -= 1
       if (left === 0) resolve()

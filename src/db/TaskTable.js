@@ -2,7 +2,7 @@
 
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
-import {AGENT_TABLE} from './AgentTable'
+import {AGENT_TABLE} from './tableNames'
 import {rowOrNull} from './index'
 // import {COMMUNITY_TABLE} from './CommunityTable'
 

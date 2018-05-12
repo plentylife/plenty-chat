@@ -24,3 +24,5 @@ export const LENGTH_OF_DAY = 1000 * 60 * 60 * 24
 export const DEMURRAGE_PERIOD = LENGTH_OF_DAY
 
 export const MAX_PRECISION_IN_AGENT_AMOUNTS = 3
+
+export const NOTIFY_PERIOD = 1000 * 60 * 60
