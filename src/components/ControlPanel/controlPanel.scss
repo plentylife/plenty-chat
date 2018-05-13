@@ -4,4 +4,60 @@
   position: relative;
   justify-content: flex-end;
   flex-direction: column;
+  font-family: Raleway, serif;
+  align-items: center;
+
+  .collapse-expand {
+    font-size: 0.9em;
+    color: #5e5e5e;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+#plenty-control-panel.collapsed {
+  .account-status-block {
+    .community-block, .accounting-info, .demurrage {
+      display: none;
+    }
+    .agent-balance {
+      display: flex;
+    }
+    .agent-block {
+      border: none;
+    }
+  }
+
+  #donate-window {
+    animation-duration: 4s;
+    animation-timing-function: ease-out;
+    animation-name: fade-in-scale;
+    height: 0;
+    overflow: hidden;
+    border: none;
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    height: auto;
+    opacity: 0;
+    border: 1px solid cadetblue;
+  }
+  70% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+    height: auto;
+    border: 1px solid cadetblue;
+  }
+  to {
+    opacity: 0;
+    height: 0;
+    border: none
+  }
 }

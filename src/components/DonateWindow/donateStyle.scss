@@ -8,7 +8,7 @@
   margin-bottom: 5px;
   margin-right: auto;
   margin-left: auto;
-  margin-top: 5px;
+  //margin-top: 5px;
 
   border: 1px solid cadetblue;
   flex-direction: column;
@@ -50,5 +50,19 @@
     & > span {
       display: flex;
     }
+  }
+}
+
+#donate-window {
+  animation-duration: 3s;
+  animation-name: fade-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

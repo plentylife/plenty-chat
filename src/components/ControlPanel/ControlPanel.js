@@ -19,6 +19,7 @@ export default class ControlPanel extends React.Component<Props> {
   constructor (props) {
     super(props)
     this.state = {
+      isCollapsed: false,
       donateModalOpen: false,
       transactionTargetAgent: null,
       transactionErrorMessage: null,
@@ -30,6 +31,7 @@ export default class ControlPanel extends React.Component<Props> {
     this.onTransactionAmountChange = this.onTransactionAmountChange.bind(this)
     this.openDonateModal = this.openDonateModal.bind(this)
     this.hideDonateModal = this.hideDonateModal.bind(this)
+    this.toggleCollapse = this.toggleCollapse.bind(this)
   }
 
   openTransactionModal (agentId: string) {
@@ -72,14 +74,23 @@ export default class ControlPanel extends React.Component<Props> {
     this.setState({transactionTargetAgent: null, transactionAmount: null, transactionErrorMessage: null})
   }
 
+  toggleCollapse () {
+    this.setState({isCollapsed: !this.state.isCollapsed})
+  }
+
   render () {
+    const openClose = <div className={'collapse-expand'} onClick={this.toggleCollapse}>
+      {this.state.isCollapsed ? 'expand' : 'collapse'}
+    </div>
+
     const donateModal = this.state.donateModalOpen
       ? <DonateModal getUserProfile={this.props.getUserProfile}
         getUserImage={this.props.getUserImage}
         isOpen={this.state.donateModalOpen} onHide={this.hideDonateModal}
         onSelect={this.openTransactionModal}
       /> : null
-    return <div id={'plenty-control-panel'}>
+    return <div id={'plenty-control-panel'} className={this.state.isCollapsed ? 'collapsed' : 'expanded'}>
+      {openClose}
       {donateModal}
       <TransactionAmountModal isOpen={!!this.state.transactionTargetAgent}
         agentName={this.state.transactionTargetName} agentImageSrc={this.state.transactionTargetImageSrc}
