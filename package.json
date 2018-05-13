@@ -9,6 +9,7 @@
     "brfs": "^1.4.3",
     "bufferutil": "^3.0.0",
     "decimal.js": "^10.0.0",
+    "intro.js": "^2.9.3",
     "leveldown": "^3.0.0",
     "mathjs": "^4.2.2",
     "nano-sql": "^1.5.2",

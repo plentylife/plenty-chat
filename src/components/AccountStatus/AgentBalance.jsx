@@ -51,8 +51,11 @@ class AgentBalance extends Component<Props> {
         // eslint-disable-next-line no-unused-expressions
         return <span className={'agent-block'}>
           <span className={'balance-block'}>
-            <span className={'agent-balance accounting-info'}><label>Balance</label><Balance amount={data.balance}/></span>
-            <span className={'demurrage info'}>Spoiling at {Decimal(1).minus(drate).times(100).trunc().toString()}% per day</span>
+            <span className={'agent-balance accounting-info'} data-step="2" data-intro="This is a tooltip!" data-position="top">
+              <label>Balance</label><Balance amount={data.balance}/>
+            </span>
+            <span className={'demurrage info'} data-step="3" data-intro="This is a tooltip!" data-position="top">
+              Spoiling at {Decimal(1).minus(drate).times(100).trunc().toString()}% per day</span>
           </span>
           <span className={'accounting-info'}><label>Credit Limit</label><Balance amount={data.creditLimit}/></span>
         </span>

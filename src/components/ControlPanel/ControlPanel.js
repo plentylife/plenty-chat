@@ -7,6 +7,8 @@ import DonateModal from '../DonateWindow/DonateModal'
 import TransactionAmountModal from '../Transactions/TransactionAmountModal'
 import {userNameFromProfile} from '../utils'
 import {convertStringToValidAmount} from '../../accounting/Accounting'
+import IntroJs from 'intro.js/intro'
+import 'intro.js/introjs.css'
 
 type Props = {
   agentId: string,
@@ -78,6 +80,13 @@ export default class ControlPanel extends React.Component<Props> {
     this.setState({isCollapsed: !this.state.isCollapsed})
   }
 
+  componentDidMount () {
+    setTimeout(() => {
+      IntroJs.introJs().setOption('showProgress', true)
+        .setOption('showBullets', false).start()
+    }, 799)
+  }
+
   render () {
     const openClose = <div className={'collapse-expand'} onClick={this.toggleCollapse}>
       {this.state.isCollapsed ? 'expand' : 'collapse'}
@@ -89,7 +98,8 @@ export default class ControlPanel extends React.Component<Props> {
         isOpen={this.state.donateModalOpen} onHide={this.hideDonateModal}
         onSelect={this.openTransactionModal}
       /> : null
-    return <div id={'plenty-control-panel'} className={this.state.isCollapsed ? 'collapsed' : 'expanded'}>
+    return <div id={'plenty-control-panel'}
+      className={this.state.isCollapsed ? 'collapsed' : 'expanded'}>
       {openClose}
       {donateModal}
       <TransactionAmountModal isOpen={!!this.state.transactionTargetAgent}

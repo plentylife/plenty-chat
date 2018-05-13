@@ -10,7 +10,7 @@ type Props = {
 
 class AccountStatus extends PureComponent<Props> {
   render () {
-    return <span className={'account-status-block'}>
+    return <span className={'account-status-block'} data-step="1" data-intro="This is a tooltip!" data-position="top">
       <AgentBalance {...this.props}/>
       <CommunityBalance {...this.props}/>
     </span>
