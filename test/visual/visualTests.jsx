@@ -71,7 +71,7 @@ nSQL().onConnected(async () => {
   await createChannel(getCurrentAgentId(), CH_ID, getCurrentCommunityId())
   await setCommunityBalance(getCurrentCommunityId(), 21.32356)
   // await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 20)
-  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), -4.16454)
+  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 10)
   await addCommunitySharePoints(getCurrentAgentId(), getCurrentCommunityId(), 1)
   await addCommunitySharePoints(OTHER_AGENT_ID, getCurrentCommunityId(), 2)
 
@@ -81,7 +81,7 @@ nSQL().onConnected(async () => {
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
-      <GiveButton messageId={'gmid'} channelId={CH_ID} messageSenderId={getCurrentAgentId()}/>
+      <GiveButton messageId={'gmid'} channelId={CH_ID} messageSenderId={OTHER_AGENT_ID}/>
 
       <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
         getUserProfile={getUP} getUserImage={getP}/>

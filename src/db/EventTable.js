@@ -1,5 +1,5 @@
-import {nSQL} from 'nano-sql/lib/index'
-import {DB_ID, DB_MODE} from '../state/GlobalState'
+import {nSQL} from 'nano-sql'
+import {DB_MODE, DB_ID} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {AGENT_TABLE} from './tableNames'
 import type {Event} from '../events'

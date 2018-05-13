@@ -34,10 +34,9 @@ export default class GiveButton extends React.Component<Props> {
   }
 
   onTransact () {
-    const params = Object.assign({}, this.props, {
-      agentId: getCurrentAgentId(), communityId: getCurrentCommunityId(), amount: this.state.transactionAmount
-    })
-    makeTransactionOnMessage(...params).then(res => {
+    const {messageId, channelId, messageSenderId} = this.props
+    makeTransactionOnMessage(messageId, channelId, messageSenderId,
+      getCurrentAgentId(), getCurrentCommunityId(), this.state.transactionAmount).then(res => {
       if (res.status) {
         this.hideTransactionModal()
       } else {
@@ -79,7 +78,8 @@ export default class GiveButton extends React.Component<Props> {
 
     return <div className={'give-button-wrapper'}>
       {modal}
-      <Button onClick={this.openTransactionModal} bsStyle={'primary'}>Give {TENGE}</Button>
+      <Button onClick={this.openTransactionModal}
+        bsStyle={'primary'} bsSize={'small'} >Give {TENGE}</Button>
     </div>
   }
 }
