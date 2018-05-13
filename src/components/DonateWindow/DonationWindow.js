@@ -7,6 +7,7 @@ import {getLastEventBy} from '../../db/EventTable'
 import AgentRow from './AgentRow'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import {COST_OF_SENDING_MESSAGE} from '../../accounting/AccountingGlobals'
+import {getWalletsForDonation} from './index'
 
 type Props = {
   getUserImage: (Object) => string,
@@ -22,28 +23,11 @@ export default class DonationWindow extends React.Component<Props> {
 
   static onChange (event, complete) {
     console.log('Donate window', event)
-    if (event.notes.includes('mount')) { // todo or a new wallet near exhaustion
-      getWalletsNearLimit(getCurrentCommunityId(), COST_OF_SENDING_MESSAGE).then(async ws => {
-        const sansSelf = ws.filter((w: Wallet) => {
-          return w.agentId !== getCurrentAgentId()
-        })
-        const sorted = await DonationWindow.sortWallets(sansSelf)
-        complete(sorted)
-      }) // fixme not going to change when community changes. gotta get redux
-    }
-  }
-
-  static async sortWallets (wallets: Array<Wallet>): Promise<Array<Wallet>> {
-    const withLastTimestamp = []
-    const ps = wallets.map(w => {
-      return getLastEventBy(w.agentId, w.communityId).then(e => {
-        withLastTimestamp.push([e.timestamp, w])
-      })
-    })
-    await Promise.all(ps)
-    return withLastTimestamp.sort((a, b) => {
-      return b[0] - a[0]
-    }).map(wt => (wt[1]))
+    // if (event.notes.includes('mount')) { // todo or a new wallet near exhaustion
+    getWalletsForDonation().then(ws => {
+      complete(ws)
+    }) // fixme not going to change when community changes. gotta get redux
+    // }
   }
 
   render () {

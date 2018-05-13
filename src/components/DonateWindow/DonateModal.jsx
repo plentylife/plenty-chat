@@ -6,6 +6,7 @@ import DonationWindow from './DonationWindow'
 import {getCurrentCommunityId} from '../../state/GlobalState'
 import './donateStyle.scss'
 import equals from 'shallow-equals'
+import {getWalletsForDonation} from './index'
 
 type Props = {
   isOpen: boolean,
@@ -21,12 +22,12 @@ export default class DonateModal extends React.Component<Props> {
     this.state = {
       wallets: []
     }
-    DonateModal.getWallets().then(ws => this.setState({wallets: ws}))
+    getWalletsForDonation().then(ws => this.setState({wallets: ws}))
   }
 
   componentDidUpdate () {
     if (this.props.isOpen) {
-      DonateModal.getWallets().then(ws => this.setState({wallets: ws}))
+      getWalletsForDonation().then(ws => this.setState({wallets: ws}))
     }
   }
 
@@ -39,18 +40,6 @@ export default class DonateModal extends React.Component<Props> {
       }
     }
     return p || ws
-  }
-
-  // setWallets () {
-  //
-  // }
-
-  static async getWallets () {
-    // fixme 300 is just for testing
-    const wallets = await getWalletsNearLimit(getCurrentCommunityId(), 300).then(ws => {
-      return DonationWindow.sortWallets(ws)
-    })
-    return wallets
   }
 
   render () {
