@@ -7,7 +7,7 @@ import {_countAgentNotifications, notifyAll} from '../../src/email/Notifications
 import {MESSAGE_TABLE, pushMessage} from '../../src/db/MessageTable'
 import {AGENT_TABLE} from '../../src/db/tableNames'
 import {nSQL} from 'nano-sql'
-import {NOTIFY_PERIOD} from '../../src/accounting/AccountingGlobals'
+import {NOTIFY_PERIOD} from '../../src/email/Notifications'
 
 const CHANNEL1 = 'chid1'
 const CHANNEL2 = 'chid2'

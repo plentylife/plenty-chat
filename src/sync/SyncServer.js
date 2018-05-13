@@ -6,6 +6,7 @@ import '../db/index'
 import {nSQL} from 'nano-sql'
 import type {Peer} from './index'
 import {applyDemurrageToAll, splitAllCommunityPots} from '../actions/AccountingActions'
+import {NOTIFY_PERIOD, notifyAll} from '../email/Notifications'
 
 console.log('Starting server')
 
@@ -45,4 +46,9 @@ nSQL().connect().then(() => {
     await applyDemurrageToAll()
     await splitAllCommunityPots()
   }, CRON_TIME * 60 * 1000)
+
+  setInterval(async () => {
+    console.log('\nEmail Cron\n', new Date())
+    await notifyAll()
+  }, NOTIFY_PERIOD)
 })

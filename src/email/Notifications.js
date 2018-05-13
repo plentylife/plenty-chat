@@ -1,8 +1,9 @@
 import {getAgentsByNotificationTime, registerNotification} from '../db/AgentTable'
-import {NOTIFY_PERIOD} from '../accounting/AccountingGlobals'
 import {getMessagesForNotifications} from '../db/MessageTable'
 import {generateEmailHtml} from './Template'
 import {sendMail} from './Mailer'
+
+export const NOTIFY_PERIOD = 1000 * 60 * 60
 
 export async function notifyAll (): void {
   const counts = await _countAgentNotifications()

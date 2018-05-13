@@ -63,3 +63,4 @@ export function setSendEventSync (v: boolean) {
 export function getSendEventSync (v: boolean) {
   return _sendEventSync
 }
+
