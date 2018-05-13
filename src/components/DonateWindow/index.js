@@ -2,11 +2,9 @@ import DW from './DonationWindow'
 import {bindNSQL} from 'nano-sql-react'
 import type {Wallet} from '../../db/AgentWalletTable'
 import {COST_OF_SENDING_MESSAGE} from '../../accounting/AccountingGlobals'
-import {getWalletsNearLimit} from '../../db/AgentWalletTable'
+import {getWalletsNearLimit} from '../../db/index'
 import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
 import {getLastEventBy} from '../../db/EventTable'
-
-const DonationWindow = bindNSQL(DW)
 
 export function getWalletsForDonation () {
   return getWalletsNearLimit(getCurrentCommunityId(), COST_OF_SENDING_MESSAGE).then(async ws => {
@@ -29,6 +27,8 @@ async function sortWallets (wallets: Array<Wallet>): Promise<Array<Wallet>> {
     return b[0] - a[0]
   }).map(wt => (wt[1]))
 }
+
+const DonationWindow = bindNSQL(DW)
 
 export {
   DonationWindow

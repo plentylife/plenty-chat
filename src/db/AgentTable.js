@@ -2,7 +2,7 @@
 
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
-import {rowOrNull} from './index'
+import {rowOrNull} from './utils'
 import {AGENT_TABLE, AGENT_WALLET_TABLE} from './tableNames'
 
 export type AgentRow = {

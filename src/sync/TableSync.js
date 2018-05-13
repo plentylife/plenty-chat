@@ -2,7 +2,7 @@ import {nSQL} from 'nano-sql'
 import {MissingProperty} from '../utils/Error'
 import {ALL_TABLES} from '../db'
 import {EVENT_TABLE, SELF_EVENT_TABLE} from '../db/EventTable'
-import {MESSAGE_TABLE} from '../db/MessageTable'
+import {MESSAGE_TABLE} from '../db/tableNames'
 import {logSync, PEER_SYNC_TABLE} from '../db/PeerSyncTable'
 import type {Peer} from './index'
 

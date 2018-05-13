@@ -1,16 +1,16 @@
 // @flow
 
-import {MESSAGE_TABLE} from './MessageTable'
-import {CHANNEL_TABLE} from './ChannelTable'
+import {AGENT_TABLE, AGENT_WALLET_TABLE, CHANNEL_TABLE, MESSAGE_TABLE} from './tableNames'
 import {nSQL} from 'nano-sql'
 
 import './AgentTable'
-import './AgentWalletTable'
-import {AGENT_TABLE, AGENT_WALLET_TABLE} from './tableNames'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {EVENT_TABLE, SELF_EVENT_TABLE} from './EventTable'
 import {PEER_SYNC_TABLE} from './PeerSyncTable'
 import {RATING_TABLE} from './RatingTable'
+import {hasEnoughFundsNum} from '../accounting/Accounting'
+import type {Wallet} from './AgentWalletTable'
+import {getWalletsInCommunity} from './AgentWalletTable'
 
 export const ALL_TABLES = [
   AGENT_TABLE, AGENT_WALLET_TABLE, CHANNEL_TABLE, COMMUNITY_TABLE, EVENT_TABLE, SELF_EVENT_TABLE, MESSAGE_TABLE,
@@ -32,13 +32,10 @@ function cn (table: string, columnName): string {
   return table + '.' + columnName
 }
 
-export function rowOrNull <T> (rows: any): (T | null) {
-  if (rows instanceof Array && rows.length > 0) {
-    const fr = rows[0]
-    if (fr instanceof Object && fr.affectedRows) {
-      return fr.affectedRows.length > 0 ? fr.affectedRows[0] : null
-    }
-    return fr
-  }
-  return null
+export function getWalletsNearLimit (communityId: string, closeBy: number): Promise<Array<Wallet>> {
+  return getWalletsInCommunity(communityId).then(ws => {
+    return ws.filter(w => {
+      return !hasEnoughFundsNum(w.balance, w.creditLimit, closeBy)
+    })
+  })
 }

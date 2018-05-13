@@ -2,11 +2,9 @@
 
 import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
-import {CHANNEL_TABLE} from './ChannelTable'
+import {CHANNEL_TABLE, MESSAGE_TABLE} from './tableNames'
 import {Decimal} from 'decimal.js'
-import {rowOrNull} from './index'
-
-export const MESSAGE_TABLE = 'Message'
+import {rowOrNull} from './utils'
 
 export type MessageRow = {id: string, senderId: string, channelId: string, timestamp: number, fundsCollected: number}
 

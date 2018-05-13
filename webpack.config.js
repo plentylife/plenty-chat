@@ -3,7 +3,8 @@ const webpackSelection = require('./webpack-build-selector')
 const webpack = require('webpack') // to access built-in plugins
 var path = require('path')
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 const common = {
   module: {
@@ -129,6 +130,14 @@ const visualTests = Object.assign({}, common, {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
         DB_MODE: JSON.stringify(process.env.DB_MODE || null)
       }
+    }),
+    new CircularDependencyPlugin({
+      // exclude detection of files based on a RegExp
+      exclude: /node_modules|build-module|build-tests|server/,
+      // add errors to webpack instead of warnings
+      failOnError: false,
+      // set the current working directory for displaying module paths
+      cwd: process.cwd()
     })
   ],
   // externals: [],

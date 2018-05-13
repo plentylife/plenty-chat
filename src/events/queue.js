@@ -1,10 +1,9 @@
-import {Peer} from '../sync'
 import {Event, _handleEvent, EventResult} from './index'
 
 /** the second value in tuple is a resolve function for the promise */
 let _eventBacklog: Array<[Event, (any) => void]> = []
 
-export function _backlogEvent (_event: Event, peer: Peer): Promise<boolean | Error | EventResult> {
+export function _backlogEvent (_event: Event): Promise<boolean | Error | EventResult> {
   const event = {..._event}
   const b = [event, null]
   const p = new Promise((resolve) => { b[1] = resolve })

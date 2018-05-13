@@ -9,4 +9,7 @@
 #createTeam {
   background-color: orange !important;
   color: rgb(15, 95, 156);
+  & > span {
+    white-space: normal;
+  }
 }

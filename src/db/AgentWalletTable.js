@@ -7,9 +7,8 @@ import {DEFAULT_COMMUNITY_SHARE_POINTS, DEFAULT_CREDIT_LIMIT} from '../accountin
 import {AGENT_TABLE, AGENT_WALLET_TABLE} from './tableNames'
 import {InappropriateAction, MissingDatabaseEntry} from '../utils/Error'
 import {assertInt} from '../accounting/utils'
-import {hasEnoughFundsNum} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
-import {rowOrNull} from './index'
+import {rowOrNull} from './utils'
 
 const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
@@ -204,14 +203,6 @@ export function getAllWallets (): Promise<Array<Wallet>> {
 
 export function getWalletsInCommunity (communityId: string): Promise<Array<Wallet>> {
   return nSQL(AGENT_WALLET_TABLE).query('select').where(['communityId', '=', communityId]).exec()
-}
-
-export function getWalletsNearLimit (communityId: string, closeBy: number): Promise<Array<Wallet>> {
-  return getWalletsInCommunity(communityId).then(ws => {
-    return ws.filter(w => {
-      return !hasEnoughFundsNum(w.balance, w.creditLimit, closeBy)
-    })
-  })
 }
 
 export function setCreditLimit (agentId: string, communityId: string, creditLimit: Decimal): Promise<null | Object> {
