@@ -1,11 +1,12 @@
 import React from 'react'
 import './donateStyle.scss'
 import {getWalletsNearLimit} from '../../db/AgentWalletTable'
-import {getCurrentCommunityId} from '../../state/GlobalState'
+import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
 import type {Wallet} from '../../db/AgentWalletTable'
 import {getLastEventBy} from '../../db/EventTable'
 import AgentRow from './AgentRow'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
+import {COST_OF_SENDING_MESSAGE} from '../../accounting/AccountingGlobals'
 
 type Props = {
   getUserImage: (Object) => string,
@@ -20,10 +21,13 @@ export default class DonationWindow extends React.Component<Props> {
   }
 
   static onChange (event, complete) {
-    console.log('Donate vindow', event)
+    console.log('Donate window', event)
     if (event.notes.includes('mount')) { // todo or a new wallet near exhaustion
-      getWalletsNearLimit(getCurrentCommunityId(), 300).then(async ws => {
-        const sorted = await DonationWindow.sortWallets(ws)
+      getWalletsNearLimit(getCurrentCommunityId(), COST_OF_SENDING_MESSAGE).then(async ws => {
+        const sansSelf = ws.filter((w: Wallet) => {
+          return w.agentId !== getCurrentAgentId()
+        })
+        const sorted = await DonationWindow.sortWallets(sansSelf)
         complete(sorted)
       }) // fixme not going to change when community changes. gotta get redux
     }
