@@ -23,6 +23,7 @@ import {dropAll} from '../utils'
 import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
 import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
 import GiveButton from '../../src/components/Transactions/GiveButton'
+import MessageAmountCollected from '../../src/components/Transactions/MessageAmountCollected'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')
@@ -81,6 +82,7 @@ nSQL().onConnected(async () => {
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
+      <MessageAmountCollected messageId={'gmid'}/>
       <GiveButton messageId={'gmid'} channelId={CH_ID} messageSenderId={OTHER_AGENT_ID}/>
 
       <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
