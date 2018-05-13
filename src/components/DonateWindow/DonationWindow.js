@@ -1,12 +1,8 @@
 import React from 'react'
 import './donateStyle.scss'
-import {getWalletsNearLimit} from '../../db/AgentWalletTable'
-import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
 import type {Wallet} from '../../db/AgentWalletTable'
-import {getLastEventBy} from '../../db/EventTable'
 import AgentRow from './AgentRow'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
-import {COST_OF_SENDING_MESSAGE} from '../../accounting/AccountingGlobals'
 import {getWalletsForDonation} from './index'
 
 type Props = {

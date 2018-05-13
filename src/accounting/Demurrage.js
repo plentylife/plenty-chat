@@ -55,7 +55,7 @@ function _cda (w: Wallet, p: string, rate: Decimal): Decimal {
 
 export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByProperty {
   const w = agentWallet
-  const balanceRate = _calculateDemurrageRate(Decimal(w.incomingStat), Decimal(w.outgoingStat))
+  const balanceRate = calculateDemurrageRate(Decimal(w.incomingStat), Decimal(w.outgoingStat))
   return {
     balance: _cda(agentWallet, 'balance', balanceRate),
     communitySharePoints: _cda(agentWallet, 'communitySharePoints', balanceRate),

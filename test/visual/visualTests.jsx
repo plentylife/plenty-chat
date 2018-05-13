@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 // import {AccountStatus, MessageRating, NotEnoughFundsForMessageModal} from '../../src/index'
-import {MessageRating} from '../../src/index'
+import {MessageRating, provideUserGetterSetter} from '../../src/index'
 import {nSQL} from 'nano-sql'
 import './visualTests.css'
 import {
@@ -22,10 +22,15 @@ import * as Tutorial from 'Tutorial'
 import {dropAll} from '../utils'
 import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
 import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
+import GiveButton from '../../src/components/Transactions/GiveButton'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')
   setCurrentCommunityId('cid')
+
+  const getUP = (agentid) => ({first_name: agentid, last_name: 'kats'})
+  const getP = () => ('https://www.shareicon.net/data/128x128/2016/05/24/769971_man_512x512.png')
+  provideUserGetterSetter(getUP, () => {}, getP)
   await dropAll()
 
   window.getBalance = () => {
@@ -73,12 +78,11 @@ nSQL().onConnected(async () => {
   await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
   await rateMessage(MSG_ID, getCurrentAgentId(), 1, 3)
 
-  const getUP = (agentid) => ({first_name: agentid, last_name: 'kats'})
-  const getP = () => ('https://www.shareicon.net/data/128x128/2016/05/24/769971_man_512x512.png')
-
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
+      <GiveButton messageId={'gmid'} channelId={CH_ID} messageSenderId={getCurrentAgentId()}/>
+
       <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
         getUserProfile={getUP} getUserImage={getP}/>
       <div onClick={() => {

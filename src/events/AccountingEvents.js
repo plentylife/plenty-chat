@@ -2,7 +2,7 @@
 
 import type {Event, EventResult} from './index'
 import type {DemurrageByProperty} from '../accounting/Demurrage'
-import {adjustBalance, applyDemurrageToWallet, getWallet, setBalance} from '../db/AgentWalletTable'
+import {adjustBalance, applyDemurrageToWallet} from '../db/AgentWalletTable'
 import type {PotSplitEntry} from '../accounting/CommunityPot'
 import {getCommunityBalance, setCommunityBalance} from '../db/CommunityTable'
 import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/utils'

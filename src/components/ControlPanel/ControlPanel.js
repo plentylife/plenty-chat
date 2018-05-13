@@ -69,7 +69,7 @@ export default class ControlPanel extends React.Component<Props> {
   }
 
   hideTransactionModal () {
-    this.setState({transactionTargetAgent: null, transactionAmount: null})
+    this.setState({transactionTargetAgent: null, transactionAmount: null, transactionErrorMessage: null})
   }
 
   render () {

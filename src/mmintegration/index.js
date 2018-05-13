@@ -6,6 +6,7 @@ import {nSQL} from 'nano-sql/lib/index'
 // eslint-disable-next-line no-unused-vars
 export var mmUserSetter = null
 export var mmUserGetter = null
+export var mmImageGetter = null
 
 export async function onChannelView (agentId: string, channelId: string, communityId: string) {
   setCurrentAgentId(agentId)
@@ -22,7 +23,8 @@ export async function onChannelView (agentId: string, channelId: string, communi
   })
 }
 
-export function provideUserGetterSetter (getter: () => Object, setter: (Object) => void) {
+export function provideUserGetterSetter (getter: () => Object, setter: (Object) => void, imageGetter) {
   mmUserGetter = getter
   mmUserSetter = setter
+  mmImageGetter = imageGetter
 }

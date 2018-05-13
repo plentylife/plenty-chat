@@ -4,7 +4,7 @@ import {
   addCommunitySharePoints,
   getWallet,
   setBalance,
-  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit, adjustBalance, WALLET_DEMURRAGE_PROPERTIES
+  _setDemurrageTimestamps, getWalletsInCommunity, setCreditLimit, adjustBalance
 } from '../db/AgentWalletTable'
 import {
   assertPositive,

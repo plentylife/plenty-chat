@@ -16,13 +16,11 @@ import type {EventResult} from '../events'
 import {hasEnoughFunds, validateAndFormatTransactionAmount} from '../accounting/Accounting'
 import {
   AMOUNT_UNDER_ZERO,
-  MESSAGE_DOES_NOT_EXIST,
   NOT_ENOUGH_FUNDS,
   PROGRAMMER_ERROR,
   RECIPIENT_DOES_NOT_EXIST
 } from '../utils/UserErrors'
 import type {TransactionPayload} from '../events/AccountingEvents'
-import {getMessage} from '../db/MessageTable'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()

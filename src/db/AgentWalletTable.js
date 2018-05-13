@@ -4,13 +4,12 @@ import {nSQL} from 'nano-sql/lib/index'
 import {DB_ID, DB_MODE} from '../state/GlobalState'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS, DEFAULT_CREDIT_LIMIT} from '../accounting/AccountingGlobals'
-import {AGENT_TABLE} from './tableNames'
+import {AGENT_TABLE, AGENT_WALLET_TABLE} from './tableNames'
 import {InappropriateAction, MissingDatabaseEntry} from '../utils/Error'
 import {assertInt} from '../accounting/utils'
 import {hasEnoughFundsNum} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
 import {rowOrNull} from './index'
-import {AGENT_WALLET_TABLE} from './tableNames'
 
 const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
