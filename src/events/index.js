@@ -17,6 +17,7 @@ import {
 import {CONVERT_TO_TASK_EVENT_TYPE, handleConvertToTaskEvent} from './TaskEvents'
 import {_backlogEvent} from './queue'
 import type {TransactionPayload} from './AccountingEvents'
+import {Decimal} from 'decimal.js'
 
 export type EventPayload = MessageEventPayload | RatingEventPayload | TransactionPayload
 export type EventType = (typeof MESSAGE_EVENT_TYPE | typeof RATING_EVENT_TYPE | typeof TRANSACTION_EVENT_TYPE)
@@ -103,9 +104,20 @@ function applyHandler (event: Event): Promise<boolean | EventResult> {
   }
 }
 
+function sanitizePayload (payload: EventPayload) {
+  const sanitized = {...payload}
+  for (const key in payload) {
+    if (payload[key] instanceof Decimal) {
+      sanitized[key] = payload[key].toNumber()
+    }
+  }
+  return sanitized
+}
+
 export async function sendEvent (eventType: EventType, senderId: string, communityId: string,
-  payload: EventPayload): Promise<boolean | EventResult> {
+  _payload: EventPayload): Promise<boolean | EventResult> {
   try {
+    const payload = sanitizePayload(_payload)
     const eventIdBits = await pushSelfEvent(eventType, communityId, payload) // fixme does not register if failed
     if (eventIdBits !== false) {
       const agentEventId = `${eventIdBits.eventId}-${eventIdBits.timestamp}`

@@ -114,7 +114,8 @@ nSQL().onConnected(async () => {
   )
 })
 
-const c = nSQL().config({mode: DB_MODE, cache: false}).connect()
+// const c = nSQL().config({mode: DB_MODE, cache: false}).connect()
+const c = nSQL().connect()
 console.log('DB con promise', c)
 
 // <FrontPage/>
