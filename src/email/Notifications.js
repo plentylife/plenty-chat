@@ -6,14 +6,16 @@ import {sendMail} from './Mailer'
 
 export async function notifyAll (): void {
   const counts = await _countAgentNotifications()
+  let ps = []
   counts.forEach((count, agent) => {
-    send(agent, count)
+    ps.push(send(agent, count))
   })
+  return Promise.all(ps)
 }
 
-function send (agent, count) {
+async function send (agent, count) {
   const {agentId, email} = agent
-  const html = generateEmailHtml(count)
+  const html = await generateEmailHtml(count)
   return sendMail(email, html).then(() => {
     return registerNotification(agentId)
   }).catch(e => {
