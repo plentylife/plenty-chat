@@ -2,10 +2,11 @@ import React, {Component} from 'react'
 import {getWallet} from '../../db/AgentWalletTable'
 import type {Wallet} from '../../db/AgentWalletTable'
 import './style.css'
-import {DEFAULT_DEMURRAGE_RATE} from '../../accounting/AccountingGlobals'
 import {bindNSQL} from 'nano-sql-react/index'
 import Balance from './Balance'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
+import {calculateDemurrageRate} from '../../accounting/Demurrage'
+import {Decimal} from 'decimal.js'
 
 type Props = {
   agentId: string,
@@ -46,11 +47,12 @@ class AgentBalance extends Component<Props> {
         // eslint-disable-next-line no-unused-expressions
         return <AgentBalance.Unavailable/>
       } else {
+        const drate = calculateDemurrageRate(data.incomingStat, data.outgoingStat)
         // eslint-disable-next-line no-unused-expressions
         return <span className={'agent-block'}>
           <span className={'balance-block'}>
             <span className={'agent-balance accounting-info'}><label>Balance</label><Balance amount={data.balance}/></span>
-            <span className={'demurrage info'}>Spoiling at {Math.trunc(DEFAULT_DEMURRAGE_RATE * 100)}% per day</span>
+            <span className={'demurrage info'}>Spoiling at {Decimal(1).minus(drate).times(100).trunc().toString()}% per day</span>
           </span>
           <span className={'accounting-info'}><label>Credit Limit</label><Balance amount={data.creditLimit}/></span>
         </span>

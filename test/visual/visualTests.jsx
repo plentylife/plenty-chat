@@ -72,7 +72,7 @@ nSQL().onConnected(async () => {
   await createChannel(getCurrentAgentId(), CH_ID, getCurrentCommunityId())
   await setCommunityBalance(getCurrentCommunityId(), 21.32356)
   // await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 20)
-  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 10)
+  await setBalance(getCurrentAgentId(), getCurrentCommunityId(), 10, true)
   await addCommunitySharePoints(getCurrentAgentId(), getCurrentCommunityId(), 1)
   await addCommunitySharePoints(OTHER_AGENT_ID, getCurrentCommunityId(), 2)
 

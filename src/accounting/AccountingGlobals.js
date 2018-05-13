@@ -10,9 +10,6 @@ export const DEFAULT_COMMUNITY_SHARE_POINTS = 100
 
 export const MAXIMUM_DEMURRAGE_RATE = 0.9
 
-// fixme should be maximum
-export const DEFAULT_DEMURRAGE_RATE = 0.02
-
 export const STATISTICS_DEMURRAGE_RATE = 0.85
 
 export const CREDIT_LIMIT_DEMURRAGE_RATE = 0.85
