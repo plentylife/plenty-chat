@@ -7,6 +7,7 @@ import {bindNSQL} from 'nano-sql-react/index'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import Balance from './Balance'
 import {CRON_TIME} from '../../state/GlobalState'
+import {COMMUNITY_BALANCE_INTRO, SHARE_INTRO} from '../Tutorial'
 
 type Props = {
   agentId: string,
@@ -57,9 +58,11 @@ class CommunityBalance extends Component<Props> {
       } else {
         // eslint-disable-next-line no-unused-expressions
         return <span className={'community-block'}>
-          <span className={'accounting-info'}><label>Community pot</label><Balance amount={data.communityBalance}/></span>
+          <span className={'accounting-info'} data-step="5" data-intro={COMMUNITY_BALANCE_INTRO} data-position="top">
+            <label>Community pot</label><Balance amount={data.communityBalance}/></span>
           <span className={'community-share-block'}>
-            <span className={'accounting-info'}><label>Your share</label><Balance amount={data.share}/></span>
+            <span className={'accounting-info'} data-step="6" data-intro={SHARE_INTRO} data-position="top">
+              <label>Your share</label><Balance amount={data.share}/></span>
             <span className={'info'}>Distributed every {CRON_TIME} minutes</span>
           </span>
         </span>

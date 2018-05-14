@@ -82,8 +82,11 @@ export default class ControlPanel extends React.Component<Props> {
 
   componentDidMount () {
     setTimeout(() => {
-      IntroJs.introJs().setOption('showProgress', true)
-        .setOption('showBullets', false).start()
+      IntroJs.introJs()
+        .setOption('showProgress', true)
+        .setOption('exitOnOverlayClick', false)
+        .setOption('showBullets', false)
+        .start()
     }, 799)
   }
 
