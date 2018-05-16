@@ -13,7 +13,7 @@ export async function onChannelView (agentId: string, channelId: string, communi
   setCurrentCommunityId(communityId)
 
   console.log('onChannelView')
-  console.log('user', mmUserGetter && mmUserGetter())
+  console.log('user', mmUserGetter && mmUserGetter(agentId))
   // userSetter()
 
   await nSQL().onConnected(async () => {
@@ -23,7 +23,7 @@ export async function onChannelView (agentId: string, channelId: string, communi
   })
 }
 
-export function provideUserGetterSetter (getter: () => Object, setter: (Object) => void, imageGetter) {
+export function provideUserGetterSetter (getter: (string) => Object, setter: (Object) => void, imageGetter) {
   mmUserGetter = getter
   mmUserSetter = setter
   mmImageGetter = imageGetter

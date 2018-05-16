@@ -3,6 +3,7 @@ import React from 'react'
 import {Button, Modal} from 'react-bootstrap'
 import {mmUserGetter, mmUserSetter} from '../../mmintegration'
 import './agentNameModal.scss'
+import {getCurrentAgentId} from '../../state/GlobalState'
 
 type Props = {}
 
@@ -32,7 +33,7 @@ export default class AgentNameModal extends React.Component<Props> {
   save () {
     let fullName = this.state.first + this.state.last
     if (fullName) {
-      let user = Object.assign({}, mmUserGetter())
+      let user = Object.assign({}, mmUserGetter(getCurrentAgentId()))
       user.first_name = this.state.first
       user.last_name = this.state.last
       mmUserSetter(user)
@@ -42,7 +43,7 @@ export default class AgentNameModal extends React.Component<Props> {
 
   static shouldShow () {
     if (mmUserGetter) {
-      let user = mmUserGetter()
+      let user = mmUserGetter(getCurrentAgentId())
       let fullName = user.last_name + user.first_name
       if (!fullName.trim()) {
         return true
