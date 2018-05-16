@@ -7,6 +7,7 @@ import Balance from './Balance'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import {calculateDemurrageRate} from '../../accounting/Demurrage'
 import {Decimal} from 'decimal.js'
+import {BALANCE_INTRO, CREDIT_LIMIT_INTRO, DEMURRAGE_INTRO} from '../Tutorial'
 
 type Props = {
   agentId: string,
@@ -51,13 +52,14 @@ class AgentBalance extends Component<Props> {
         // eslint-disable-next-line no-unused-expressions
         return <span className={'agent-block'}>
           <span className={'balance-block'}>
-            <span className={'agent-balance accounting-info'} data-step="2" data-intro="This is a tooltip!" data-position="top">
+            <span className={'agent-balance accounting-info'} data-step="2" data-intro={BALANCE_INTRO} data-position="top">
               <label>Balance</label><Balance amount={data.balance}/>
             </span>
-            <span className={'demurrage info'} data-step="3" data-intro="This is a tooltip!" data-position="top">
+            <span className={'demurrage info'} data-step="3" data-intro={DEMURRAGE_INTRO} data-position="top">
               Spoiling at {Decimal(1).minus(drate).times(100).trunc().toString()}% per day</span>
           </span>
-          <span className={'accounting-info'}><label>Credit Limit</label><Balance amount={data.creditLimit}/></span>
+          <span className={'accounting-info'} data-step="4" data-intro={CREDIT_LIMIT_INTRO} data-position="top">
+            <label>Credit Limit</label><Balance amount={data.creditLimit}/></span>
         </span>
       }
     }
