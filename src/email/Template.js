@@ -26,6 +26,7 @@ function fillDate (template): string {
   return template.replace(/\[DATE\]/g, `${dayOfWeek} ${time}`)
 }
 
+// eslint-disable-next-line no-unused-vars
 function fillCommunity (balance: Decimal, share: Decimal, template: string): string {
   let html = template.replace('[COMMUNITY_BALANCE]', floorWithPrecision(balance, AMOUNT_PRECISION_IN_DISPLAY).toNumber())
   return html.replace('[SHARE]', floorWithPrecision(share, AMOUNT_PRECISION_IN_DISPLAY).toNumber())
@@ -48,6 +49,7 @@ function fillBalanceStyle (standing: number, html: string) {
   return html.replace('[BALANCE_STYLE]', style)
 }
 
+/* eslint-disable-next-line no-unused-vars */
 function fillWallet (wallet: Wallet, template: string): string {
   let html = template.replace('[BALANCE]', floorWithPrecision(wallet.balance, AMOUNT_PRECISION_IN_DISPLAY))
   let standing = 1
