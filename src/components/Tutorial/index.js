@@ -23,8 +23,24 @@ export const SHARE_INTRO = 'share intro'
 export const GIVE_INTRO = 'give intro'
 
 export function getGiveButtonToIntro () {
-  const allButotns = document.getElementsByClassName('give-button-wrapper')
-  return allButotns
+  const allButtons = document.getElementsByClassName('give-button-wrapper')
+
+  // const messageList = null
+  // let mlOffsetTop = 0
+  // if (messageList) {
+  //   const offset = el.getBoundingClientRect()
+  //   mlOffsetTop = offset.top
+  // }
+
+  let minimum = 0
+  let winner = null
+
+  allButtons.forEach(b => {
+    const offset = b.getBoundingClientRect().top
+    if (offset >= 0 && offset < minimum) winner = b
+  })
+
+  return winner
 }
 
 export {
