@@ -111,6 +111,7 @@ library.externals = Object.assign({}, library.externals, {
   'React': 'commonjs react',
   'react-dom': 'commonjs react-dom',
   'react-bootstrap': 'commonjs react-bootstrap',
+  'jquery': 'jquery'
   // 'nano-sql': 'commonjs nano-sql',
   // 'nano-sql-react': 'commonjs nano-sql-react',
   // 'react-animate-on-change': 'commonjs react-animate-on-change',
@@ -130,15 +131,15 @@ const visualTests = Object.assign({}, common, {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
         DB_MODE: JSON.stringify(process.env.DB_MODE || null)
       }
-    }),
-    new CircularDependencyPlugin({
-      // exclude detection of files based on a RegExp
-      exclude: /node_modules|build-module|build-tests|server/,
-      // add errors to webpack instead of warnings
-      failOnError: false,
-      // set the current working directory for displaying module paths
-      cwd: process.cwd()
-    })
+    })// ,
+    // new CircularDependencyPlugin({
+    //   // exclude detection of files based on a RegExp
+    //   exclude: /node_modules|build-module|build-tests|server/,
+    //   // add errors to webpack instead of warnings
+    //   failOnError: false,
+    //   // set the current working directory for displaying module paths
+    //   cwd: process.cwd()
+    // })
   ],
   // externals: [],
   mode: process.env.NODE_ENV || 'development',
