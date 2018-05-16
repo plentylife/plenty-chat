@@ -15,10 +15,10 @@ type Props = {
 export default class GiveButton extends React.Component<Props> {
   constructor (props) {
     super(props)
-    const profile = mmUserGetter(props.messageSenderId)
+    // const profile = mmUserGetter(props.messageSenderId)
     this.state = {
-      transactionTargetName: userNameFromProfile(profile),
-      transactionTargetImageSrc: mmImageGetter(profile),
+      // transactionTargetName: userNameFromProfile(profile),
+      // transactionTargetImageSrc: mmImageGetter(profile),
       transactionModalOpen: false,
       transactionErrorMessage: null,
       transactionAmount: 1
@@ -30,7 +30,12 @@ export default class GiveButton extends React.Component<Props> {
   }
 
   openTransactionModal () {
-    this.setState({transactionModalOpen: true})
+    const profile = mmUserGetter(this.props.messageSenderId)
+    this.setState({
+      transactionModalOpen: true,
+      transactionTargetName: userNameFromProfile(profile),
+      transactionTargetImageSrc: mmImageGetter(profile)
+    })
   }
 
   onTransact () {
