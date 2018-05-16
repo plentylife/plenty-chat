@@ -9,6 +9,8 @@ import {userNameFromProfile} from '../utils'
 import {convertStringToValidAmount} from '../../accounting/Accounting'
 import IntroJs from 'intro.js/intro'
 import 'intro.js/introjs.css'
+import {makeTransaction} from '../../actions/AccountingActions'
+import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
 
 type Props = {
   agentId: string,
@@ -45,7 +47,14 @@ export default class ControlPanel extends React.Component<Props> {
   }
 
   onTransact () {
-
+    makeTransaction(getCurrentAgentId(), getCurrentCommunityId(), this.state.transactionAmount,
+      this.state.transactionTargetAgent, 'donation').then(res => {
+      if (res.status) {
+        this.hideTransactionModal()
+      } else {
+        this.setState({transactionErrorMessage: res.value})
+      }
+    })
   }
 
   onTransactionAmountChange (amount: string) {
