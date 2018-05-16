@@ -105,10 +105,17 @@ function applyHandler (event: Event): Promise<boolean | EventResult> {
 }
 
 function sanitizePayload (payload: EventPayload) {
-  const sanitized = {...payload}
-  for (const key in payload) {
-    if (payload[key] instanceof Decimal) {
-      sanitized[key] = payload[key].toNumber()
+  if (payload instanceof Array) {
+    return payload.map(sanitizeObject)
+  }
+  if (payload instanceof Object) return sanitizeObject(payload)
+}
+
+function sanitizeObject (object: EventPayload) {
+  const sanitized = {...object}
+  for (const key in object) {
+    if (object[key] instanceof Decimal) {
+      sanitized[key] = object[key].toNumber()
     }
   }
   return sanitized
