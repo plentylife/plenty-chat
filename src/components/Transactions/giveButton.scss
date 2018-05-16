@@ -1,8 +1,10 @@
 .give-button-wrapper {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .btn-primary {
-    background-color: orange;
+    background-color: forestgreen !important;
     padding: 3px;
     font-weight: bold;
     font-family: 'Comfortaa', serif;
