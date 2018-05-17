@@ -7,6 +7,7 @@ import ScreenTasks from './ScreenTasks'
 import ScreenCaveat from './ScreenCaveat'
 import IntroJs from 'intro.js/intro'
 import 'intro.js/introjs.css'
+import {getBooleanSetting, pushSimpleSetting} from '../../db/SettingsTable'
 
 export const DASH = '\u2013'
 
@@ -24,10 +25,14 @@ export const SHARE_INTRO = 'share intro'
 
 export const GIVE_BUTTON_INTRO = 'give intro'
 
-let mainIntroComplete = true
+const MAIN_INTRO_SETTING_KEY = 'main_intro'
+const GIVE_BUTTON_INTRO_SETTING_KEY = 'give_button_intro'
+
+let mainIntroComplete = false
 let giveButtonIntroStarted = false
 
-export function startMainIntro () {
+export async function startMainIntro () {
+  mainIntroComplete = await getBooleanSetting(MAIN_INTRO_SETTING_KEY)
   if (!mainIntroComplete) {
     setTimeout(() => {
       let exited = false
@@ -49,24 +54,34 @@ export function startMainIntro () {
 
 function completeMainIntro () {
   mainIntroComplete = true
-  // startGiveButtonIntro()
+  pushSimpleSetting(MAIN_INTRO_SETTING_KEY, true)
+
+  const giveBtn = getGiveButtonToIntro()
+  if (giveBtn) pushSimpleSetting(GIVE_BUTTON_INTRO_SETTING_KEY, true)
 }
 
-export function startGiveButtonIntro () {
+export async function startGiveButtonIntro () {
+  mainIntroComplete = await getBooleanSetting(MAIN_INTRO_SETTING_KEY)
   if (mainIntroComplete && !giveButtonIntroStarted) {
     giveButtonIntroStarted = true
+    const hasCompleted = await getBooleanSetting(GIVE_BUTTON_INTRO_SETTING_KEY)
 
-    const giveBtn = getGiveButtonToIntro()
-    // const intro = IntroJs(giveBtn)
-    IntroJs(giveBtn)
-      .setOption('exitOnOverlayClick', true)
-      .setOption('showProgress', false)
-      .setOption('showBullets', false)
-      .start()
+    if (!hasCompleted) {
+      const giveBtn = getGiveButtonToIntro()
+      const intro = IntroJs(giveBtn)
+        .setOption('exitOnOverlayClick', true)
+        .setOption('showProgress', false)
+        .setOption('showBullets', false)
+        .start()
 
-    // intro.oncomplete(onCompleteOfFirstLeg)
-    // intro.onexit()
+      intro.oncomplete(completeGiveButtonIntro)
+      intro.onexit(completeGiveButtonIntro)
+    }
   }
+}
+
+function completeGiveButtonIntro () {
+  pushSimpleSetting(GIVE_BUTTON_INTRO_SETTING_KEY, true)
 }
 
 export function getGiveButtonToIntro () {

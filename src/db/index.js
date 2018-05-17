@@ -4,6 +4,7 @@ import {AGENT_TABLE, AGENT_WALLET_TABLE, CHANNEL_TABLE, MESSAGE_TABLE} from './t
 import {nSQL} from 'nano-sql'
 
 import './AgentTable'
+import './SettingsTable'
 import {COMMUNITY_TABLE} from './CommunityTable'
 import {EVENT_TABLE, SELF_EVENT_TABLE} from './EventTable'
 import {PEER_SYNC_TABLE} from './PeerSyncTable'
