@@ -34,23 +34,21 @@ let giveButtonIntroStarted = false
 export async function startMainIntro () {
   mainIntroComplete = await getBooleanSetting(MAIN_INTRO_SETTING_KEY)
   if (!mainIntroComplete) {
-    setTimeout(() => {
-      let exited = false
-      const intro = IntroJs()
-        .setOption('showProgress', true)
-        .setOption('exitOnOverlayClick', false)
-        .setOption('hidePrev', true)
-        .setOption('hideNext', true)
-        .setOption('showBullets', false)
-        .start()
-      intro.oncomplete(completeMainIntro)
-      intro.onexit(() => {
-        if (!exited) {
-          exited = true
-          completeMainIntro()
-        }
-      })
-    }, 799)
+    let exited = false
+    const intro = IntroJs()
+      .setOption('showProgress', true)
+      .setOption('exitOnOverlayClick', false)
+      .setOption('hidePrev', true)
+      .setOption('hideNext', true)
+      .setOption('showBullets', false)
+      .start()
+    intro.oncomplete(completeMainIntro)
+    intro.onexit(() => {
+      if (!exited) {
+        exited = true
+        completeMainIntro()
+      }
+    })
   }
 }
 

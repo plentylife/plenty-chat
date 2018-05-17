@@ -18,11 +18,26 @@ type Props = {
   getUserImage: (Object) => string
 }
 
+let tutorialStarted = false
 let componentsToRenderBeforeTutorial: Set<string> = new Set(['panel', 'donation'])
 export function registerReadyForTutorial (component: string) {
   componentsToRenderBeforeTutorial.delete(component)
-  if (componentsToRenderBeforeTutorial.size === 0) {
-    startMainIntro()
+  if (componentsToRenderBeforeTutorial.size === 0 && !tutorialStarted) {
+    tutorialStarted = true
+    setTimeout(() => {
+      startMainIntro()
+      fixMattermostScroll()
+    }, 1000)
+  }
+}
+
+function fixMattermostScroll () {
+  let postList = document.getElementById('post-list')
+  if (postList) {
+    postList = postList.getElementsByClassName('post-list-holder-by-time')[0]
+    const panel = document.getElementById('plenty-control-panel')
+    const height = panel.getBoundingClientRect().height
+    postList.scrollTop = postList.scrollTop + height
   }
 }
 
