@@ -18,6 +18,14 @@ type Props = {
   getUserImage: (Object) => string
 }
 
+let componentsToRenderBeforeTutorial: Set<string> = new Set(['panel', 'donation'])
+export function registerReadyForTutorial (component: string) {
+  componentsToRenderBeforeTutorial.delete(component)
+  if (componentsToRenderBeforeTutorial.size === 0) {
+    startMainIntro()
+  }
+}
+
 export default class ControlPanel extends React.Component<Props> {
   constructor (props) {
     super(props)
@@ -89,7 +97,7 @@ export default class ControlPanel extends React.Component<Props> {
   }
 
   componentDidMount () {
-    startMainIntro()
+    registerReadyForTutorial('panel')
   }
 
   render () {

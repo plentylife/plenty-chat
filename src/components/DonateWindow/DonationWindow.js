@@ -4,6 +4,7 @@ import type {Wallet} from '../../db/AgentWalletTable'
 import AgentRow from './AgentRow'
 import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import {getWalletsForDonation} from './index'
+import {registerReadyForTutorial} from '../ControlPanel/ControlPanel'
 
 type Props = {
   getUserImage: (Object) => string,
@@ -21,6 +22,7 @@ export default class DonationWindow extends React.Component<Props> {
     console.log('Donate window', event)
     // if (event.notes.includes('mount')) { // todo or a new wallet near exhaustion
     getWalletsForDonation().then(ws => {
+      registerReadyForTutorial('donation')
       complete(ws)
     }) // fixme not going to change when community changes. gotta get redux
     // }

@@ -39,6 +39,8 @@ export async function startMainIntro () {
       const intro = IntroJs()
         .setOption('showProgress', true)
         .setOption('exitOnOverlayClick', false)
+        .setOption('hidePrev', true)
+        .setOption('hideNext', true)
         .setOption('showBullets', false)
         .start()
       intro.oncomplete(completeMainIntro)
