@@ -7,6 +7,7 @@ import {Button} from 'react-bootstrap'
 import './giveButton.scss'
 import {makeTransactionOnMessage} from '../../actions/AccountingActions'
 import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
+import {GIVE_BUTTON_INTRO, startGiveButtonIntro} from '../Tutorial'
 
 type Props = {
   messageId: string, channelId: string, messageSenderId: string
@@ -70,6 +71,10 @@ export default class GiveButton extends React.Component<Props> {
     this.setState({transactionModalOpen: false, transactionErrorMessage: null})
   }
 
+  componentDidMount () {
+    startGiveButtonIntro()
+  }
+
   render () {
     const modal = this.state.transactionModalOpen &&
       <TransactionAmountModal isOpen={this.state.transactionModalOpen}
@@ -83,7 +88,7 @@ export default class GiveButton extends React.Component<Props> {
 
     return <div className={'give-button-wrapper'}>
       {modal}
-      <Button onClick={this.openTransactionModal}
+      <Button onClick={this.openTransactionModal} data-intro={GIVE_BUTTON_INTRO} data-position="right" data-step='7'
         bsStyle={'primary'} bsSize={'small'} >Give {TENGE}</Button>
     </div>
   }

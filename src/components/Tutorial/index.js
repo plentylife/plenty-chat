@@ -5,6 +5,8 @@ import ScreenFour from './ScreenFour'
 import ScreenFive from './ScreenFive'
 import ScreenTasks from './ScreenTasks'
 import ScreenCaveat from './ScreenCaveat'
+import IntroJs from 'intro.js/intro'
+import 'intro.js/introjs.css'
 
 export const DASH = '\u2013'
 
@@ -20,24 +22,72 @@ export const COMMUNITY_BALANCE_INTRO = 'com bal intro'
 
 export const SHARE_INTRO = 'share intro'
 
-export const GIVE_INTRO = 'give intro'
+export const GIVE_BUTTON_INTRO = 'give intro'
+
+let mainIntroComplete = true
+let giveButtonIntroStarted = false
+
+export function startMainIntro () {
+  if (!mainIntroComplete) {
+    setTimeout(() => {
+      let exited = false
+      const intro = IntroJs()
+        .setOption('showProgress', true)
+        .setOption('exitOnOverlayClick', false)
+        .setOption('showBullets', false)
+        .start()
+      intro.oncomplete(completeMainIntro)
+      intro.onexit(() => {
+        if (!exited) {
+          exited = true
+          completeMainIntro()
+        }
+      })
+    }, 799)
+  }
+}
+
+function completeMainIntro () {
+  mainIntroComplete = true
+  // startGiveButtonIntro()
+}
+
+export function startGiveButtonIntro () {
+  if (mainIntroComplete && !giveButtonIntroStarted) {
+    giveButtonIntroStarted = true
+
+    const giveBtn = getGiveButtonToIntro()
+    // const intro = IntroJs(giveBtn)
+    IntroJs(giveBtn)
+      .setOption('exitOnOverlayClick', true)
+      .setOption('showProgress', false)
+      .setOption('showBullets', false)
+      .start()
+
+    // intro.oncomplete(onCompleteOfFirstLeg)
+    // intro.onexit()
+  }
+}
 
 export function getGiveButtonToIntro () {
   const allButtons = document.getElementsByClassName('give-button-wrapper')
 
-  // const messageList = null
-  // let mlOffsetTop = 0
-  // if (messageList) {
-  //   const offset = el.getBoundingClientRect()
-  //   mlOffsetTop = offset.top
-  // }
+  const messageList = document.getElementById('post-list')
+  let mlOffsetTop = 0
+  if (messageList) {
+    const offset = messageList.getBoundingClientRect()
+    mlOffsetTop = offset.top
+  }
 
-  let minimum = 0
+  let minimum = null
   let winner = null
 
-  allButtons.forEach(b => {
-    const offset = b.getBoundingClientRect().top
-    if (offset >= 0 && offset < minimum) winner = b
+  Array.from(allButtons).forEach(b => {
+    const offset = b.getBoundingClientRect().top - mlOffsetTop
+    if ((offset >= 0 && offset < minimum) || minimum === null) {
+      minimum = offset
+      winner = b
+    }
   })
 
   return winner

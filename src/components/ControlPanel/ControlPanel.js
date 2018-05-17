@@ -7,10 +7,9 @@ import DonateModal from '../DonateWindow/DonateModal'
 import TransactionAmountModal from '../Transactions/TransactionAmountModal'
 import {userNameFromProfile} from '../utils'
 import {convertStringToValidAmount} from '../../accounting/Accounting'
-import IntroJs from 'intro.js/intro'
-import 'intro.js/introjs.css'
 import {makeTransaction} from '../../actions/AccountingActions'
 import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
+import {startMainIntro} from '../Tutorial'
 
 type Props = {
   agentId: string,
@@ -90,13 +89,7 @@ export default class ControlPanel extends React.Component<Props> {
   }
 
   componentDidMount () {
-    setTimeout(() => {
-      IntroJs.introJs()
-        .setOption('showProgress', true)
-        .setOption('exitOnOverlayClick', false)
-        .setOption('showBullets', false)
-        .start()
-    }, 799)
+    startMainIntro()
   }
 
   render () {

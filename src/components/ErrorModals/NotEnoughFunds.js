@@ -2,7 +2,7 @@
 import React from 'react'
 import {Modal} from 'react-bootstrap'
 import Balance from '../AccountStatus/Balance'
-import {CRON_TIME} from '../../state/GlobalState'
+// import {CRON_TIME} from '../../state/GlobalState'
 import './notEnoughFundsStyle.css'
 import {THANKS} from '../utils'
 
