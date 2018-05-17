@@ -118,6 +118,9 @@ export default class ControlPanel extends React.Component<Props> {
   render () {
     const openClose = <div className={'collapse-expand'} onClick={this.toggleCollapse}>
       {this.state.isCollapsed ? 'expand' : 'collapse'}
+      <a href={'http://about.plenty.life/basics'} target={'_blank'} className={'help-text'}>
+        help
+      </a>
     </div>
 
     const donateModal = this.state.donateModalOpen
