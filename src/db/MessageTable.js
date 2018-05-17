@@ -12,7 +12,8 @@ const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
   {key: 'senderId', type: 'string'},
   {key: 'channelId', type: CHANNEL_TABLE, props: ['ref=>messages[]']},
-  {key: 'timestamp', type: 'number', props: ['idx']},
+  // {key: 'timestamp', type: 'number', props: ['idx']},
+  {key: 'timestamp', type: 'number'}, // fixme this needs to be indexed
   {key: 'fundsCollected', type: 'number', default: 0}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 

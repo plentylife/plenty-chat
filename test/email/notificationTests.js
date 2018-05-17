@@ -36,6 +36,10 @@ test.serial('first notification, single community, single user', async t => {
   await addAgentToCommunity('a1', COMMUNITY1)
   await pushMessage('m1', 'a1', CHANNEL1 + COMMUNITY1)
   await pushMessage('m2', 'a2', CHANNEL2 + COMMUNITY1)
+  const messages = await nSQL(MESSAGE_TABLE).query('select').orm(['channelId'])
+    .where(['timestamp', '>', 0])
+    .exec()
+  t.is(messages.length, 2)
 
   const counts = await _countAgentNotifications()
   await registerNotification('a1')
@@ -80,7 +84,7 @@ test.serial('two communities, both users in one, one in the other', async t => {
   })
 })
 
-test.serial('send the emails', async t => {
-  await notifyAll()
-  t.pass()
-})
+// test.serial('send the emails', async t => {
+//   await notifyAll()
+//   t.pass()
+// })
