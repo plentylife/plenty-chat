@@ -24,11 +24,15 @@ export class MessageAmountCollected extends React.Component<Props> {
     }
     getMessage(this.props.messageId).then(async msg => {
       if (msg) {
-        const events = msg.relatedEvents && await Promise.all(msg.relatedEvents.map(e => {
-          return getEvent(e)
+        const eventsToParse = []
+        let events = msg.relatedEvents && await Promise.all(msg.relatedEvents.map(async e => {
+          const event = await getEvent(e)
+          if (!event) eventsToParse.push(e)
+          return event
         }))
+        events = events.filter(e => (e !== null))
         const transactions = await MessageAmountCollected.extractTransactionsInfo([], events || [])
-        this.setState({amount: msg.fundsCollected, transactions})
+        this.setState({amount: msg.fundsCollected, transactions, eventsToParse})
       }
     })
   }
