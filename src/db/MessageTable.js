@@ -6,14 +6,15 @@ import {CHANNEL_TABLE, MESSAGE_TABLE} from './tableNames'
 import {Decimal} from 'decimal.js'
 import {rowOrNull} from './utils'
 
-export type MessageRow = {id: string, senderId: string, channelId: string, timestamp: number, fundsCollected: number}
+export type MessageRow = {id: string, senderId: string, channelId: string, timestamp: number, fundsCollected: number, relatedEvents: Array<string>}
 
 const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'id', type: 'string', props: ['pk']},
   {key: 'senderId', type: 'string'},
   {key: 'channelId', type: CHANNEL_TABLE, props: ['ref=>messages[]']},
   {key: 'timestamp', type: 'number', props: ['idx']},
-  {key: 'fundsCollected', type: 'number', default: 0}
+  {key: 'fundsCollected', type: 'number', default: 0},
+  {key: 'relatedEvents', type: 'string[]'}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
 export function pushMessage (id: string, senderId: string, channelId: string): Promise<null | MessageRow> {
@@ -34,8 +35,10 @@ export function getMessage (id: string): Promise<MessageRow | null> {
   })
 }
 
-export function setMessageFunds (id: string, amount: Decimal): Promise<MessageRow | null> {
-  return nSQL(MESSAGE_TABLE).query('upsert', {id, fundsCollected: amount.toNumber()}).exec().then(rowOrNull)
+export function addTransactionOnMessage (messageId: string, eventIds: Array<string>, amount: Decimal): Promise<MessageRow | null> {
+  return nSQL(MESSAGE_TABLE).query('upsert', {
+    id: messageId, fundsCollected: amount.toNumber(), relatedEvents: eventIds
+  }).exec().then(rowOrNull)
 }
 
 export function getMessagesForNotifications (after: number): Promise<Array<MessageRow & {communityId: string}>> {

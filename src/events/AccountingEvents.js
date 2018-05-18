@@ -9,7 +9,7 @@ import {assertNumber, assertPositive, floorWithPrecision} from '../accounting/ut
 import {InappropriateAction, MissingProperty, NotEnoughFunds} from '../utils/Error'
 import {hasEnoughFunds, updateCreditLimit} from '../accounting/Accounting'
 import {Decimal} from 'decimal.js'
-import {getMessage, pushMessage, setMessageFunds} from '../db/MessageTable'
+import {getMessage, pushMessage, addTransactionOnMessage} from '../db/MessageTable'
 
 export const DEMURRAGE_EVENT_TYPE: 'demurrage' = 'demurrage'
 
@@ -90,19 +90,22 @@ export async function handleTransaction (event: Event): Promise<EventResult> {
     await adjustBalance(event.senderId, event.communityId, amount.neg())
     await adjustBalance(payload.recipientAgentId, event.communityId, amount)
     await updateCreditLimit(payload.recipientAgentId, event.communityId, amount)
-    if (payload.transactionType === MESSAGE_TRANSACTION_TYPE) await updateMessageCollectedFunds(amount, payload)
+    if (payload.transactionType === MESSAGE_TRANSACTION_TYPE) await updateMessageCollectedFunds(amount, event.globalEventId, payload)
     return {status: true}
   } catch (e) {
     return {status: false, error: e}
   }
 }
 
-async function updateMessageCollectedFunds (amount: Decimal, payload: TransactionPayload): Promise<void> {
+async function updateMessageCollectedFunds (amount: Decimal, eventId: string, payload: TransactionPayload): Promise<void> {
   let msg = await getMessage(payload.messageId)
   if (msg === null) {
     // todo. see if this will include funds collected
     msg = await pushMessage(payload.messageId, payload.recipientAgentId, payload.channelId)
   }
+  let relatedEvents = []
+  if (msg.relatedEvents) relatedEvents = msg.relatedEvents
+  relatedEvents.push(eventId)
   const updated = Decimal(msg.fundsCollected).plus(amount)
-  return setMessageFunds(payload.messageId, updated)
+  return addTransactionOnMessage(payload.messageId, relatedEvents, updated)
 }
