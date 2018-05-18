@@ -1,6 +1,6 @@
 function webpackSelection (serverTest, server, library, visualTests) {
   return [
-    // serverTest,
+    serverTest,
     // server,
     library,
     visualTests

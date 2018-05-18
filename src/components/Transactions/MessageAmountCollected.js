@@ -1,13 +1,12 @@
 import React from 'react'
 import {MESSAGE_TABLE} from '../../db/tableNames'
 import {bindNSQL} from 'nano-sql-react/index'
-import type {MessageRow} from '../../db/MessageTable'
 import {getMessage} from '../../db/MessageTable'
 import Balance from '../AccountStatus/Balance'
-import {getEvent} from '../../db/EventTable'
-// import {getMessage} from '../../db/MessageTable'
+import {EVENT_TABLE, getEvent} from '../../db/EventTable'
+import {Event} from '../../events'
 
-type Props = {messageId: string, nSQLdata: Array<MessageRow>}
+type Props = {messageId: string, nSQLdata: {rows: Array<Object>, table: string}, nSQLloading: boolean}
 
 type TransactionInfo = {eventId: string, amount: number, agentId: string}
 
@@ -16,61 +15,77 @@ export class MessageAmountCollected extends React.Component<Props> {
     super(props)
     this.state = {
       amount: 0,
-      transactions: []
+      transactions: [],
+      eventsToParse: []
     }
     getMessage(this.props.messageId).then(async msg => {
       if (msg) {
-        const transactions = await MessageAmountCollected.extractTransactionsInfo([], msg.relatedEvents || [])
+        const events = msg.relatedEvents && await Promise.all(msg.relatedEvents.map(e => {
+          return getEvent(e)
+        }))
+        const transactions = await MessageAmountCollected.extractTransactionsInfo([], events || [])
         this.setState({amount: msg.fundsCollected, transactions})
       }
     })
   }
   static tables () {
-    return [MESSAGE_TABLE]
+    return [MESSAGE_TABLE, EVENT_TABLE]
   }
 
   static onChange (event, complete) {
     if (!event.notes.includes('mount')) {
-      complete(event.affectedRows)
+      complete({table: event.table, rows: event.affectedRows})
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    const self = nextProps.nSQLdata && nextProps.nSQLdata.find(r => (r.id === this.props.messageId))
-    // return !!self || (nextState.amount !== this.state.amount)
-    const isSelf = !!self && !nextProps.nSQLloading
+    if (nextProps.nSQLloading) return false
+
     const isChanged = nextState.amount !== this.state.amount || this.state.transactions.length !== nextState.transactions.length
-    return isSelf || isChanged
+    if (isChanged) return true
+
+    if (nextProps.nSQLdata.table === MESSAGE_TABLE) {
+      const self = nextProps.nSQLdata && nextProps.nSQLdata.rows.find(r => (r.id === this.props.messageId))
+      return self.fundsCollected !== this.state.amount && !nextProps.nSQLloading
+    } else if (nextProps.nSQLdata.table === EVENT_TABLE) {
+      if (this.state.eventsToParse.length > 0) {
+        let incomingIds = []
+        if (nextProps.nSQLdata) incomingIds = nextProps.nSQLdata.rows.map(r => (r.globalEventId))
+        const self = incomingIds.filter(i => (this.state.eventsToParse.includes(i)))
+        return self.length > 0
+      } else {
+        return false
+      }
+    }
   }
 
-  static extractTransactionsInfo (existing: Array<TransactionInfo>, toExtract: Array<string>): Array<TransactionInfo> {
+  static extractTransactionsInfo (existing: Array<TransactionInfo>, toExtract: Array<Event>): Array<TransactionInfo> {
     const updated = [...existing]
     const checkAgainst = updated.map(e => (e.eventId))
-    const ps = toExtract.map(async eventId => {
-      if (!checkAgainst.includes(eventId)) {
-        const eventInfo = await getEvent(eventId)
-        if (eventInfo) {
-          const agentId = eventInfo.senderId
-          const amount = eventInfo.payload.amount
-          updated.push({eventId, agent: agentId, amount})
-        }
+    toExtract.map(async event => {
+      if (!checkAgainst.includes(event.globalEventId)) {
+        const agentId = event.senderId
+        const amount = event.payload.amount
+        updated.push({eventId: event.globalEventId, agent: agentId, amount})
       }
     })
 
-    return Promise.all(ps).then(() => updated)
+    return updated
   }
 
   componentDidUpdate () {
-    const self = this.props.nSQLdata && this.props.nSQLdata.find(r => (r.id === this.props.messageId))
-    if (self) {
-      const amount = self.fundsCollected
-      if (amount === this.state.amount) return
-      MessageAmountCollected.extractTransactionsInfo(this.state.transactions, self.relatedEvents || []).then(
-        transactions => {
-          const nextState = {amount, transactions}
-          this.setState(nextState)
-        }
-      )
+    if (this.props.nSQLdata.table === MESSAGE_TABLE) {
+      const self = this.props.nSQLdata && this.props.nSQLdata.rows.find(r => (r.id === this.props.messageId))
+      const parsedIds = this.state.transactions.map(t => (t.eventId))
+      const toParse = self.relatedEvents.filter(re => (!parsedIds.includes(re)))
+      this.setState({amount: self.fundsCollected, eventsToParse: toParse})
+    } else if (this.props.nSQLdata.table === EVENT_TABLE) {
+      const toParse = this.props.nSQLdata.rows.filter(i => (this.state.eventsToParse.includes(i.globalEventId))) || []
+      const toParseIds = toParse.map(p => (p.globalEventId))
+      const leftToParse = this.state.eventsToParse.filter(p => (!toParseIds.includes(p)))
+
+      const transactions = MessageAmountCollected.extractTransactionsInfo(this.state.transactions, toParse)
+      this.setState({transactions, eventsToParse: leftToParse})
     }
   }
 
