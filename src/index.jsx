@@ -21,7 +21,7 @@ import MMStyles from './utils/style-utils.scss'
 import FrontPage from 'MiscPages/FrontPage'
 import ControlPanel from 'ControlPanel/ControlPanel'
 import GiveButton from 'Transactions/GiveButton'
-
+import MessageAmountCollected from 'Transactions/MessageAmountCollected'
 import './db/index'
 
 function plentyInit () {
@@ -49,7 +49,7 @@ function plentyInitSync (agentId, communityId, cb, singlePeer) {
   }
 }
 
-export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal, FrontPage, ControlPanel, GiveButton,
+export {AccountStatus, MessageRating, NotEnoughFundsForMessageModal, AgentNameModal, FrontPage, ControlPanel, GiveButton, MessageAmountCollected,
   sendMessage, hasEnoughFundsToSendMessage,
   plentyInit, plentyInitSync, onChannelView, provideUserGetterSetter,
   nSQL,

@@ -23,7 +23,7 @@ const eventModel = baseEventModel.concat([
 ])
 const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
-export function getEvent (globalEventId: string): Promise<Object | null> {
+export function getEvent (globalEventId: string): Promise<Event | null> {
   return nSQL(EVENT_TABLE).query('select').where(['globalEventId', '=', globalEventId])
     .exec().then(rows => (rows.length > 0 ? rows[0] : null))
 }
