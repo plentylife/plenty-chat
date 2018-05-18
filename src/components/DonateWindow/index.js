@@ -19,7 +19,7 @@ async function sortWallets (wallets: Array<Wallet>): Promise<Array<Wallet>> {
   const withLastTimestamp = []
   const ps = wallets.map(w => {
     return getLastEventBy(w.agentId, w.communityId).then(e => {
-      withLastTimestamp.push([e.timestamp, w])
+      withLastTimestamp.push([e ? e.timestamp : 0, w])
     })
   })
   await Promise.all(ps)
