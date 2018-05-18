@@ -1,0 +1,15 @@
+.message-contribution {
+  display: inline;
+
+  .avatar {
+    height: 16px;
+    vertical-align: middle;
+
+    img {
+      height: 100%
+    }
+  }
+  .agent-name::before, .agent-name::after, .gave-word::after {
+    content: ' ';
+  }
+}

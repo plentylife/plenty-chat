@@ -34,16 +34,16 @@
     position: relative; /* for animation */
 }
 
-.account-status-block .balance {
+.balance {
     font-family: 'Raleway', sans-serif;
 }
-.account-status-block .balance.good-standing {
+.balance.good-standing {
     color: forestgreen;
 }
-.account-status-block .balance.warning {
+.balance.warning {
     color: #b9872a;
 }
-.account-status-block .balance.danger {
+    .balance.danger {
     color: #a94442;
 }
 

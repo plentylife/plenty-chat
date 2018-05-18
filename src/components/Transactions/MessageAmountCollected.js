@@ -5,6 +5,10 @@ import {getMessage} from '../../db/MessageTable'
 import Balance from '../AccountStatus/Balance'
 import {EVENT_TABLE, getEvent} from '../../db/EventTable'
 import {Event} from '../../events'
+import {mmImageGetter, mmUserGetter} from '../../mmintegration'
+import {userNameFromProfile} from '../utils'
+import './messageAmountCollected.scss'
+import {Well} from 'react-bootstrap'
 
 type Props = {messageId: string, nSQLdata: {rows: Array<Object>, table: string}, nSQLloading: boolean}
 
@@ -66,7 +70,7 @@ export class MessageAmountCollected extends React.Component<Props> {
       if (!checkAgainst.includes(event.globalEventId)) {
         const agentId = event.senderId
         const amount = event.payload.amount
-        updated.push({eventId: event.globalEventId, agent: agentId, amount})
+        updated.push({eventId: event.globalEventId, agentId, amount})
       }
     })
 
@@ -91,11 +95,33 @@ export class MessageAmountCollected extends React.Component<Props> {
     }
   }
 
+  static renderAgentContribution (agentId: string, amount: number, isLast: boolean) {
+    const profile = mmUserGetter(agentId)
+    const image = mmImageGetter(profile)
+
+    return <div className={'message-contribution'}>
+      <span className={'avatar'}>
+        <img src={image}/>
+      </span>
+      <span className={'agent-name'}>
+        {userNameFromProfile(profile)}
+      </span>
+      <span className={'gave-word'}>gave</span>
+      <Balance amount={amount}/>
+      {!isLast ? ',' : null}
+    </div>
+  }
+
   render () {
     // return (!this.state.amount) ? null : <div className={'message-collected'}>
     return <div className={'message-collected'}>
-      <Balance amount={this.state.amount} spellThanks={true}/> earned
-      {JSON.stringify(this.state.transactions)}
+      <Well bsSize={'small'}>
+        <Balance amount={this.state.amount} spellThanks={true}/> earned:
+        {this.state.transactions.map((t, i) => {
+          const isLast = (this.state.transactions.length - 1 - i) === 0
+          return (MessageAmountCollected.renderAgentContribution(t.agentId, t.amount, isLast))
+        })}
+      </Well>
     </div>
   }
 }
