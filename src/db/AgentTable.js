@@ -14,7 +14,7 @@ export type AgentRow = {
 const agentTable = nSQL(AGENT_TABLE).model([
   {key: 'agentId', type: 'string', props: ['pk']},
   {key: 'email', type: 'string'},
-  {key: 'lastNotification', type: 'number', props: ['idx']}, // fixme add idx when bug is solved
+  {key: 'lastNotification', type: 'number', props: ['idx']},
   {key: 'wallets', type: AGENT_WALLET_TABLE + '[]', props: ['ref=>agentId']}
 ]).config({mode: DB_MODE || 'PERM', id: DB_ID})
 
