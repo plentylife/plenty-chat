@@ -50,7 +50,7 @@ export class MessageAmountCollected extends React.Component<Props> {
 
     if (nextProps.nSQLdata.table === MESSAGE_TABLE) {
       const self = nextProps.nSQLdata && nextProps.nSQLdata.rows.find(r => (r.id === this.props.messageId))
-      return self.fundsCollected !== this.state.amount && !nextProps.nSQLloading
+      return !!self && self.fundsCollected !== this.state.amount && !nextProps.nSQLloading
     } else if (nextProps.nSQLdata.table === EVENT_TABLE) {
       if (this.state.eventsToParse.length > 0) {
         let incomingIds = []

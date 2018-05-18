@@ -80,12 +80,13 @@ nSQL().onConnected(async () => {
   await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
   await rateMessage(MSG_ID, getCurrentAgentId(), 1, 3)
   await makeTransactionOnMessage('gmid', CH_ID, OTHER_AGENT_ID, getCurrentAgentId(), getCurrentCommunityId(), 4.4)
+  // await makeTransactionOnMessage('gmid', CH_ID, OTHER_AGENT_ID, getCurrentAgentId(), getCurrentCommunityId(), 1.4)
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
     return <div className={'tests-container'}>
       <MessageAmountCollected messageId={'gmid'}/>
-      <GiveButton messageId={'gmid'} channelId={CH_ID} messageSenderId={OTHER_AGENT_ID}/>
+      <GiveButton messageId={'not-gmid'} channelId={CH_ID} messageSenderId={OTHER_AGENT_ID}/>
 
       <ControlPanel agentId={getCurrentAgentId()} communityId={getCurrentCommunityId()}
         getUserProfile={getUP} getUserImage={getP}/>
