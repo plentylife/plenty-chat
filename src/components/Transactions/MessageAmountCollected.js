@@ -39,10 +39,10 @@ export class MessageAmountCollected extends React.Component<Props> {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    if (nextProps.nSQLloading) return false
-
     const isChanged = nextState.amount !== this.state.amount || this.state.transactions.length !== nextState.transactions.length
     if (isChanged) return true
+
+    if (nextProps.nSQLloading) return false
 
     if (nextProps.nSQLdata.table === MESSAGE_TABLE) {
       const self = nextProps.nSQLdata && nextProps.nSQLdata.rows.find(r => (r.id === this.props.messageId))
@@ -74,18 +74,20 @@ export class MessageAmountCollected extends React.Component<Props> {
   }
 
   componentDidUpdate () {
-    if (this.props.nSQLdata.table === MESSAGE_TABLE) {
-      const self = this.props.nSQLdata && this.props.nSQLdata.rows.find(r => (r.id === this.props.messageId))
-      const parsedIds = this.state.transactions.map(t => (t.eventId))
-      const toParse = self.relatedEvents.filter(re => (!parsedIds.includes(re)))
-      this.setState({amount: self.fundsCollected, eventsToParse: toParse})
-    } else if (this.props.nSQLdata.table === EVENT_TABLE) {
-      const toParse = this.props.nSQLdata.rows.filter(i => (this.state.eventsToParse.includes(i.globalEventId))) || []
-      const toParseIds = toParse.map(p => (p.globalEventId))
-      const leftToParse = this.state.eventsToParse.filter(p => (!toParseIds.includes(p)))
+    if (this.props.nSQLdata) {
+      if (this.props.nSQLdata.table === MESSAGE_TABLE) {
+        const self = this.props.nSQLdata.rows.find(r => (r.id === this.props.messageId))
+        const parsedIds = this.state.transactions.map(t => (t.eventId))
+        const toParse = self.relatedEvents.filter(re => (!parsedIds.includes(re)))
+        this.setState({amount: self.fundsCollected, eventsToParse: toParse})
+      } else if (this.props.nSQLdata.table === EVENT_TABLE) {
+        const toParse = this.props.nSQLdata.rows.filter(i => (this.state.eventsToParse.includes(i.globalEventId))) || []
+        const toParseIds = toParse.map(p => (p.globalEventId))
+        const leftToParse = this.state.eventsToParse.filter(p => (!toParseIds.includes(p)))
 
-      const transactions = MessageAmountCollected.extractTransactionsInfo(this.state.transactions, toParse)
-      this.setState({transactions, eventsToParse: leftToParse})
+        const transactions = MessageAmountCollected.extractTransactionsInfo(this.state.transactions, toParse)
+        this.setState({transactions, eventsToParse: leftToParse})
+      }
     }
   }
 

@@ -24,6 +24,7 @@ import ControlPanel from '../../src/components/ControlPanel/ControlPanel'
 import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
 import GiveButton from '../../src/components/Transactions/GiveButton'
 import MessageAmountCollected from '../../src/components/Transactions/MessageAmountCollected'
+import {makeTransactionOnMessage} from '../../src/actions/AccountingActions'
 
 nSQL().onConnected(async () => {
   setCurrentAgentId('aid')
@@ -78,6 +79,7 @@ nSQL().onConnected(async () => {
 
   await sendMessage(OTHER_AGENT_ID, CH_ID, MSG_ID)
   await rateMessage(MSG_ID, getCurrentAgentId(), 1, 3)
+  await makeTransactionOnMessage('gmid', CH_ID, OTHER_AGENT_ID, getCurrentAgentId(), getCurrentCommunityId(), 4.4)
 
   function ComponentDisplay () {
     console.log('Test Component Display rendering')
