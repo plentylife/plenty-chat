@@ -95,11 +95,11 @@ export class MessageAmountCollected extends React.Component<Props> {
     }
   }
 
-  static renderAgentContribution (agentId: string, amount: number, isLast: boolean) {
+  static renderAgentContribution (agentId: string, amount: number, isLast: boolean, index: number) {
     const profile = mmUserGetter(agentId)
     const image = mmImageGetter(profile)
 
-    return <div className={'message-contribution'}>
+    return <div className={'message-contribution'} key={index}>
       <span className={'avatar'}>
         <img src={image}/>
       </span>
@@ -119,7 +119,7 @@ export class MessageAmountCollected extends React.Component<Props> {
         <Balance amount={this.state.amount} spellThanks={true}/> earned:
         {this.state.transactions.map((t, i) => {
           const isLast = (this.state.transactions.length - 1 - i) === 0
-          return (MessageAmountCollected.renderAgentContribution(t.agentId, t.amount, isLast))
+          return (MessageAmountCollected.renderAgentContribution(t.agentId, t.amount, isLast, i))
         })}
       </Well>
     </div>
