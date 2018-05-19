@@ -117,8 +117,7 @@ export class MessageAmountCollected extends React.Component<Props> {
   }
 
   render () {
-    // return (!this.state.amount) ? null : <div className={'message-collected'}>
-    return <div className={'message-collected'}>
+    return (!this.state.amount) ? null : <div className={'message-collected'}>
       <Well bsSize={'small'}>
         <Balance amount={this.state.amount} spellThanks={true}/> earned:
         {this.state.transactions.map((t, i) => {

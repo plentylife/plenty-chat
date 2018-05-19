@@ -9,7 +9,13 @@
       height: 100%
     }
   }
-  .agent-name::before, .agent-name::after, .gave-word::after {
+  .agent-name::before, .agent-name::after, .gave-word::after, &::before {
     content: ' ';
+  }
+}
+
+.message-collected {
+  .well {
+    margin-bottom: 0;
   }
 }
