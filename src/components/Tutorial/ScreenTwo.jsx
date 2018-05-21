@@ -2,18 +2,18 @@
 
 import React from 'react'
 import './style.scss'
-import {DASH} from './index'
+import {THANKS} from '../utils'
 
 type Props = {}
 
 export default function ScreenTwo (props: Props) {
+  const cryptoUrl = 'http://about.plenty.life/#currency'
+
   return <div className={'tutorial-screen screen-two'}>
-    <h3>Truly social crypto-currency</h3>
-    <span>
-      <p>We are one of a kind crypto-currency. Unlike the rest, we {'aren\'t'} out to make a buck. We are the first not-for-profit project of this kind.</p>
-      <p>Directly improving the lives of people is our goal {DASH} <span className={'plenty-word'}>Plenty</span> acts as the social fabric that bonds friends into micro-communities.</p>
-      <p>{'We\'ve'} integrated <span className={'plenty-word'}>Plenty</span> into a chat app, which helps to bring friends together around things they love to do.</p>
-      <p>And lets organizations enjoy teams that are self-organized, efficient, and effective.</p>
-    </span>
+    <p>We are all wealthy</p>
+
+    <p>We would all be rich if {THANKS} were money</p>
+
+    <p>So {'that\'s'} exactly what we did. We turned {THANKS} into a <a target='_blank' href={cryptoUrl}>natural currency</a></p>
   </div>
 }
