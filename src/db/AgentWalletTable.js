@@ -131,11 +131,7 @@ export function addCommunitySharePoints (agentId: string, communityId: string, p
 export function applyDemurrageToWallet (agentId: string, communityId: string, delta: Object): Promise<Array<any>> {
   return getRecord(agentId, communityId).then(r => {
     if (r.length !== 1) {
-      return nSQL('Event').query('select').where([['eventType', '=', 'addAgentToCommunity'], 'AND', ['senderId', '=', 'up1g6iyezbdw9ptby8ts4hrs9w']]).exec().then(ch => {
-      // nSQL('Event').query('select').where([['eventType', '=', 'addAgentToCommunity'], 'AND', ['senderId', '=', 'jdjr9bpehtgs3pokkas8n7dr8e']]).exec().then(ch => {
-        console.log(ch)
-        throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
-      })
+      throw new MissingDatabaseEntry('Could not add community share points to non-existent account', agentId, communityId)
     }
     const now = new Date().getTime()
     let flagAny = false
