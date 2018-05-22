@@ -19,7 +19,8 @@ export async function onChannelView (agentId: string, channelId: string, communi
   await nSQL().onConnected(async () => {
     console.log('DB connected (onConnected)')
     await createChannel(agentId, channelId, communityId)
-    await addAgentToCommunity(agentId, communityId)
+    const profile = mmUserGetter(agentId)
+    await addAgentToCommunity(agentId, communityId, profile.email)
   })
 }
 

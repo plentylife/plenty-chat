@@ -12,10 +12,10 @@ export async function createAgent (agentId: string): Promise<boolean> {
 
 // todo. maybe this should be in a community actions file?
 
-export async function addAgentToCommunity (agentId: string, communityId: string, force: boolean = false): Promise<boolean> {
+export async function addAgentToCommunity (agentId: string, communityId: string, email: string, force: boolean = false): Promise<boolean> {
   const ex = await walletExists(agentId, communityId)
   if (!ex || force) {
-    return sendEvent(ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, agentId, communityId, {})
+    return sendEvent(ADD_AGENT_TO_COMMUNITY_EVEN_TYPE, agentId, communityId, {email})
   } else {
     return null
   }

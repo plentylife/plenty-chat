@@ -4,6 +4,7 @@ import type {Event} from './index'
 import {STUB} from '../utils'
 import {walletExists} from '../db/AgentWalletTable'
 import {initializeAccount} from '../accounting/Accounting'
+import {pushAgent} from '../db/AgentTable'
 
 // export const CREATE_AGENT_EVENT_TYPE: 'createAgent' = 'createAgent'
 
@@ -15,6 +16,7 @@ export async function handleCreateAgentEvent (event: Event): Promise<boolean> {
 }
 
 export async function handleAddAgentToCommunity (event: Event): Promise<boolean> {
+  await pushAgent(event.senderId, event.payload.email)
   return walletExists(event.senderId, event.communityId).then(e => {
     if (!e) {
       return initializeAccount(event.senderId, event.communityId)
