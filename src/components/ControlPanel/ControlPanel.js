@@ -19,7 +19,7 @@ type Props = {
 }
 
 let tutorialStarted = false
-let componentsToRenderBeforeTutorial: Set<string> = new Set(['panel', 'donation'])
+let componentsToRenderBeforeTutorial: Set<string> = new Set(['panel', 'donation', 'account', 'community'])
 export function registerReadyForTutorial (component: string) {
   componentsToRenderBeforeTutorial.delete(component)
   if (componentsToRenderBeforeTutorial.size === 0 && !tutorialStarted) {
@@ -35,9 +35,11 @@ function fixMattermostScroll () {
   let postList = document.getElementById('post-list')
   if (postList) {
     postList = postList.getElementsByClassName('post-list-holder-by-time')[0]
-    const panel = document.getElementById('plenty-control-panel')
-    const height = panel.getBoundingClientRect().height
-    postList.scrollTop = postList.scrollTop + height
+    if (postList) { // fixme this will not happen at the right time in all cases, such as slow internet connection
+      const panel = document.getElementById('plenty-control-panel')
+      const height = panel.getBoundingClientRect().height
+      postList.scrollTop = postList.scrollTop + height
+    }
   }
 }
 

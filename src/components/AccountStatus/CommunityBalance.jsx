@@ -8,6 +8,7 @@ import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import Balance from './Balance'
 import {CRON_TIME} from '../../state/GlobalState'
 import {COMMUNITY_BALANCE_INTRO, SHARE_INTRO} from '../Tutorial'
+import {registerReadyForTutorial} from '../ControlPanel/ControlPanel'
 
 type Props = {
   agentId: string,
@@ -42,6 +43,14 @@ class CommunityBalance extends Component<Props> {
   shouldComponentUpdate (nextProps, nextState) {
     return true
     // return JSON.stringify(this.props.nSQLdata) !== JSON.stringify(nextProps.nSQLdata)
+  }
+
+  componentDidUpdate () {
+    if (this.props.nSQLdata) registerReadyForTutorial('community')
+  }
+
+  componentDidMount () {
+    if (this.props.nSQLdata) registerReadyForTutorial('community')
   }
 
   static Unavailable () {

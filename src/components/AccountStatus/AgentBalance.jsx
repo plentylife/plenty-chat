@@ -8,6 +8,7 @@ import {AGENT_WALLET_TABLE} from '../../db/tableNames'
 import {calculateDemurrageRate} from '../../accounting/Demurrage'
 import {Decimal} from 'decimal.js'
 import {BALANCE_INTRO, CREDIT_LIMIT_INTRO, DEMURRAGE_INTRO} from '../Tutorial'
+import {registerReadyForTutorial} from '../ControlPanel/ControlPanel'
 
 type Props = {
   agentId: string,
@@ -38,6 +39,13 @@ class AgentBalance extends Component<Props> {
 
   static Unavailable () {
     return <div className="unavailable">Wallet info unavailable</div>
+  }
+  componentDidUpdate () {
+    if (this.props.nSQLdata) registerReadyForTutorial('account')
+  }
+
+  componentDidMount () {
+    if (this.props.nSQLdata) registerReadyForTutorial('account')
   }
 
   render () {
