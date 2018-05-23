@@ -21,16 +21,17 @@ import {
   RECIPIENT_DOES_NOT_EXIST
 } from '../utils/UserErrors'
 import type {TransactionPayload} from '../events/AccountingEvents'
+import {Decimal} from 'decimal.js'
 
 export async function applyDemurrageToAll (): Promise<boolean> {
   const wallets = await getAllWallets()
   const sentPromises = wallets.map(w => {
     const d = calculateDemurrageForAgent(w)
-    let hasAnyNonZero = 0
+    let sum = Decimal(0)
     Object.keys(d).forEach(k => {
-      hasAnyNonZero += d[k]
+      sum = sum.plus(d[k])
     })
-    if (hasAnyNonZero > 0) {
+    if (sum.gt(0)) {
       const payload = Object.assign({}, w, d) // fixme remove unnecessary properties from payload
       console.log(`Sending out demurrage for agent ${w.agentId} with payload ${JSON.stringify(payload)}`)
       return sendEvent(DEMURRAGE_EVENT_TYPE, getCurrentAgentId(), w.communityId, payload)
