@@ -12,6 +12,8 @@ type Props = {
 
 export default function AgentRow (props: Props) {
   const userProfile = props.getProfile(props.agentId)
+  if (!userProfile) return <div>could not find user with id {props.agentId}</div>
+
   let plea = null
   if (props.plea) {
     plea = <span className={'plea'}>
