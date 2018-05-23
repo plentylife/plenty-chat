@@ -56,12 +56,14 @@ function _cda (w: Wallet, p: string, rate: Decimal): Decimal {
 export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByProperty {
   const w = agentWallet
   const balanceRate = calculateDemurrageRate(Decimal(w.incomingStat), Decimal(w.outgoingStat))
+  let creditLimit = _cda(w, 'creditLimit', CREDIT_LIMIT_DEMURRAGE_RATE)
+  console.log('creditLimit', creditLimit.toNumber())
   return {
     balance: _cda(agentWallet, 'balance', balanceRate),
     communitySharePoints: _cda(agentWallet, 'communitySharePoints', balanceRate),
     incomingStat: _cda(w, 'incomingStat', STATISTICS_DEMURRAGE_RATE),
     outgoingStat: _cda(w, 'outgoingStat', STATISTICS_DEMURRAGE_RATE),
-    creditLimit: _cda(w, 'creditLimit', CREDIT_LIMIT_DEMURRAGE_RATE)
+    creditLimit: creditLimit
   }
 }
 

@@ -65,13 +65,13 @@ function cdaMacro (t, w, la, ex) {
 cdaMacro.title = (t, w, la, ex) => `${t} - ${JSON.stringify(w)} at ${la} => ${JSON.stringify(ex)}`
 
 test('calculating demurrage for agent', cdaMacro, {
-  balance: 100, communitySharePoints: 110, incomingStat: 0, outgoingStat: 0, creditLimit: 1
+  balance: 100, communitySharePoints: 110, incomingStat: 0, outgoingStat: 0, creditLimit: 2
 }, 1, {
-  balance: 0, communitySharePoints: 0, incomingStat: 0, outgoingStat: 0, creditLimit: 0
+  balance: 0, communitySharePoints: 0, incomingStat: 0, outgoingStat: 0, creditLimit: 2 - 0.85 * 2
 })
 
 test('calculating demurrage for agent', cdaMacro, {
-  balance: 1, communitySharePoints: 100, incomingStat: 10, outgoingStat: 20, creditLimit: 1
+  balance: 1, communitySharePoints: 100, incomingStat: 10, outgoingStat: 20, creditLimit: 1.17
 }, 1, {
   balance: 0, communitySharePoints: 0, incomingStat: 10 * (1 - STATISTICS_DEMURRAGE_RATE), outgoingStat: 20 * (1 - STATISTICS_DEMURRAGE_RATE), creditLimit: 0
 })
