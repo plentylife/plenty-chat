@@ -67,19 +67,19 @@ cdaMacro.title = (t, w, la, ex) => `${t} - ${JSON.stringify(w)} at ${la} => ${JS
 test('calculating demurrage for agent', cdaMacro, {
   balance: 100, communitySharePoints: 110, incomingStat: 0, outgoingStat: 0, creditLimit: 1
 }, 1, {
-  balance: 0, communitySharePoints: 0, incomingStat: 0, outgoingStat: 0, creditLimit: 0.15
+  balance: 0, communitySharePoints: 0, incomingStat: 0, outgoingStat: 0, creditLimit: 0
 })
 
 test('calculating demurrage for agent', cdaMacro, {
   balance: 1, communitySharePoints: 100, incomingStat: 10, outgoingStat: 20, creditLimit: 1
 }, 1, {
-  balance: 0, communitySharePoints: 0, incomingStat: 10 * (1 - STATISTICS_DEMURRAGE_RATE), outgoingStat: 20 * (1 - STATISTICS_DEMURRAGE_RATE), creditLimit: 0.15
+  balance: 0, communitySharePoints: 0, incomingStat: 10 * (1 - STATISTICS_DEMURRAGE_RATE), outgoingStat: 20 * (1 - STATISTICS_DEMURRAGE_RATE), creditLimit: 0
 })
 
 test('calculating demurrage for agent', cdaMacro, {
-  balance: 1, communitySharePoints: 100, incomingStat: 10, outgoingStat: 0, creditLimit: 1
+  balance: 1, communitySharePoints: 100, incomingStat: 10, outgoingStat: 0, creditLimit: 2
 }, 1, {
-  balance: 1 - MAXIMUM_DEMURRAGE_RATE, communitySharePoints: 100 * (1 - MAXIMUM_DEMURRAGE_RATE)
+  balance: 1 - MAXIMUM_DEMURRAGE_RATE, communitySharePoints: 100 * (1 - MAXIMUM_DEMURRAGE_RATE), creditLimit: (1 - STATISTICS_DEMURRAGE_RATE) * 2
 })
 
 const stdr35 = 1 - Math.pow(STATISTICS_DEMURRAGE_RATE, 35)
