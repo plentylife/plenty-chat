@@ -41,9 +41,7 @@ export async function pushEvent (event: Event, handledSuccessfully: boolean): Pr
     const withTime = Object.assign({}, event, {
       timestamp: now, handledSuccessfully, receivedFrom
     })
-    return nSQL(EVENT_TABLE).query('upsert', withTime).exec().then(rs => {
-      console.log('inserted rows', rs)
-    }).catch(e => {
+    return nSQL(EVENT_TABLE).query('upsert', withTime).exec().catch(e => {
       console.error('could not insert row into event table', e)
     })
   }
