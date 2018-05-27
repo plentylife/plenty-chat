@@ -20,8 +20,10 @@ export async function handleMessageEvent (event: Event): Promise<boolean> {
 
   const fc = await hasEnoughFunds(agentId, communityId, COST_OF_SENDING_MESSAGE)
   if (fc) {
-    pushMessage(payload.messageId, agentId, channelId)
+    await pushMessage(payload.messageId, agentId, channelId)
     return spend(agentId, communityId, COST_OF_SENDING_MESSAGE).then(r => true)
+  } else {
+    console.error(`Agent ${agentId} does not have enough funds to send message`)
   }
   return false
 }
