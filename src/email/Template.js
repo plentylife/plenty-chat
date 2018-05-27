@@ -6,9 +6,11 @@ import {AMOUNT_PRECISION_IN_DISPLAY} from '../components/utils'
 import {Decimal} from 'decimal.js'
 import {getDayOfWeek} from '../utils'
 
+const TEMPLATE_PATH = process.env.EMAIL_TEMPLATE_PATH || 'src/email/template.html'
+
 export function generateEmailHtml (newCount: number, wallet: Wallet, communityBalance: Decimal, share: Decimal): Promise<string> {
   return new Promise((resolve, reject) => {
-    fs.readFile('src/email/template.html', (err, data) => {
+    fs.readFile(TEMPLATE_PATH, (err, data) => {
       if (err) reject(err)
       let html = fillMsgCount(newCount, data.toString())
       // html = fillWallet(wallet, html)
