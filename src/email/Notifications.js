@@ -33,7 +33,7 @@ export async function _countAgentNotifications () : Map<string, number> {
     newByCommunity.set(m.channelId.communityId, count + 1)
   })
   const potentialAgents = await getAgentsByNotificationTime(lastBefore)
-  console.debug('Agents to potentially receive notifications', lastBefore, newMessages.length, potentialAgents.map(a => (a.agentId)))
+  console.debug('Agents to potentially receive notifications', lastBefore, newMessages.length, potentialAgents.length)
   const newByAgent = new Map()
   potentialAgents.forEach(a => {
     let count = 0
