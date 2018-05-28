@@ -25,8 +25,8 @@ export function registerReadyForTutorial (component: string) {
   if (componentsToRenderBeforeTutorial.size === 0 && !tutorialStarted) {
     tutorialStarted = true
     setTimeout(() => {
-      startMainIntro()
       fixMattermostScroll()
+      startMainIntro()
     }, 1000)
   }
 }
