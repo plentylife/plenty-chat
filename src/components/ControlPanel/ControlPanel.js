@@ -123,7 +123,7 @@ export default class ControlPanel extends React.Component<Props> {
       <a href={'http://about.plenty.life/basics'} target={'_blank'} className={'help-text'} onClick={e => {
         e.stopPropagation()
       }}>
-        help
+        help!
       </a>
     </div>
 
