@@ -14,9 +14,7 @@ export default function FrontPage (props: Props) {
       <div className={'img-holder'}>
       </div>
       <div className={'subtitle'}>
-        <span className={'top'}>Changing the meaning of profit,</span><br/>
-        <span className={'middle'}>so that corporations can</span><br/>
-        <span className={'bottom'}>become guardians of the world</span>
+        <span className={'top'}>We are all wealthy</span>
       </div>
       <Button bsStyle="primary" className={'login-action'} onClick={() => {
         props.history.push('/login' + props.location.search)
