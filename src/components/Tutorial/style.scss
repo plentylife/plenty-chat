@@ -33,3 +33,15 @@
 .thanks-word {
   color: forestgreen;
 }
+
+.introjs-hint-pulse {
+  border-color: rgba(255, 0, 0, 0.71) !important;
+}
+
+.introjs-hint-dot {
+  border-color: #ff7a00 !important;
+}
+
+.introjs-hint {
+  z-index: 10000;
+}

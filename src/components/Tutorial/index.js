@@ -27,7 +27,9 @@ export const COMMUNITY_BALANCE_INTRO = `Some ${ThanksSpan}, like the ones that s
 
 export const SHARE_INTRO = `Every so often, the community pot is split between members. This is your share.`
 
-export const GIVE_BUTTON_INTRO = `Whenever you see a message that deserves some ${ThanksSpan}, use this button to give some.`
+export const GIVE_BUTTON_INTRO = `Whenever you see a message that deserves some ${ThanksSpan}, use this button to give some. It could be somebody offering help, or sharing a great idea ${DASH} make sure to give them some ${ThanksSpan}`
+
+const INVITE_INTRO = 'Invite your friends using the links in the menu.'
 
 const MAIN_INTRO_SETTING_KEY = 'main_intro'
 const GIVE_BUTTON_INTRO_SETTING_KEY = 'give_button_intro'
@@ -37,7 +39,7 @@ export const ABOUT_CURRENCY_URL = 'http://about.plenty.life/#currency'
 let mainIntroComplete = false
 let giveButtonIntroStarted = false
 
-export async function startMainIntro () {
+export async function startIntro () {
   mainIntroComplete = await getBooleanSetting(MAIN_INTRO_SETTING_KEY)
   if (!mainIntroComplete) {
     let exited = false
@@ -55,15 +57,33 @@ export async function startMainIntro () {
         completeMainIntro()
       }
     })
+  } else {
+    startGiveButtonIntro()
   }
 }
 
-function completeMainIntro () {
-  mainIntroComplete = true
-  pushSimpleSetting(MAIN_INTRO_SETTING_KEY, true)
+function startHints () {
+  const teamHeader = document.getElementById('teamHeader')
+  let hintElem
+  if (teamHeader.getBoundingClientRect().x < 0) {
+    const header = document.getElementsByClassName('navbar-header')[0]
+    hintElem = header
+  } else {
+    hintElem = teamHeader
+  }
+  IntroJs().setOptions({
+    hints: [
+      { hint: INVITE_INTRO, element: hintElem, hintPosition: 'middle-right' }
+    ]
+  }).addHints()
+}
 
-  const giveBtn = getGiveButtonToIntro()
-  if (giveBtn) pushSimpleSetting(GIVE_BUTTON_INTRO_SETTING_KEY, true)
+async function completeMainIntro () {
+  mainIntroComplete = true
+  await pushSimpleSetting(MAIN_INTRO_SETTING_KEY, true)
+
+  startHints()
+  startGiveButtonIntro()
 }
 
 export async function startGiveButtonIntro () {
@@ -73,15 +93,35 @@ export async function startGiveButtonIntro () {
     const hasCompleted = await getBooleanSetting(GIVE_BUTTON_INTRO_SETTING_KEY)
 
     if (!hasCompleted) {
-      const giveBtn = getGiveButtonToIntro()
-      const intro = IntroJs(giveBtn)
-        .setOption('exitOnOverlayClick', true)
-        .setOption('showProgress', false)
-        .setOption('showBullets', false)
-        .start()
+      let giveBtn = getGiveButtonToIntro()
+      if (giveBtn) {
+        const gbr = giveBtn.getBoundingClientRect()
 
-      intro.oncomplete(completeGiveButtonIntro)
-      intro.onexit(completeGiveButtonIntro)
+        giveBtn = giveBtn.getElementsByClassName('btn')[0]
+        const scrollableContainer = document.getElementById('post-list').getElementsByClassName('post-list-holder-by-time')[0]
+        const initialScroll = scrollableContainer.scrollTop
+
+        console.log('Starting give button intro on button', giveBtn)
+        const intro = IntroJs()
+          .setOptions({
+            steps: [{intro: GIVE_BUTTON_INTRO, position: 'right', element: giveBtn}]
+          })
+          .setOption('scrollToElement', false)
+          .setOption('exitOnOverlayClick', false)
+          .setOption('showProgress', false)
+          .setOption('showBullets', false)
+
+        intro.oncomplete(completeGiveButtonIntro)
+        intro.onexit(completeGiveButtonIntro)
+        intro.start()
+
+        console.log('bounding rectangle for give button intro', gbr)
+        document.getElementsByClassName('introjs-helperLayer')[0].style.top = `${gbr.top}px`
+        document.getElementsByClassName('introjs-helperLayer')[0].style.height = `${gbr.height}px`
+        document.getElementsByClassName('introjs-tooltipReferenceLayer')[0].style.top = `${gbr.top}px`
+
+        scrollableContainer.scrollTop = initialScroll
+      }
     }
   }
 }
@@ -105,7 +145,7 @@ export function getGiveButtonToIntro () {
 
   Array.from(allButtons).forEach(b => {
     const offset = b.getBoundingClientRect().top - mlOffsetTop
-    if ((offset >= 0 && offset < minimum) || minimum === null) {
+    if (offset >= 0 && (offset < minimum || minimum === null)) {
       minimum = offset
       winner = b
     }

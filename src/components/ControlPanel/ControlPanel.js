@@ -9,7 +9,7 @@ import {userNameFromProfile} from '../utils'
 import {convertStringToValidAmount} from '../../accounting/Accounting'
 import {makeTransaction} from '../../actions/AccountingActions'
 import {getCurrentAgentId, getCurrentCommunityId} from '../../state/GlobalState'
-import {startMainIntro} from '../Tutorial'
+import {startIntro} from '../Tutorial'
 
 type Props = {
   agentId: string,
@@ -26,7 +26,7 @@ export function registerReadyForTutorial (component: string) {
     tutorialStarted = true
     setTimeout(() => {
       fixMattermostScroll()
-      startMainIntro()
+      startIntro()
     }, 1000)
   }
 }
