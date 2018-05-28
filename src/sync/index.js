@@ -156,7 +156,7 @@ async function handleUpdateRequest (peer: Peer, communityId: string, fromTimesta
     } else {
       relevantEntries = await getCommunityEvents(communityId, fromTimestamp)
     }
-    console.log('Sending event sync')
+    console.log('Sending event sync', relevantEntries.length)
     relevantEntries.forEach((_e: Event) => {
       if (!_e.receivedFrom.has(peer.agentId)) {
         addToOutgoingQueue(peer, _e)
