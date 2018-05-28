@@ -32,6 +32,8 @@ export const GIVE_BUTTON_INTRO = `Whenever you see a message that deserves some 
 const MAIN_INTRO_SETTING_KEY = 'main_intro'
 const GIVE_BUTTON_INTRO_SETTING_KEY = 'give_button_intro'
 
+export const ABOUT_CURRENCY_URL = 'http://about.plenty.life/#currency'
+
 let mainIntroComplete = false
 let giveButtonIntroStarted = false
 
