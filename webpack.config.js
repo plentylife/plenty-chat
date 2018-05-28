@@ -156,7 +156,9 @@ const server = Object.assign({}, common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        DB_NAME: JSON.stringify('db-plenty-prod.sqlite3')
+        // DB_NAME: JSON.stringify('db-plenty-prod.sqlite3'),
+        DB_MODE: JSON.stringify('PERM'),
+        EMAIL_TEMPLATE_PATH: JSON.stringify('template.html')
       }
     })
   ],
@@ -174,10 +176,13 @@ const serverTest = Object.assign({}, server, {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('test'),
-        DB_NAME: JSON.stringify('plenty-test-db.sqlite3')
+        EMAIL_TEMPLATE_PATH: JSON.stringify('template.html'),
+        DB_MODE: JSON.stringify('PERM')
+        // DB_NAME: JSON.stringify('plenty-test-db.sqlite3')
       }
     })
   ],
+  devtool: 'source-map',
   mode: 'development'
 })
 
