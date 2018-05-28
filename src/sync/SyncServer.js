@@ -20,8 +20,6 @@ const io = require('socket.io')(server, {
 })
 const port = process.env.PORT || 3000
 
-server.listen(port, () => console.log('server listening on port ' + port))
-
 console.log('Node env', process.env.NODE_ENV)
 // console.log('DB mode', DB_MODE)
 console.log('DB name', process.env.DB_NAME)
@@ -40,6 +38,8 @@ nSQL().connect().then(() => {
     }
     onConnectToPeer(peer)
   })
+
+  server.listen(port, () => console.log('server listening on port ' + port))
 
   setInterval(async () => {
     console.log('\nCRON\n', new Date())
