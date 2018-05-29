@@ -30,7 +30,7 @@ export class MessageAmountCollected extends React.Component<Props> {
           if (!event) eventsToParse.push(e)
           return event
         }))
-        events = events.filter(e => (e !== null))
+        events = events ? events.filter(e => (e !== null)) : []
         const transactions = await MessageAmountCollected.extractTransactionsInfo([], events || [])
         this.setState({amount: msg.fundsCollected, transactions, eventsToParse})
       }
@@ -91,7 +91,7 @@ export class MessageAmountCollected extends React.Component<Props> {
       } else if (this.props.nSQLdata.table === EVENT_TABLE) {
         const toParse = this.props.nSQLdata.rows.filter(i => (this.state.eventsToParse.includes(i.globalEventId))) || []
         const toParseIds = toParse.map(p => (p.globalEventId))
-        const leftToParse = this.state.eventsToParse.filter(p => (!toParseIds.includes(p))) // fixme this filter or another might be buggering out
+        const leftToParse = this.state.eventsToParse.filter(p => (!toParseIds.includes(p)))
 
         const transactions = MessageAmountCollected.extractTransactionsInfo(this.state.transactions, toParse)
         this.setState({transactions, eventsToParse: leftToParse})
