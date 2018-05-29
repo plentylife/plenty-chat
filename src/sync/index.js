@@ -14,7 +14,7 @@ const TABLE_SYNC_CHANNEL = 'table-sync'
 const READY_CHANNEL = 'ready'
 
 export const NO_EVENTS_BEFORE = 1524749468216
-const MIN_PLENTY_VERSION = 180523
+const MIN_PLENTY_VERSION = 180528
 
 export type Peer = {
   agentId: string,
