@@ -29,7 +29,7 @@ function plentyInit () {
   console.log('DB Mode', DB_MODE)
   console.log('DB Name', process.env.DB_NAME)
 
-  nSQL().connect().then(() => console.log('plentyInit NSQL connected'))
+  nSQL().connect().then((db) => console.log('plentyInit NSQL connected', db))
 
   window.nsql = nSQL
 }

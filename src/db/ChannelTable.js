@@ -9,7 +9,7 @@ const channelTable = nSQL(CHANNEL_TABLE).model([
   {key: 'channelId', type: 'string', props: ['pk']},
   {key: 'communityId', type: COMMUNITY_TABLE},
   {key: 'messages', type: MESSAGE_TABLE + '[]', props: ['channelId']}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export function getCommunityOfChannel (channelId: string): Promise<string> {
   return nSQL(CHANNEL_TABLE).query('select').where(['channelId', '=', channelId]).exec().then(r => {

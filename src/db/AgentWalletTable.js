@@ -22,7 +22,7 @@ const agentWalletTable = nSQL(AGENT_WALLET_TABLE).model([
   {key: 'demurrageTimestamps', type: 'map'},
   {key: 'incomingStat', type: 'number', default: 0},
   {key: 'outgoingStat', type: 'number', default: 0}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 function getRecord (agentId: string, communityId: string): Promise<Array<any>> {
   return nSQL(AGENT_WALLET_TABLE).query('select')

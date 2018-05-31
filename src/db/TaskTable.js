@@ -21,7 +21,7 @@ const taskTable = nSQL(TASK_TABLE).model([
   {key: 'completionTime', type: 'number', default: -1},
   // might not necessarily be one of the bidders
   {key: 'markedCompletedBy', type: AGENT_TABLE}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export async function pushNewTask (parentMessageId: string, creatorId: string): Promise<TaskRow | null> {
   // console.log('pushing message with id', id)

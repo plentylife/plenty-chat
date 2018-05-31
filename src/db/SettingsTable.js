@@ -8,7 +8,7 @@ import {SETTINGS_TABLE} from './tableNames'
 const settingsTable = nSQL(SETTINGS_TABLE).model([
   {key: 'key', type: 'string', props: ['pk']},
   {key: '*', type: '*'}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export function pushSimpleSetting (key: string, value: any): Promise<any | null> {
   return nSQL(SETTINGS_TABLE).query('upsert', {

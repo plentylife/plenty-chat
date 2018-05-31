@@ -15,7 +15,7 @@ const messageTable = nSQL(MESSAGE_TABLE).model([
   {key: 'timestamp', type: 'number', props: ['idx']},
   {key: 'fundsCollected', type: 'number', default: 0},
   {key: 'relatedEvents', type: 'string[]'}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export function pushMessage (id: string, senderId: string, channelId: string): Promise<null | MessageRow> {
   // console.log('pushing message with id', id)

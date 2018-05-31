@@ -21,7 +21,7 @@ const eventModel = baseEventModel.concat([
   {key: 'receivedFrom', type: 'string[]'},
   {key: 'handledSuccessfully', type: 'bool'}
 ])
-const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM', id: DB_ID})
+const eventTable = nSQL(EVENT_TABLE).model(eventModel).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export function getEvent (globalEventId: string): Promise<Event | null> {
   return nSQL(EVENT_TABLE).query('select').where(['globalEventId', '=', globalEventId])
@@ -103,7 +103,7 @@ export const SELF_EVENT_TABLE = 'SelfEvent'
 const selfEventModel = baseEventModel.concat([
   {key: 'eventId', type: 'int', props: ['pk', 'ai']}
 ])
-const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode: DB_MODE || 'PERM', id: DB_ID})
+const selfEventTable = nSQL(SELF_EVENT_TABLE).model(selfEventModel).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 /**
  * @return the id of the event that includes the timestamp

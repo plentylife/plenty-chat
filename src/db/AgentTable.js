@@ -16,7 +16,7 @@ const agentTable = nSQL(AGENT_TABLE).model([
   {key: 'email', type: 'string'},
   {key: 'lastNotification', type: 'number', props: ['idx']},
   {key: 'wallets', type: AGENT_WALLET_TABLE + '[]', props: ['ref=>agentId']}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 export function pushAgent (agentId: string, email: string): Promise<AgentRow | null> {
   return nSQL(AGENT_TABLE).query('upsert', {

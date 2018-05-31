@@ -9,7 +9,7 @@ const ratingTable = nSQL(RATING_TABLE).model([
   {key: 'agentId', type: 'string', props: ['idx']},
   {key: 'messageId', type: 'string', props: ['idx']},
   {key: 'rating', type: 'float'}
-]).config({mode: DB_MODE || 'PERM', id: DB_ID})
+]).config({mode: DB_MODE || 'PERM', id: DB_ID, cache: false})
 
 function getRatingQuery (agentId: string, messageId: string) {
   return nSQL(RATING_TABLE).query('select', ['id', 'rating'])
