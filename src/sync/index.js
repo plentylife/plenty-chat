@@ -175,6 +175,7 @@ async function handleUpdateRequest (peer: Peer, communityId: string, fromTimesta
 async function doTableSync (peer: Peer, fromTimestamp: number): Promise<void> {
   let tableSyncMsgs = await generateAllTableSyncMessages(fromTimestamp)
   let count = tableSyncMsgs.length
+  console.log(`Table sync has ${count} messages to send`)
   if (count === 0) return Promise.resolve()
 
   return new Promise(resolve => {
