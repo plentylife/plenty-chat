@@ -45,18 +45,20 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
   const payload = [...p]
   console.log(`Splitting Community (${event.communityId}) ${payload.length} ways`, payload)
   let entry = payload.shift()
+
+  const communityBalance = await getCommunityBalance(event.communityId) // fixme move up
+  let newCommBalance = Decimal(communityBalance)
   while (entry && entry.amount !== 0) {
     const amount = floorWithPrecision(entry.amount)
-    const communityBalance = await getCommunityBalance(event.communityId) // fixme move up
-    const newCommBalance = Decimal(communityBalance).minus(amount)
+    newCommBalance = newCommBalance.minus(amount)
 
     await adjustBalance(entry.agentId, event.communityId, amount)
     await updateCreditLimit(entry.agentId, event.communityId, Decimal(entry.amount))
-    await setCommunityBalance(event.communityId, newCommBalance)
 
     console.log(`Handling community split for agent ${entry.agentId} ${communityBalance} - ${entry.amount} = ${newCommBalance}`)
     entry = payload.shift()
   }
+  await setCommunityBalance(event.communityId, newCommBalance)
   return true
 }
 

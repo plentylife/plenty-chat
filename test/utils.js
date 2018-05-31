@@ -3,6 +3,7 @@
 import {DB_MODE} from '../src/state/GlobalState'
 import {nSQL} from 'nano-sql/lib/index'
 import {ALL_TABLES} from '../src/db'
+import apEqual from 'approximately-equal'
 
 export function setupDb (t) {
   console.log('Setting up')
@@ -62,4 +63,10 @@ export function waitAndCheck (condition: () => boolean) {
     }, 500)
   })
   return p
+}
+
+export function apEq (that, other, error) {
+  const res = apEqual(that, other, error)
+  if (!res) console.error('===\t***\tError: Not approximaetly equal', that, other)
+  return res
 }

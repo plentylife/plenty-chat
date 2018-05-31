@@ -1,6 +1,5 @@
 import test from 'ava'
-import {setupDb} from '../utils'
-import apEq from 'approximately-equal'
+import {setupDb, apEq} from '../utils'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {splitAllCommunityPots} from '../../src/actions/AccountingActions'
 import {initializeCommunity} from '../../src/accounting/Accounting'
@@ -20,6 +19,7 @@ for (let i = 0; i < NUM_AGENTS; i++) {
   AGENTS.push(`agent-id-${i}`)
 }
 const COMMUNITY_ID = 'cid'
+const COMMUNITY_ID_2 = 'cid2'
 
 setCurrentAgentId('server')
 
@@ -27,10 +27,12 @@ test.before(t => {
   return setupDb(t).then(async () => {
     await Promise.all(AGENTS.map(async (a, i) => {
       await addAgentToCommunity(a, COMMUNITY_ID)
+      await addAgentToCommunity(a, COMMUNITY_ID_2)
       await addCommunitySharePoints(a, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS) // fixme
       await addCommunitySharePoints(a, COMMUNITY_ID, AGENT_POINTS[i])
     }))
     await initializeCommunity(COMMUNITY_ID)
+    await initializeCommunity(COMMUNITY_ID_2)
 
     await macroCheckWallets(t, [
       {b: 0, sp: 10}, {b: 0, sp: 20}, {b: 0, sp: 30}
@@ -38,11 +40,11 @@ test.before(t => {
   })
 })
 
-function macroCheckWallets (t, ex) {
+function macroCheckWallets (t, ex, cid) {
   const ps = AGENTS.map(async (a, i) => {
-    const w = await getWallet(a, COMMUNITY_ID)
+    const w = await getWallet(a, cid || COMMUNITY_ID)
     t.true(apEq(w.balance, ex[i].b))
-    t.true(apEq(w.communitySharePoints, ex[i].sp))
+    ex[i].sp && t.true(apEq(w.communitySharePoints, ex[i].sp))
   })
   return Promise.all(ps)
 }
@@ -59,7 +61,7 @@ test.serial('pot is split properly', async t => {
   await splitAllCommunityPots()
 
   await macroCheckWallets(t, [
-    {b: 9.99999, sp: 10}, {b: 19.99999, sp: 20}, {b: 30.00002, sp: 30}
+    {b: 20, sp: 10}, {b: 20, sp: 20}, {b: 20, sp: 30}
   ])
   t.is(await getCommunityBalance(COMMUNITY_ID), 0)
 })
@@ -68,11 +70,11 @@ test.serial('pot should be fully split, always, event it if means fractions', as
   await setCommunityBalance(COMMUNITY_ID, 61)
   await splitAllCommunityPots()
 
-  const checkAgainst = [{b: 20.16665, sp: 10}, {b: 40.33332, sp: 20}, {b: 60.50003, sp: 30}]
+  const checkAgainst = [{b: 40.333, sp: 10}, {b: 40.333, sp: 20}, {b: 40.333, sp: 30}]
   const sumOfcheck = MMath.sum(...checkAgainst.map(c => (c.b)))
-  t.true(sumOfcheck === 121)
+  t.true(sumOfcheck === 120.999)
   await macroCheckWallets(t, checkAgainst)
-  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0))
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0.001))
 })
 
 test.serial('pot split event should have an array as payload', async t => {
@@ -83,6 +85,28 @@ test.serial('pot split event should have an array as payload', async t => {
   })
 })
 
-test.todo('when communty pot is nothing. division by zero')
+test.serial('when community pot is tiny nothing should be split', async t => {
+  await splitAllCommunityPots()
+  const checkAgainst = [{b: 40.333, sp: 10}, {b: 40.333, sp: 20}, {b: 40.333, sp: 30}]
+  await macroCheckWallets(t, checkAgainst)
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0.001))
+})
 
-test.todo('with multile communities')
+test.serial('the other community should have not been affected', async t => {
+  const checkAgainst = [{b: 0}, {b: 0}, {b: 0}]
+  await macroCheckWallets(t, checkAgainst, COMMUNITY_ID_2)
+})
+
+test.serial('with multiple communities', async t => {
+  await setCommunityBalance(COMMUNITY_ID, 3)
+  await setCommunityBalance(COMMUNITY_ID_2, 10)
+  await splitAllCommunityPots()
+
+  const checkAgainst1 = [{b: 41.333, sp: 10}, {b: 41.333, sp: 20}, {b: 41.333, sp: 30}]
+  await macroCheckWallets(t, checkAgainst1)
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID), 0))
+
+  const checkAgainst2 = [{b: 3.333}, {b: 3.333}, {b: 3.333}]
+  await macroCheckWallets(t, checkAgainst2, COMMUNITY_ID_2)
+  t.true(apEq(await getCommunityBalance(COMMUNITY_ID_2), 0.001))
+})
