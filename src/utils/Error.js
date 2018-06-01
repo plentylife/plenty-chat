@@ -27,3 +27,15 @@ export class ExistsInDB extends Error {
 }
 
 export class NotEnoughFunds extends Error {}
+
+export class PeerNotConnected extends Error {
+  constructor (id: any) {
+    super(`Peer with id ${id} is not connected`)
+  }
+}
+
+export class MaxRetriesReached extends Error {
+  constructor (eventId: any) {
+    super(`Reached max retries to send event id ${eventId}`)
+  }
+}
