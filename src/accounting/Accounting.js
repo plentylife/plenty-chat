@@ -39,7 +39,7 @@ export function initializeCommunity (communityId: string): Promise<void> {
 }
 
 export function hasEnoughFundsNum (balance, creditLimit, amountRequested): boolean {
-  return (balance + creditLimit - amountRequested > 0)
+  return (balance + creditLimit - amountRequested >= 0)
 }
 
 /**
@@ -119,7 +119,7 @@ export function convertStringToValidAmount (str: string): {amount: ?Decimal, err
         return {amount, error: null}
       } catch (e) {
         if (e instanceof RangeError) {
-          return {amount: number, error: AMOUNT_UNDER_ZERO}
+          return {amount: null, error: AMOUNT_UNDER_ZERO}
         }
         return {amount: null, error: 'unknown error. whoops...'}
       }
