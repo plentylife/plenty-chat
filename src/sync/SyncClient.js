@@ -1,6 +1,6 @@
 // @flow
 import io from 'socket.io-client'
-import {listenForTableSync, onConnectToPeer, registerSendEventsObserver} from './index'
+import {onConnectToPeer, registerSendEventsObserver} from './index'
 import type {Peer} from './index'
 import {setSendEventSync, setSendTableSync} from '../state/GlobalState'
 
@@ -24,7 +24,6 @@ export function startSync (peers: Array<string>): void {
   peers.forEach(address => {
     console.log('Starting sync with', address)
     connectToPeer(address).then(peer => {
-      listenForTableSync(peer)
       onConnectToPeer(peer)
     })
   })

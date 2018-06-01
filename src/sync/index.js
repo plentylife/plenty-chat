@@ -6,6 +6,7 @@ import {getCurrentAgentId, getSendEventSync, getSendTableSync, PLENTY_VERSION} f
 import {nSQL} from 'nano-sql'
 import {getSyncedUpToInAll, logSync} from '../db/PeerSyncTable'
 import {generateAllTableSyncMessages, receiveTableSyncMessage} from './TableSync'
+import {MaxRetriesReached, PeerNotConnected} from '../utils/Error'
 
 const REQUEST_UPDATE_CHANNEL = 'requestUpdate'
 const REQUEST_UPDATE_ALL = ':all:'
@@ -15,6 +16,9 @@ const READY_CHANNEL = 'ready'
 
 export const NO_EVENTS_BEFORE = 1524749468216
 const MIN_PLENTY_VERSION = 180530
+
+const EVENT_ACK_TIMEOUT = 60 * 1000
+const MAX_EVENT_RETRIES = 3
 
 export type Peer = {
   agentId: string,
@@ -73,6 +77,7 @@ function addToOutgoingQueue (peer: Peer, event: Event) {
 
 let _isConsumingOutgoingQueue = false
 async function consumeOutgoingQueue () {
+  console.log('outgoing queue is consuming', _isConsumingOutgoingQueue)
   if (!_isConsumingOutgoingQueue) {
     _isConsumingOutgoingQueue = true
 
@@ -80,7 +85,14 @@ async function consumeOutgoingQueue () {
     let peer = next[0]
     let event = next[1]
     while (event) {
-      await emitEvent(peer, event)
+      console.log('outgoing queue is about to emit event. there are left', outgoingQueue.length)
+      try {
+        await emitEvent(peer, event)
+      } catch (e) {
+        // removing all events for a given peer
+        console.log(`sending event ${event.globalEventId} to agent ${peer.agentId} failed`, e)
+        outgoingQueue = outgoingQueue.filter(q => (q[0].agentId !== peer.agentId))
+      }
       next = outgoingQueue.shift()
       if (next) {
         peer = next[0]
@@ -90,25 +102,41 @@ async function consumeOutgoingQueue () {
       }
     }
 
+    console.log('outgoing queue finished consuming')
     _isConsumingOutgoingQueue = false
   }
 }
 
 function emitEvent (peer: Peer, event: Event): Promise<void> {
-  return new Promise(resolve => {
-    console.log(`EVENT (n) --> ${peer.agentId}`)
-
-    const outgoingEvent = Object.assign({}, event, {plentyVersion: PLENTY_VERSION})
-    peer.socket.emit(EVENT_CHANNEL, outgoingEvent, ack => {
-      console.log(EVENT_CHANNEL + '.ack' + '  ' + event.globalEventId)
-      resolve()
-    })
+  return new Promise((resolve, reject) => {
+    return _emitEvent(peer, event, resolve, reject)
   })
+}
+
+function _emitEvent (peer: Peer, event: Event, resolve, reject, tryCount: number = 0): Promise<void> {
+  console.log(`EVENT (n) [${event.globalEventId}] --> ${peer.agentId} \t (try ${tryCount + 1} / ${MAX_EVENT_RETRIES})`)
+
+  if (tryCount >= MAX_EVENT_RETRIES) reject(new MaxRetriesReached(event.globalEventId))
+  const outgoingEvent = Object.assign({}, event, {plentyVersion: PLENTY_VERSION})
+
+  if (!peer.socket.connected) reject(new PeerNotConnected(peer.agentId))
+  let timeout
+
+  peer.socket.emit(EVENT_CHANNEL, outgoingEvent, ack => {
+    console.log(EVENT_CHANNEL + '.ack' + '  ' + event.globalEventId)
+    timeout && clearTimeout(timeout)
+    resolve()
+  })
+
+  timeout = setTimeout(() => {
+    _emitEvent(peer, event, resolve, reject, tryCount + 1)
+  }, EVENT_ACK_TIMEOUT)
 }
 
 /** watch the database for new events, and send them out to all peers */
 export function registerSendEventsObserver () {
   nSQL(EVENT_TABLE).on('upsert', (queryEvent) => {
+    // console.log(`trying to send events ${queryEvent.affectedRows.map(r => (r.globalEventId))} to peers`, peers.map(p => (p.agentId)))
     peers.forEach(async peer => {
       await peer.hadUpdatePromise // waiting for the first update to happen before sending out the rest
 
@@ -167,8 +195,10 @@ async function handleUpdateRequest (peer: Peer, communityId: string, fromTimesta
   if (getSendTableSync()) {
     console.log('Sending table sync')
     await doTableSync(peer, fromTimestamp)
+    console.log('Table sync completed')
   }
 
+  console.log(`resolving hadUpdatePromise for peer ${peer.agentId}`)
   peer.hadUpdatePromiseResolver()
 }
 
@@ -182,6 +212,7 @@ async function doTableSync (peer: Peer, fromTimestamp: number): Promise<void> {
     tableSyncMsgs.forEach(msg => {
       peer.socket.emit(TABLE_SYNC_CHANNEL, msg, ack => {
         count--
+        console.log(TABLE_SYNC_CHANNEL + '.ack | ' + count + ' left')
         if (count === 0) resolve()
       })
     })
@@ -212,6 +243,7 @@ export function onConnectToPeer (peer: Peer) {
 
   listenForEvents(peer)
   listenForUpdateRequests(peer)
+  if (getCurrentAgentId() !== 'server-default-id') listenForTableSync(peer)
 
   let hasRequestedFlag = false
   const reqUpd = async () => {
@@ -222,11 +254,7 @@ export function onConnectToPeer (peer: Peer) {
     }
   }
 
-  peer.socket.on('reconnect', async () => {
-    const timestamp = await getSyncedUpToInAll(peer.agentId)
-    console.log('Reconnected to', peer.agentId, 'requesting updates upto', timestamp)
-    requestCommunityUpdate(peer.socket, REQUEST_UPDATE_ALL, timestamp) // todo. updateAll is a hack
-  })
+  listenForTeardown(peer)
 
   const myPeerInfo = {agentId: getCurrentAgentId()}
   peer.socket.on(READY_CHANNEL, (peerInfo, ackFn) => {
@@ -240,5 +268,29 @@ export function onConnectToPeer (peer: Peer) {
     console.log(`Peer (at address ${peer.address}) Agent ID is set to ${peerInfo.agentId} (E)`)
     peer.agentId = peerInfo.agentId
     reqUpd()
+  })
+}
+
+function listenForTeardown (peer: Peer) {
+  peer.socket.on('disconnect', () => {
+    console.log(`Websocket for peer ${peer.agentId} has disconnected`)
+
+    peer.socket.off && peer.socket.off()
+    if (peer.socket.removeAllListeners) {
+      peer.socket.removeAllListeners(REQUEST_UPDATE_CHANNEL)
+      peer.socket.removeAllListeners(EVENT_CHANNEL)
+      peer.socket.removeAllListeners(READY_CHANNEL)
+      peer.socket.removeAllListeners(TABLE_SYNC_CHANNEL)
+      peer.socket.removeAllListeners('reconnect')
+      peer.socket.removeAllListeners('disconnect')
+    }
+
+    peers = peers.filter(p => (p.agentId !== peer.agentId))
+    console.log('peers', peers.map(p => (p.agentId)))
+
+    peer.socket.on('reconnect', async () => {
+      console.log('Reconnected to', peer.agentId)
+      onConnectToPeer(peer)
+    })
   })
 }
