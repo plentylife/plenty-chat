@@ -55,7 +55,8 @@ export default class GiveButton extends React.Component<Props> {
       if (amount[amount.length - 1] !== '.') {
         let checkedAmount = convertStringToValidAmount(amount)
         this.setState({
-          transactionAmount: checkedAmount.amount === null ? this.state.transactionAmount : checkedAmount.amount,
+          // transactionAmount: checkedAmount.amount === null ? this.state.transactionAmount : checkedAmount.amount,
+          transactionAmount: checkedAmount.amount === null ? amount : checkedAmount.amount,
           transactionErrorMessage: checkedAmount.error
         })
       } else {
