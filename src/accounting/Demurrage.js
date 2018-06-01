@@ -61,6 +61,7 @@ export function calculateDemurrageForAgent (agentWallet: Wallet): DemurrageByPro
   return {
     balance: _cda(agentWallet, 'balance', balanceRate),
     // communitySharePoints: _cda(agentWallet, 'communitySharePoints', balanceRate), fixme. for not community share points are not replenished, so they should not depreciate
+    communitySharePoints: 0,
     incomingStat: _cda(w, 'incomingStat', STATISTICS_DEMURRAGE_RATE),
     outgoingStat: _cda(w, 'outgoingStat', STATISTICS_DEMURRAGE_RATE),
     creditLimit: creditLimit
