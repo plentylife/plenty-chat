@@ -7,7 +7,7 @@ let _currentCommunityId = null
 let _sendTableSync = false
 let _sendEventSync = false
 
-export const PLENTY_VERSION = 180530
+export const PLENTY_VERSION = 180601
 
 export const DB_ID = PLENTY_VERSION.toString()
 
