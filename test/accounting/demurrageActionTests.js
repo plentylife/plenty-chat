@@ -1,11 +1,13 @@
 import test from 'ava'
 import {_setDemurrageTimestamps, addCommunitySharePoints, getWallet, setBalance} from '../../src/db/AgentWalletTable'
 import {DEFAULT_COMMUNITY_SHARE_POINTS, LENGTH_OF_DAY} from '../../src/accounting/AccountingGlobals'
-import {setupDb} from '../utils'
-import apEq from 'approximately-equal'
+import {setupDb, apEq} from '../utils'
 import {addAgentToCommunity} from '../../src/actions/AgentActions'
 import {applyDemurrageToAll} from '../../src/actions/AccountingActions'
 import {setCurrentAgentId} from '../../src/state/GlobalState'
+import {nSQL} from 'nano-sql'
+import {AGENT_WALLET_TABLE} from '../../src/db/tableNames'
+import {getCommunityBalance} from '../../src/db/CommunityTable'
 
 const AGENT_ID_POOR = 'uid_poor'
 const AGENT_ID_RICH = 'uid_rich'
@@ -75,6 +77,13 @@ let lastTimestamps = {}
 test.serial('doing demurrage on a older agents that do not have community share points', async t => {
   await setBalance(AGENT_ID_POOR, COMMUNITY_ID, 50)
   await setBalance(AGENT_ID_RICH, COMMUNITY_ID, 100)
+
+  await nSQL(AGENT_WALLET_TABLE).query('select')
+    .where([['agentId', '=', AGENT_ID_POOR], 'AND', ['communityId', '=', COMMUNITY_ID]]).exec().then(r => {
+      return nSQL(AGENT_WALLET_TABLE).query('upsert', {id: r[0].id, incomingStat: 1}).exec()
+    })
+  await nSQL(AGENT_WALLET_TABLE).query('upsert', {id: AGENT_ID_RICH + '-' + COMMUNITY_ID, incomingStat: 1}).exec()
+
   await addCommunitySharePoints(AGENT_ID_POOR, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS)
   await addCommunitySharePoints(AGENT_ID_RICH, COMMUNITY_ID, -DEFAULT_COMMUNITY_SHARE_POINTS)
 
@@ -91,12 +100,14 @@ test.serial('doing demurrage on a older agents that do not have community share 
   await applyDemurrageToAll()
 
   await macroCheckWallets(t, [
-    {b: 49, sp: 0}, {b: 98, sp: 0}
+    {b: 45, sp: 0}, {b: 90, sp: 0}
   ])
   wp = await getWallet(AGENT_ID_POOR, COMMUNITY_ID)
   wr = await getWallet(AGENT_ID_RICH, COMMUNITY_ID)
+  const bComm = await getCommunityBalance(COMMUNITY_ID)
 
   const now = new Date().getTime()
+  t.true(apEq(15, bComm))
   t.false(wp.demurrageTimestamps.balance === ts)
   t.false(wr.demurrageTimestamps.balance === ts)
   t.true(apEq(wp.demurrageTimestamps.balance, now, 50))

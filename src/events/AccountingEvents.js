@@ -36,7 +36,13 @@ export async function handleDemurrageEvent (event: Event): Promise<boolean> {
   const p = (event.payload : DemurragePayload)
   return applyDemurrageToWallet(
     p.agentId, event.communityId, p
-  ).then(affR => (affR.length > 0))
+  ).then(async affR => {
+    const success = (affR.length > 0)
+    const communityBalance = await getCommunityBalance(event.communityId)
+    let newCommBalance = Decimal(communityBalance).plus(p.balance)
+    await setCommunityBalance(event.communityId, newCommBalance)
+    return success
+  })
 }
 
 export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
@@ -46,7 +52,7 @@ export async function handleCommunityPotSplit (event: Event): Promise<boolean> {
   console.log(`Splitting Community (${event.communityId}) ${payload.length} ways`, payload)
   let entry = payload.shift()
 
-  const communityBalance = await getCommunityBalance(event.communityId) // fixme move up
+  const communityBalance = await getCommunityBalance(event.communityId)
   let newCommBalance = Decimal(communityBalance)
   while (entry && entry.amount !== 0) {
     const amount = floorWithPrecision(entry.amount)
