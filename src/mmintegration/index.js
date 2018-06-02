@@ -25,7 +25,12 @@ export async function onChannelView (agentId: string, channelId: string, communi
 }
 
 export function provideUserGetterSetter (getter: (string) => Object, setter: (Object) => void, imageGetter) {
-  mmUserGetter = getter
+  mmUserGetter = (id) => {
+    const p = getter(id)
+    console.log(`for agent ${id} got profile`, p)
+    return p
+  }
+  window.mmug = getter
   mmUserSetter = setter
   mmImageGetter = imageGetter
 }
