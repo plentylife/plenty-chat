@@ -16,11 +16,15 @@ export default function FrontPage (props: Props) {
       <div className={'subtitle'}>
         <span className={'top'}>We are all wealthy</span>
       </div>
-      <Button bsStyle="primary" className={'login-action'} onClick={() => {
-        props.history.push('/login' + props.location.search)
-      }}>
-      Login
-      </Button>
+      <div className={'login-action'}>
+        <Button bsStyle="primary" onClick={() => {
+          props.history.push('/login' + props.location.search)
+        }}>
+          Login
+        </Button>
+        <a className={'story-link'} href={'http://about.plenty.life'}>Read our story</a>
+      </div>
+
     </div>
   </div>
 }
